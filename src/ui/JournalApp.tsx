@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   accountIdFor,
   addAccount,
@@ -19,10 +19,12 @@ import { AddTradeSheet, type AddPreset } from './AddTradeSheet'
 import { BackupSheet } from './BackupSheet'
 import { BagDetail } from './BagDetail'
 import { BagList, type ListTab } from './BagList'
+import { DetailLayer } from './DetailLayer'
 import { EditTradeSheet } from './EditTradeSheet'
 import { Header } from './Header'
 import { PlusIcon } from './icons'
 import { coinMap, findBagSummary, geckoIdsFor, liveAccounts, openPositions, openTotals, priceFor } from './portfolioView'
+import { useBagRoute } from './route'
 import { SummaryCard } from './SummaryCard'
 import { accountTabId } from './tabKeys'
 import { Toast, type ToastMessage } from './Toast'
@@ -55,24 +57,24 @@ export function JournalApp() {
   const totals = useMemo(() => openTotals(positions), [positions])
 
   const [listTab, setListTab] = useState<ListTab>('open')
-  const [bagId, setBagId] = useState<string | null>(null)
   const [sheet, setSheet] = useState<SheetState>(null)
+  // Going back or forward in history also dismisses whatever sheet is open.
+  const { bagId, openBag, closeBag } = useBagRoute(() => setSheet(null))
   const [toast, setToast] = useState<ToastMessage | null>(null)
   const notify = (text: string) => setToast({ id: Date.now(), text })
 
   const detail = useMemo(() => (bagId ? findBagSummary(journal, bagId) : null), [journal, bagId])
-
-  // The main list stays mounted but hidden under the detail; bring back its scroll position.
-  const mainScroll = useRef(0)
   const showingDetail = detail !== null
-  useLayoutEffect(() => {
-    window.scrollTo(0, showingDetail ? 0 : mainScroll.current)
-  }, [showingDetail])
 
-  const openBag = (id: string) => {
-    mainScroll.current = window.scrollY
-    setBagId(id)
-  }
+  // The list stays in place under the bag screen; only the bag screen scrolls meanwhile.
+  useEffect(() => {
+    if (!showingDetail) return
+    const html = document.documentElement.style
+    html.overflow = 'hidden'
+    return () => {
+      html.overflow = ''
+    }
+  }, [showingDetail])
 
   const saveTrade = (input: NewTradeInput) => {
     apply((j, now) => addTrade(j, input, now).journal)
@@ -90,7 +92,7 @@ export function JournalApp() {
   const removeTrade = (tradeId: string) => {
     const next = apply((j, now) => deleteTrade(j, tradeId, now))
     setSheet(null)
-    if (bagId && !findBagSummary(next, bagId)) setBagId(null)
+    if (bagId && !findBagSummary(next, bagId)) closeBag()
     notify('Trade deleted')
   }
 
@@ -105,7 +107,7 @@ export function JournalApp() {
 
   return (
     <>
-      <div className="app" hidden={showingDetail}>
+      <div className="app" inert={showingDetail}>
         <Header
           accounts={accounts}
           activeId={accountId}
@@ -145,13 +147,13 @@ export function JournalApp() {
       </div>
 
       {detail && (
-        <div className="app">
+        <DetailLayer key={detail.bag.id} onBack={closeBag}>
           <BagDetail
             summary={detail}
             coin={coins.get(detail.bag.symbol)}
             price={priceFor(coins.get(detail.bag.symbol), prices.snapshot.prices)}
             backLabel={accounts.find((a) => a.id === detail.bag.accountId)?.name ?? 'Back'}
-            onBack={() => setBagId(null)}
+            onBack={closeBag}
             onEditTrade={(tradeId) => setSheet({ kind: 'edit', tradeId })}
             onTrade={(side) =>
               setSheet({
@@ -161,7 +163,7 @@ export function JournalApp() {
             }
             onRename={(name) => apply((j, now) => renameBag(j, detail.bag.id, name, now))}
           />
-        </div>
+        </DetailLayer>
       )}
 
       {sheet?.kind === 'add' && (

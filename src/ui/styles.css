@@ -485,6 +485,18 @@ button:disabled {
 
 /* Bag detail */
 
+/* Covers the list rather than replacing it, so an edge swipe can reveal the list underneath. */
+.detail-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--bg);
+  /* Off-screen while at rest; shows along the left edge while the screen is dragged away. */
+  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.28);
+}
+
 .topbar {
   display: flex;
   align-items: center;
