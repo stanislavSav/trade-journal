@@ -1,6 +1,6 @@
 # List sorting — plan
 
-> **Status:** Planned · **Owner:** @stanislavSav · **Decided:** 2026-10-12
+> **Status:** In progress · **Owner:** @stanislavSav · **Decided:** 2026-10-12
 > **Vocabulary:** [docs/CONTEXT.md](../CONTEXT.md) (Invested, Latest action, Device preference) · **Decisions:**
 > [docs/README.md](../README.md) G4, G5 · **Depends on:** feature 2 ([docs/i18n/plan.md](../i18n/plan.md): `useT()`)
 > · **Next:** feature 5 ([docs/storage-tags/plan.md](../storage-tags/plan.md)) filters before this sort ·

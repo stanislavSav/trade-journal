@@ -188,3 +188,38 @@ export function defaultBagName(date: string | null, months: readonly string[] = 
 export function newId(): string {
   return crypto.randomUUID()
 }
+
+/** Live bags of the account, and live trades whose bag (live or deleted) belongs to the account. */
+export function countAccountData(journal: Journal, accountId: string): { bags: number; trades: number } {
+  const bagIds = accountBagIds(journal, accountId)
+  return {
+    bags: journal.bags.filter((b) => b.accountId === accountId && !b.deleted).length,
+    trades: journal.trades.filter((t) => bagIds.has(t.bagId) && !t.deleted).length,
+  }
+}
+
+/**
+ * Tombstone a live account, every live bag of it, and every live trade whose bag belongs to it (live or deleted bag).
+ * Records that are already deleted are not touched. Coins are not touched. Throws "Account not found".
+ * Spec: docs/account-removal/plan.md §6.1.
+ */
+export function removeAccount(journal: Journal, accountId: string, now: number): Journal {
+  const account = journal.accounts.find((a) => a.id === accountId && !a.deleted)
+  if (!account) throw new Error('Account not found')
+  const bagIds = accountBagIds(journal, accountId)
+  return {
+    ...journal,
+    accounts: putById(journal.accounts, { ...account, deleted: true, updatedAt: now }),
+    bags: journal.bags.map((b) =>
+      b.accountId === accountId && !b.deleted ? { ...b, deleted: true, updatedAt: now } : b,
+    ),
+    trades: journal.trades.map((t) =>
+      bagIds.has(t.bagId) && !t.deleted ? { ...t, deleted: true, updatedAt: now } : t,
+    ),
+  }
+}
+
+/** Ids of every bag of the account, live or deleted. */
+function accountBagIds(journal: Journal, accountId: string): Set<string> {
+  return new Set(journal.bags.filter((b) => b.accountId === accountId).map((b) => b.id))
+}

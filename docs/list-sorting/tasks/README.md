@@ -12,7 +12,7 @@ truth.** Update both in the same change.
 
 | #   | Task                                                                   | Depends on    | Status      | Progress |
 | --- | ---------------------------------------------------------------------- | ------------- | ----------- | -------- |
-| 01  | [`sortBags` and the sort helpers](01-sort-bags-function.md)            | —             | Not started | 0%       |
+| 01  | [`sortBags` and the sort helpers](01-sort-bags-function.md)            | —             | Done        | 100%     |
 | 02  | [Sort button, sort sheet and the saved choice](02-sort-control-ui.md)  | 01, feature 2 | Not started | 0%       |
 
 ## How to pick up a task (also for a new agent session)

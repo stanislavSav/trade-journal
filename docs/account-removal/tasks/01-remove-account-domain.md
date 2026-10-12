@@ -65,11 +65,11 @@ a second one tells the UI how much will be deleted. Both are covered by tests, i
 
 ## Acceptance criteria
 
-- [ ] `removeAccount` and `countAccountData` are exported from `src/domain` (through `src/domain/index.ts`).
-- [ ] All tests of step 4 exist and pass.
-- [ ] `removeAccount` changes no record that was already deleted and never touches `coins`.
-- [ ] One call gives every tombstone the same `updatedAt` (`now`).
-- [ ] `npm test`, `npm run typecheck`, `npm run build` pass.
+- [x] `removeAccount` and `countAccountData` are exported from `src/domain` (through `src/domain/index.ts`).
+- [x] All tests of step 4 exist and pass.
+- [x] `removeAccount` changes no record that was already deleted and never touches `coins`.
+- [x] One call gives every tombstone the same `updatedAt` (`now`).
+- [x] `npm test`, `npm run typecheck`, `npm run build` pass.
 
 ## Verification
 
@@ -84,8 +84,19 @@ No manual check: there is no UI yet.
 
 _(Append a dated entry before you stop, even mid-task: what is done, what is next, surprises.)_
 
+- **2026-10-12** — Done. `countAccountData` and `removeAccount` are appended at the end of `src/domain/actions.ts`
+  (with a private helper `accountBagIds`), so they are exported through `src/domain/index.ts`. The 12 tests of step 4
+  are in a new file `src/domain/removeAccount.test.ts` (13 `it`s: test 8 is split into "counts" and "unknown account
+  gives zeros"), so `actions.test.ts` stays as it is. The sample journal is built by hand (fixed ids, one orphan trade,
+  one already-deleted bag and trade) so every case is deterministic.
+  - **Error message:** `removeAccount` throws `new Error('Account not found')`, as this task says. This branch was built
+    before feature 2 (i18n) moved domain errors to error codes. **Convert to AppError code when merging with i18n**
+    (use the same code as `addTrade`'s "Account not found"), and update the `toThrow` checks in
+    `removeAccount.test.ts`.
+  - No surprises. Next: task 02 (needs feature 2 shipped: Settings sheet, `useT()`).
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
 | ----------- | ---------- | ---------- | ------------ |
-| Not started | 0%         | 0h         | 0            |
+| Done        | 100%       | 0.5h       | —            |

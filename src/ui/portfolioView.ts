@@ -52,21 +52,15 @@ export function priceFor(coin: Coin | undefined, prices: Record<string, number>)
   return coin?.geckoId ? prices[coin.geckoId] : undefined
 }
 
-/** Priced bags by value (largest first), then unpriced ones by cost. */
+/** One row per open bag with its coin and live value, in input order. `sortBags` (src/ui/bagSort.ts) orders them. */
 export function openPositions(
   open: BagSummary[],
   coins: Map<string, Coin>,
   prices: Record<string, number>,
 ): OpenPosition[] {
-  const rows = open.map((summary) => {
+  return open.map((summary) => {
     const coin = coins.get(summary.bag.symbol)
     return { summary, coin, pos: valuePosition(summary, priceFor(coin, prices)) }
-  })
-  return rows.sort((a, b) => {
-    if (a.pos.value !== null && b.pos.value !== null) return b.pos.value - a.pos.value
-    if (a.pos.value !== null) return -1
-    if (b.pos.value !== null) return 1
-    return b.summary.cost - a.summary.cost
   })
 }
 

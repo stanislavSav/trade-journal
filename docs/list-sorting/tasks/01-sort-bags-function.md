@@ -80,12 +80,12 @@ and the list keeps today's look until task 02 adds the control.
 
 ## Acceptance criteria
 
-- [ ] `src/ui/bagSort.ts` exports the API of plan §6.1 with JSDoc in plain English.
-- [ ] All tests of step 4 pass.
-- [ ] `openPositions` no longer sorts; `sortBags` is the only place that orders list rows.
-- [ ] The Open list shows Value ↓ order (the same as before this task) and the Closed list shows Latest action ↓ order
+- [x] `src/ui/bagSort.ts` exports the API of plan §6.1 with JSDoc in plain English.
+- [x] All tests of step 4 pass.
+- [x] `openPositions` no longer sorts; `sortBags` is the only place that orders list rows.
+- [x] The Open list shows Value ↓ order (the same as before this task) and the Closed list shows Latest action ↓ order
       (the defaults).
-- [ ] `npm test`, `npm run typecheck`, `npm run build` pass.
+- [x] `npm test`, `npm run typecheck`, `npm run build` pass.
 
 ## Verification
 
@@ -105,8 +105,25 @@ Manual (dev, `?demo`, account "Demo", data from `src/state/demo.ts`):
 
 _(Append a dated entry before you stop, even mid-task: what is done, what is next, surprises.)_
 
+- **2026-10-12** — Done. Owner decision applied: five keys on Open (Value, Gain %, Invested, Latest action, Name;
+  default Value ↓), four on Closed (no Value; default Latest action ↓).
+  - `src/ui/bagSort.ts` (new) has the API of plan §6.1. `src/ui/bagSort.test.ts` (new) covers the 15 tests of step 4
+    in 22 `it`s. Test 11 keeps a copy of the old `openPositions` comparator as the reference order.
+  - `openPositions` (`src/ui/portfolioView.ts`) no longer sorts; its doc comment says so.
+  - **UI change, kept small on purpose** (other branches change UI strings at the same time): `JournalApp.tsx` builds
+    `openRows` and `closedRows` with `sortBags(…, DEFAULT_SORT.…)` in `useMemo` and passes them to `BagList`.
+    **Deviation from step 3:** `BagList.tsx` is not changed. `closedRows` is mapped back to `BagSummary[]`, so
+    `BagList` keeps its `closed: BagSummary[]` prop and `ClosedRow` gets the summary as before. Task 02 changes
+    `BagList` anyway (sort button, new props); it can switch the `closed` prop to `{ summary }[]` rows then, or keep
+    it as it is.
+  - The app looks the same: Open is in Value ↓ order (only ties may differ: now by name, before by input order);
+    Closed is in Latest action ↓ order (only ties may differ: now by name, before by bag id).
+  - Manual check with `?demo` was not done in this session (no browser). Tests 10 and 11 check the same orders on
+    sample data. Do the manual check together with task 02.
+  - Next: task 02 (needs feature 2 shipped for `useT()`).
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
 | ----------- | ---------- | ---------- | ------------ |
-| Not started | 0%         | 0h         | 0            |
+| Done        | 100%       | 0.5h       | —            |

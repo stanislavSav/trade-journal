@@ -1,6 +1,6 @@
 # Remove an account — plan
 
-> **Status:** Planned · **Owner:** @stanislavSav · **Decided:** 2026-10-12
+> **Status:** In progress · **Owner:** @stanislavSav · **Decided:** 2026-10-12
 > **Vocabulary:** [docs/CONTEXT.md](../CONTEXT.md) · **Decisions:** [docs/README.md](../README.md) G4, G5, G6 ·
 > **Depends on:** feature 2 ([docs/i18n/plan.md](../i18n/plan.md): Settings sheet, `useT()`) ·
 > **Tasks:** [tasks/](tasks/README.md) · **Parking lot:** [parking-lot/](parking-lot/README.md)
