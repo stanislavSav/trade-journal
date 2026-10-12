@@ -54,7 +54,7 @@ because later features add UI text in two languages (needs i18n) and the demo da
 | #   | Feature                                            | What the user gets                                                     | Status  |
 | --- | -------------------------------------------------- | ---------------------------------------------------------------------- | ------- |
 | 1   | [Open source](open-source/plan.md)                 | MIT licence, a README for strangers, work email removed from history   | Shipped |
-| 2   | [Ukrainian / English](i18n/plan.md)                | The whole app in Ukrainian or English; new Settings sheet with the switch | Planned |
+| 2   | [Ukrainian / English](i18n/plan.md)                | The whole app in Ukrainian or English; new Settings sheet with the switch | Shipped |
 | 3   | [Remove an account](account-removal/plan.md)       | Accounts section in Settings; remove an account with its bags and trades | Planned |
 | 4   | [List sorting](list-sorting/plan.md)               | Sort open bags by value, gain %, invested, latest action or name; closed bags by the last four | Planned |
 | 5   | [Storage tags](storage-tags/plan.md)               | Tag where each bag is kept (Binance, Ledger, …), icons, filter chips   | Planned |
