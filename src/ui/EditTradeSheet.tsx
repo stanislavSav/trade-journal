@@ -1,6 +1,15 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { formatPrice, formatQty, formatUsd, todayIso, type Side, type Trade, type TradePatch } from '../domain'
-import { DateInput, DecimalInput, Field, SideToggle } from './fields'
+import {
+  asError,
+  formatPrice,
+  formatQty,
+  formatUsd,
+  todayIso,
+  type Side,
+  type Trade,
+  type TradePatch,
+} from '../domain'
+import { DateInput, DecimalInput, Field, FormError, SideToggle } from './fields'
 import { useT } from '../i18n'
 import { amountErrorText, dateErrorText, readAmount, readAsText } from './formValues'
 import { NoteField } from './NoteField'
@@ -10,7 +19,7 @@ import { Sheet } from './Sheet'
 interface Props {
   trade: Trade
   symbol: string
-  /** Both may throw; the message is shown in the form. */
+  /** Both may throw; the error is shown in the form. */
   onSave: (patch: TradePatch) => void
   onDelete: () => void
   onClose: () => void
@@ -24,7 +33,7 @@ export function EditTradeSheet({ trade, symbol, onSave, onDelete, onClose }: Pro
   const [totalText, setTotalText] = useState(() => toMoneyInputText(trade.total))
   const [note, setNote] = useState(trade.note ?? '')
   const [confirming, setConfirming] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<Error | null>(null)
 
   // The delete confirmation expires so a stray second tap later does not delete.
   useEffect(() => {
@@ -47,7 +56,7 @@ export function EditTradeSheet({ trade, symbol, onSave, onDelete, onClose }: Pro
     try {
       action()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
+      setError(asError(err))
     }
   }
 
@@ -65,25 +74,25 @@ export function EditTradeSheet({ trade, symbol, onSave, onDelete, onClose }: Pro
   }
 
   return (
-    <Sheet title={`Edit ${symbol} trade`} onClose={onClose}>
+    <Sheet title={t.trade.editTitle({ symbol })} onClose={onClose}>
       <form className="trade-form" onSubmit={submit} noValidate>
         <SideToggle value={side} onChange={setSide} />
         <div className="card form-card">
-          <Field id="edit-date" label="Date" error={dError} hint={date === '' ? 'Unknown date, shown as ?' : null}>
+          <Field id="edit-date" label={t.trade.date} error={dError} hint={date === '' ? t.trade.unknownDate : null}>
             <div className="input-with-btn">
               <DateInput id="edit-date" value={date} onChange={setDate} />
               {date !== '' ? (
                 <button type="button" className="chip-btn" onClick={() => setDate('')}>
-                  Unknown
+                  {t.trade.unknown}
                 </button>
               ) : (
                 <button type="button" className="chip-btn" onClick={() => setDate(todayIso())}>
-                  Today
+                  {t.trade.today}
                 </button>
               )}
             </div>
           </Field>
-          <Field id="edit-qty" label="Qty" error={qtyError} hint={qtyHint}>
+          <Field id="edit-qty" label={t.trade.qty} error={qtyError} hint={qtyHint}>
             <DecimalInput
               id="edit-qty"
               value={qtyText}
@@ -92,7 +101,7 @@ export function EditTradeSheet({ trade, symbol, onSave, onDelete, onClose }: Pro
               hasMsg={!!qtyError || !!qtyHint}
             />
           </Field>
-          <Field id="edit-total" label="Total $" error={totalError} hint={totalHint}>
+          <Field id="edit-total" label={t.trade.total} error={totalError} hint={totalHint}>
             <DecimalInput
               id="edit-total"
               value={totalText}
@@ -102,29 +111,25 @@ export function EditTradeSheet({ trade, symbol, onSave, onDelete, onClose }: Pro
             />
           </Field>
           <div className="field readonly">
-            <span className="field-label">Price</span>
+            <span className="field-label">{t.trade.price}</span>
             <output className="num" htmlFor="edit-qty edit-total">
-              {formatPrice(price)} <span className="muted">(auto)</span>
+              {formatPrice(price)} <span className="muted">{t.trade.auto}</span>
             </output>
           </div>
         </div>
 
         <NoteField id="edit-note" value={note} onChange={setNote} />
 
-        {error && (
-          <p className="form-error" role="alert">
-            {error}
-          </p>
-        )}
+        {error && <FormError error={error} />}
         <button type="submit" className="btn primary block" disabled={!valid}>
-          Save changes
+          {t.trade.saveChanges}
         </button>
         <button
           type="button"
           className={`btn block danger${confirming ? ' confirming' : ''}`}
           onClick={() => (confirming ? run(onDelete) : setConfirming(true))}
         >
-          {confirming ? 'Tap again to delete' : 'Delete trade'}
+          {confirming ? t.trade.tapAgainToDelete : t.trade.deleteTrade}
         </button>
       </form>
     </Sheet>

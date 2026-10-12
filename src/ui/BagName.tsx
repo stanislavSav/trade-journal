@@ -1,9 +1,13 @@
 import { useState, type FormEvent } from 'react'
+import { asError } from '../domain'
+import { useT } from '../i18n'
+import { FormError } from './fields'
 
-/** Bag name with inline rename. `onRename` may throw; its message is shown next to the input. */
+/** Bag name with inline rename. `onRename` may throw; the error is shown next to the input. */
 export function BagName({ name, onRename }: { name: string; onRename: (name: string) => void }) {
+  const t = useT()
   const [draft, setDraft] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<Error | null>(null)
 
   const stop = () => {
     setDraft(null)
@@ -15,7 +19,7 @@ export function BagName({ name, onRename }: { name: string; onRename: (name: str
       <div className="bag-name-row">
         <span className="bag-name">{name}</span>
         <button type="button" className="text-btn" onClick={() => setDraft(name)}>
-          Rename
+          {t.bag.rename}
         </button>
       </div>
     )
@@ -28,14 +32,14 @@ export function BagName({ name, onRename }: { name: string; onRename: (name: str
       if (next && next !== name) onRename(next)
       stop()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not rename')
+      setError(asError(err))
     }
   }
 
   return (
     <form className="bag-name-row rename" onSubmit={submit}>
       <label htmlFor="bag-rename" className="sr-only">
-        Bag name
+        {t.bag.nameLabel}
       </label>
       <input
         id="bag-rename"
@@ -53,16 +57,12 @@ export function BagName({ name, onRename }: { name: string; onRename: (name: str
         }}
       />
       <button type="submit" className="btn small" disabled={draft.trim() === ''}>
-        Save
+        {t.common.save}
       </button>
       <button type="button" className="text-btn" onClick={stop}>
-        Cancel
+        {t.common.cancel}
       </button>
-      {error && (
-        <p id="bag-rename-msg" className="form-error rename-error" role="alert">
-          {error}
-        </p>
-      )}
+      {error && <FormError id="bag-rename-msg" className="rename-error" error={error} />}
     </form>
   )
 }

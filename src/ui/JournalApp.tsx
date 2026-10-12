@@ -11,6 +11,7 @@ import {
   type NewTradeInput,
   type TradePatch,
 } from '../domain'
+import { errorText, useT } from '../i18n'
 import { usePrices } from '../prices/usePrices'
 import { useJournal } from '../state/useJournal'
 import { useStoredString } from '../state/useStoredString'
@@ -39,6 +40,7 @@ type SheetState =
   | null
 
 export function JournalApp() {
+  const t = useT()
   const api = useJournal()
   const { journal, apply } = api
 
@@ -82,20 +84,21 @@ export function JournalApp() {
     apply((j, now) => addTrade(j, input, now).journal)
     setSheet(null)
     rememberAccount(input.accountId)
-    notify(`${input.side === 'buy' ? 'Bought' : 'Sold'} ${formatQty(input.qty)} ${input.symbol.toUpperCase()}`)
+    const done = { qty: formatQty(input.qty), symbol: input.symbol.toUpperCase() }
+    notify(input.side === 'buy' ? t.trade.bought(done) : t.trade.sold(done))
   }
 
   const saveEdit = (tradeId: string, patch: TradePatch) => {
     apply((j, now) => updateTrade(j, tradeId, patch, now))
     setSheet(null)
-    notify('Trade updated')
+    notify(t.trade.updated)
   }
 
   const removeTrade = (tradeId: string) => {
     const next = apply((j, now) => deleteTrade(j, tradeId, now))
     setSheet(null)
     if (bagId && !findBagSummary(next, bagId)) closeBag()
-    notify('Trade deleted')
+    notify(t.trade.deleted)
   }
 
   const createAccount = (name: string) => {
@@ -121,7 +124,7 @@ export function JournalApp() {
         />
         {api.saveError && (
           <p className="banner" role="alert">
-            {api.saveError}. Save a backup now.
+            {t.backup.saveFailed({ error: errorText(t, api.saveError).text })}
           </p>
         )}
         {summary && accountId ? (
@@ -131,9 +134,9 @@ export function JournalApp() {
           </main>
         ) : (
           <main className="empty-state">
-            <p>No accounts yet.</p>
+            <p>{t.account.none}</p>
             <button type="button" className="btn primary" onClick={() => setSheet({ kind: 'account' })}>
-              Add account
+              {t.account.add}
             </button>
           </main>
         )}
@@ -141,7 +144,7 @@ export function JournalApp() {
           <button
             type="button"
             className="fab"
-            aria-label="Add trade"
+            aria-label={t.trade.addTitle}
             onClick={() => setSheet({ kind: 'add', preset: { accountId } })}
           >
             <PlusIcon size={28} />
@@ -155,7 +158,7 @@ export function JournalApp() {
             summary={detail}
             coin={coins.get(detail.bag.symbol)}
             price={priceFor(coins.get(detail.bag.symbol), prices.snapshot.prices)}
-            backLabel={accounts.find((a) => a.id === detail.bag.accountId)?.name ?? 'Back'}
+            backLabel={accounts.find((a) => a.id === detail.bag.accountId)?.name ?? t.common.back}
             onBack={closeBag}
             onEditTrade={(tradeId) => setSheet({ kind: 'edit', tradeId })}
             onTrade={(side) =>
@@ -196,7 +199,7 @@ export function JournalApp() {
           onMerge={api.mergeBackup}
           onMerged={({ added, updated }) => {
             setSheet(null)
-            notify(`Merged: ${added} new, ${updated} updated`)
+            notify(t.backup.merged({ added, updated }))
           }}
           onClose={() => setSheet(null)}
         />

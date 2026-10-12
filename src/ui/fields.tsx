@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { todayIso, type Side } from '../domain'
+import { errorText, useT } from '../i18n'
 import { msgId } from './formValues'
 
 /** One labelled row in a grouped form card, with an optional message line under it. */
@@ -64,9 +65,22 @@ export function DecimalInput({ id, value, onChange, invalid, hasMsg, placeholder
   )
 }
 
-export function SideToggle({ value, onChange }: { value: Side; onChange: (side: Side) => void }) {
+/** A caught error in the UI language; an English technical detail, if any, in smaller text under it. */
+export function FormError({ error, id, className }: { error: unknown; id?: string; className?: string }) {
+  const t = useT()
+  const { text, detail } = errorText(t, error)
   return (
-    <div className="side-toggle" role="radiogroup" aria-label="Side">
+    <p id={id} className={className ? `form-error ${className}` : 'form-error'} role="alert">
+      {text}
+      {detail && <span className="error-detail">{detail}</span>}
+    </p>
+  )
+}
+
+export function SideToggle({ value, onChange }: { value: Side; onChange: (side: Side) => void }) {
+  const t = useT()
+  return (
+    <div className="side-toggle" role="radiogroup" aria-label={t.trade.side}>
       {(['buy', 'sell'] as const).map((s) => (
         <button
           key={s}
@@ -76,7 +90,7 @@ export function SideToggle({ value, onChange }: { value: Side; onChange: (side: 
           className={`side-btn ${s}`}
           onClick={() => onChange(s)}
         >
-          {s === 'buy' ? 'BUY' : 'SELL'}
+          {s === 'buy' ? t.trade.buy : t.trade.sell}
         </button>
       ))}
     </div>

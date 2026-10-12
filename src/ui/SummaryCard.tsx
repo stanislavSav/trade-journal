@@ -28,36 +28,36 @@ export function SummaryCard({ totals, realized, prices }: Props) {
   const plTone = tone(totals.pl)
 
   return (
-    <section className="card summary" aria-label="Portfolio summary">
+    <section className="card summary" aria-label={t.summary.label}>
       <div className="summary-row summary-main">
-        <span className="summary-label">Value</span>
+        <span className="summary-label">{t.summary.value}</span>
         <span className="summary-value num">{formatUsd(value)}</span>
       </div>
       {totals.unpriced > 0 && (
-        <div className="summary-note">
-          {totals.unpriced} of {totals.count} without price
-        </div>
+        <div className="summary-note">{t.summary.withoutPrice({ unpriced: totals.unpriced, count: totals.count })}</div>
       )}
       <div className="summary-row">
-        <span className="summary-label">Open P/L</span>
+        <span className="summary-label">{t.summary.openPl}</span>
         <span className={`num ${plTone}`}>
           {formatUsd(totals.pl, { signed: true })}
           <span className="summary-pct">{formatPct(totals.plPct)}</span>
         </span>
       </div>
       <div className="summary-row">
-        <span className="summary-label">Realized</span>
+        <span className="summary-label">{t.summary.realized}</span>
         <span className={`num ${tone(realized)}`}>{formatUsd(realized, { signed: true })}</span>
       </div>
       <div className="price-line">
-        <span className="num">{snapshot.fetchedAt ? `prices ${formatStamp(snapshot.fetchedAt)}` : 'no prices yet'}</span>
+        <span className="num">
+          {snapshot.fetchedAt ? t.summary.pricesAt({ time: formatStamp(snapshot.fetchedAt) }) : t.prices.noPricesYet}
+        </span>
         <span aria-hidden="true">·</span>
         <button
           type="button"
           className={`refresh-btn${refreshing ? ' spinning' : ''}`}
           onClick={refresh}
           disabled={refreshing}
-          aria-label={refreshing ? 'Refreshing prices' : 'Refresh prices'}
+          aria-label={refreshing ? t.summary.refreshing : t.summary.refresh}
         >
           <RefreshIcon />
         </button>

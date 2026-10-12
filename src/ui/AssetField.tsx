@@ -52,14 +52,14 @@ export function AssetField({ id, value, onChange, coins }: Props) {
   const showList = suggesting && query !== '' && (local.length > 0 || remoteWanted)
 
   let hint: string
-  if (pick) hint = pick.geckoId ? pick.name : `${pick.name} · no live price`
-  else if (known) hint = known.geckoId ? known.name : `${known.name} · no live price`
-  else if (symbol) hint = remote.results.length > 0 ? 'New coin · pick it from the list for a live price' : 'New coin · no live price'
-  else hint = 'Type a symbol or name'
+  if (pick) hint = pick.geckoId ? pick.name : t.search.coinNoLivePrice({ name: pick.name })
+  else if (known) hint = known.geckoId ? known.name : t.search.coinNoLivePrice({ name: known.name })
+  else if (symbol) hint = remote.results.length > 0 ? t.search.newCoinPick : t.search.newCoinNoPrice
+  else hint = t.search.typeHint
 
   return (
     <>
-      <Field id={id} label="Asset" hint={hint}>
+      <Field id={id} label={t.trade.asset} hint={hint}>
         <input
           id={id}
           className="input"
@@ -87,7 +87,7 @@ export function AssetField({ id, value, onChange, coins }: Props) {
         />
       </Field>
       {showList && (
-        <div className="suggest" aria-label="Suggestions" role="group">
+        <div className="suggest" aria-label={t.search.suggestions} role="group">
           {local.map((c) => (
             <button
               key={c.id}
@@ -98,7 +98,7 @@ export function AssetField({ id, value, onChange, coins }: Props) {
               <span className="suggest-thumb placeholder" aria-hidden="true" />
               <span className="suggest-name">{c.name}</span>
               <span className="suggest-symbol">{c.symbol}</span>
-              <span className="suggest-rank">in journal</span>
+              <span className="suggest-rank">{t.search.inJournal}</span>
             </button>
           ))}
           {remoteWanted &&
@@ -119,12 +119,12 @@ export function AssetField({ id, value, onChange, coins }: Props) {
                 <span className="suggest-rank num">{r.rank ? `#${r.rank}` : ''}</span>
               </button>
             ))}
-          {remoteWanted && remote.loading && <div className="suggest-status">Searching…</div>}
+          {remoteWanted && remote.loading && <div className="suggest-status">{t.search.searching}</div>}
           {remoteWanted && !remote.loading && remote.error && (
-            <div className="suggest-status">Search unavailable ({errorText(t, remote.error).text}). You can still save.</div>
+            <div className="suggest-status">{t.search.unavailable({ reason: errorText(t, remote.error).text })}</div>
           )}
           {remoteWanted && !remote.loading && !remote.error && remote.results.length === 0 && local.length === 0 && (
-            <div className="suggest-status">No coins found</div>
+            <div className="suggest-status">{t.search.noCoins}</div>
           )}
         </div>
       )}

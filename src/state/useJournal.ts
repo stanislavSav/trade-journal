@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { mergeJournals, type Journal } from '../domain'
+import { asError, mergeJournals, type Journal } from '../domain'
 import {
   exportBackup,
   getBackupState,
@@ -22,8 +22,8 @@ export interface JournalApi {
   apply: (fn: (j: Journal, now: number) => Journal) => Journal
   backup: BackupState
   unsaved: boolean
-  /** Set when the last save to this device failed (e.g. storage full). */
-  saveError: string | null
+  /** Set when the last save to this device failed (e.g. storage full); the UI writes the text (errorText). */
+  saveError: Error | null
   exportNow: () => Promise<'shared' | 'downloaded' | 'cancelled'>
   mergeBackup: (file: File) => Promise<MergeCounts>
 }
@@ -37,7 +37,7 @@ function readBackupState(): BackupState {
 export function useJournal(): JournalApi {
   const [journal, setJournal] = useState<Journal>(() => (isDemo ? demoJournal() : loadJournal()))
   const [backup, setBackup] = useState<BackupState>(readBackupState)
-  const [saveError, setSaveError] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<Error | null>(null)
   // The ref always holds the newest journal, so several apply() calls in one tick chain correctly.
   const current = useRef(journal)
 
@@ -49,7 +49,7 @@ export function useJournal(): JournalApi {
       saveJournal(next)
       setSaveError(null)
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : 'Could not save on this device')
+      setSaveError(asError(err))
     }
     setBackup(getBackupState())
     return next

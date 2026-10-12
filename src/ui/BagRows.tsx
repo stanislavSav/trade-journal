@@ -1,14 +1,16 @@
 import { formatBagDates, formatPct, formatPrice, formatQty, formatUsd, type BagSummary } from '../domain'
+import { useT } from '../i18n'
 import { tone } from './numbers'
 import type { OpenPosition } from './portfolioView'
 
 function Title({ summary }: { summary: BagSummary }) {
+  const t = useT()
   return (
     <span className="row-title">
       {summary.bag.symbol}
       {summary.warnings.length > 0 && (
-        <span className="warn-dot" title="Has warnings">
-          <span className="sr-only">, has warnings</span>
+        <span className="warn-dot" title={t.list.hasWarnings}>
+          <span className="sr-only">{t.list.hasWarningsSr}</span>
         </span>
       )}
     </span>
@@ -16,6 +18,7 @@ function Title({ summary }: { summary: BagSummary }) {
 }
 
 export function OpenRow({ position, onOpen }: { position: OpenPosition; onOpen: (bagId: string) => void }) {
+  const t = useT()
   const { summary: s, pos } = position
   return (
     <button type="button" className="row" onClick={() => onOpen(s.bag.id)}>
@@ -23,7 +26,7 @@ export function OpenRow({ position, onOpen }: { position: OpenPosition; onOpen: 
         <Title summary={s} />
         <span className="row-sub">{s.bag.name}</span>
         <span className="row-meta num">
-          {formatQty(s.qty)} · avg {formatPrice(s.avg)}
+          {t.list.qtyAvg({ qty: formatQty(s.qty), avg: formatPrice(s.avg) })}
         </span>
       </span>
       {pos.value !== null ? (
@@ -34,7 +37,7 @@ export function OpenRow({ position, onOpen }: { position: OpenPosition; onOpen: 
       ) : (
         <span className="row-side">
           <span className="row-value num muted">{formatUsd(s.cost)}</span>
-          <span className="row-sub">cost · no price</span>
+          <span className="row-sub">{t.list.costNoPrice}</span>
         </span>
       )}
     </button>

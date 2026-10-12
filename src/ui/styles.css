@@ -988,6 +988,15 @@ textarea.input {
   font-size: 15px;
 }
 
+/* English technical detail under a translated error (docs/i18n/plan.md D13). */
+.error-detail {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
 .form-hint {
   margin: -6px 0 0;
   color: var(--muted);

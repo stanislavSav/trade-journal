@@ -1,6 +1,9 @@
 import { useRef, useState, type ChangeEvent } from 'react'
+import { asError } from '../domain'
+import { useT } from '../i18n'
 import type { MergeCounts } from '../state/mergeCounts'
 import type { BackupState } from '../storage'
+import { FormError } from './fields'
 import { Sheet } from './Sheet'
 import { formatStamp } from './time'
 
@@ -13,14 +16,13 @@ interface Props {
   onClose: () => void
 }
 
-const message = (err: unknown) => (err instanceof Error ? err.message : String(err))
-
 export function BackupSheet({ backup, unsaved, onExport, onMerge, onMerged, onClose }: Props) {
+  const t = useT()
   const fileInput = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState<'save' | 'load' | null>(null)
-  const [status, setStatus] = useState<string | null>(null)
-  const [saveError, setSaveError] = useState<string | null>(null)
-  const [loadError, setLoadError] = useState<string | null>(null)
+  const [status, setStatus] = useState<'saved' | 'downloaded' | null>(null)
+  const [saveError, setSaveError] = useState<Error | null>(null)
+  const [loadError, setLoadError] = useState<Error | null>(null)
 
   // No await before onExport(): the share sheet only opens during the user's tap.
   const save = () => {
@@ -29,10 +31,10 @@ export function BackupSheet({ backup, unsaved, onExport, onMerge, onMerged, onCl
     setBusy('save')
     onExport()
       .then((result) => {
-        if (result === 'shared') setStatus('Backup saved')
-        else if (result === 'downloaded') setStatus('Downloaded trades.json')
+        if (result === 'shared') setStatus('saved')
+        else if (result === 'downloaded') setStatus('downloaded')
       })
-      .catch((err: unknown) => setSaveError(message(err)))
+      .catch((err: unknown) => setSaveError(asError(err)))
       .finally(() => setBusy(null))
   }
 
@@ -44,38 +46,34 @@ export function BackupSheet({ backup, unsaved, onExport, onMerge, onMerged, onCl
     setBusy('load')
     onMerge(file)
       .then(onMerged)
-      .catch((err: unknown) => setLoadError(message(err)))
+      .catch((err: unknown) => setLoadError(asError(err)))
       .finally(() => setBusy(null))
   }
 
   return (
-    <Sheet title="Backup" onClose={onClose}>
+    <Sheet title={t.backup.title} onClose={onClose}>
       <div className="backup">
         <section className="card backup-card">
           <p className="backup-status">
             {backup.lastBackupAt ? (
               <>
-                Last backup <span className="num">{formatStamp(backup.lastBackupAt)}</span>
+                {t.backup.lastBackup} <span className="num">{formatStamp(backup.lastBackupAt)}</span>
               </>
             ) : (
-              'No backup yet'
+              t.backup.none
             )}
-            {unsaved && <span className="backup-unsaved"> · changes since then</span>}
+            {unsaved && <span className="backup-unsaved"> · {t.backup.changesSince}</span>}
           </p>
           <button type="button" className="btn primary block" onClick={save} disabled={busy !== null}>
-            {busy === 'save' ? 'Saving…' : 'Save backup'}
+            {busy === 'save' ? t.backup.saving : t.backup.save}
           </button>
-          <p className="help">On iPhone choose Save to Files → iCloud Drive → Trades and replace trades.json.</p>
+          <p className="help">{t.backup.iphoneHelp}</p>
           {status && (
             <p className="help ok" role="status">
-              {status}
+              {status === 'saved' ? t.backup.saved : t.backup.downloaded}
             </p>
           )}
-          {saveError && (
-            <p className="form-error" role="alert">
-              {saveError}
-            </p>
-          )}
+          {saveError && <FormError error={saveError} />}
         </section>
 
         <section className="card backup-card">
@@ -94,14 +92,10 @@ export function BackupSheet({ backup, unsaved, onExport, onMerge, onMerged, onCl
             onClick={() => fileInput.current?.click()}
             disabled={busy !== null}
           >
-            {busy === 'load' ? 'Loading…' : 'Load backup'}
+            {busy === 'load' ? t.backup.loading : t.backup.load}
           </button>
-          <p className="help">Loading merges the file into this device. Trades that are only here are kept.</p>
-          {loadError && (
-            <p className="form-error" role="alert">
-              {loadError}
-            </p>
-          )}
+          <p className="help">{t.backup.loadHelp}</p>
+          {loadError && <FormError error={loadError} />}
         </section>
       </div>
     </Sheet>

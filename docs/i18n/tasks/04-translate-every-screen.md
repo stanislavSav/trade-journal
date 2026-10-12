@@ -58,14 +58,15 @@ of a broken backup file.
 
 ## Acceptance criteria
 
-- [ ] The grep in step 5 finds only names, symbols, `CoinGecko`, `GitHub`, `iCloud Drive`, `trades.json`, the asset
+- [x] The grep in step 5 finds only names, symbols, `CoinGecko`, `GitHub`, `iCloud Drive`, `trades.json`, the asset
       placeholder `BTC, SOL, Hyperliquid…`, and the language names in Settings.
-- [ ] `uk.ts` has no English sentence (read it once from top to bottom).
-- [ ] Plural toast in Ukrainian: loading a backup with 1, 3 and 5 new trades shows "1 нова", "3 нові", "5 нових".
-- [ ] A new bag created in Ukrainian without a name gets the Ukrainian default name; switching back to English does not
+- [x] `uk.ts` has no English sentence (read it once from top to bottom).
+- [x] Plural toast in Ukrainian: loading a backup with 1, 3 and 5 new trades shows "1 нова", "3 нові", "5 нових".
+- [x] A new bag created in Ukrainian without a name gets the Ukrainian default name; switching back to English does not
       rename it.
-- [ ] In English every screen reads exactly as on `main` (no wording change slipped in).
-- [ ] The catalog test, plural test and `errorText` test pass.
+- [x] In English every screen reads exactly as on `main` (no wording change slipped in). _(Except the planned D13
+      change: Load backup errors are now a headline plus the technical detail; see plan D13.)_
+- [x] The catalog test, plural test and `errorText` test pass.
 
 ## Verification
 
@@ -81,8 +82,33 @@ Manual: the click-through in step 6, once in each language, on desktop and on an
 
 _(Append a dated entry before you stop, even mid-task: what is done, what is next, surprises.)_
 
+- **2026-10-12** — Done.
+  - `en.ts` / `uk.ts` are complete and grouped as in plan §6 (`common`, `header`, `summary`, `list`, `bag`, `trade`,
+    `search`, `account`, `backup`, `settings`, `crash`, `errors`, `prices`). Every file in Scope reads from `useT()`.
+  - Every `catch` keeps the `Error` in state (`asError`, new in `src/domain/errors.ts`) and renders it with
+    `FormError` (`src/ui/fields.tsx`): the translated text, plus the English detail in smaller grey text
+    (`.error-detail`). Load backup now shows the D13 headlines. Because the error object is kept, a shown error
+    follows a language switch. `useJournal.saveError` is an `Error`; the banner uses `backup.saveFailed`.
+  - `AddAccountSheet` shows only the text in its field message (no detail; account errors have none).
+  - Plurals: the merge toast. "N of M without price" needs no plural in either language (plan D4 note).
+  - "Enter asset, qty and total": `joinList(lang, words)` (`src/i18n/joinList.ts`, tested). English uses `en-GB`
+    so there is no comma before "and", as before (plan §3 defaults note).
+  - Default bag name: `AddTradeSheet` computes `defaultBagName(date, t.trade.months, t.trade.newBagDefault)` for the
+    placeholder and sends it as `newBagName` when the field is empty.
+  - The crash screen shows a failed backup as a red `FormError` (before: grey help text).
+  - Qty label in Ukrainian is «Кількість» (fits at 390 px); task 05 checks 320 px and falls back to «К-сть» if needed.
+  - Grep from step 5: only the asset placeholder and "Trade Journal" in About remain. `src/state/demo.ts` has English
+    sample names; they are stored data (D10), and feature 6 owns the demo data.
+  - Click-through in headless Chrome at 390 px, both languages: list open / closed, bag open / closed / no live
+    price / with warning, add buy (empty, new bag), sell with "You hold only", edit, delete confirm, backup, three
+    broken files, add account (exists), settings, price error, coin search offline, empty state, merge toasts for 1,
+    3 and 5 new trades ("1 нова", "3 нові", "5 нових"), a new bag in Ukrainian without a name ("Жовт 26"; it stays
+    after switching to English, because the name is stored). English texts match `main` apart from D13. Not checked
+    on an iPhone (task 05).
+  - Next: task 05.
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
 | ----------- | ---------- | ---------- | ------------ |
-| Not started | 0%         | 0h         | 0            |
+| Done        | 100%       | 2h         | —            |

@@ -1,5 +1,8 @@
 import { Component, useState, type ErrorInfo, type ReactNode } from 'react'
+import { asError } from '../domain'
+import { useT } from '../i18n'
 import { exportBackup, loadJournal } from '../storage'
+import { FormError } from './fields'
 
 // React only supports error boundaries as class components.
 export class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
@@ -18,35 +21,43 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, { error: E
   }
 }
 
-/** Last resort screen. Your data is still on the device, so offer a backup before anything else. */
+/**
+ * Last resort screen. Your data is still on the device, so offer a backup before anything else.
+ * The crash message itself is technical and stays as it is (plan D13).
+ */
 function Crashed({ error }: { error: Error }) {
-  const [note, setNote] = useState<string | null>(null)
+  const t = useT()
+  const [saved, setSaved] = useState(false)
+  const [backupError, setBackupError] = useState<Error | null>(null)
 
   const backup = () => {
+    setSaved(false)
+    setBackupError(null)
     try {
       exportBackup(loadJournal()).then(
-        (r) => setNote(r === 'cancelled' ? null : 'Backup saved'),
-        (err: unknown) => setNote(err instanceof Error ? err.message : 'Backup failed'),
+        (r) => setSaved(r !== 'cancelled'),
+        (err: unknown) => setBackupError(asError(err)),
       )
     } catch (err) {
-      setNote(err instanceof Error ? err.message : 'Backup failed')
+      setBackupError(asError(err))
     }
   }
 
   return (
     <main className="app crashed">
-      <h1>Something went wrong</h1>
+      <h1>{t.common.somethingWrong}</h1>
       <p className="muted">{error.message}</p>
-      <p>Your trades are still stored on this device.</p>
+      <p>{t.crash.stillStored}</p>
       <div className="action-row">
         <button type="button" className="btn primary" onClick={backup}>
-          Save backup
+          {t.crash.saveBackup}
         </button>
         <button type="button" className="btn" onClick={() => location.reload()}>
-          Reload
+          {t.crash.reload}
         </button>
       </div>
-      {note && <p className="help">{note}</p>}
+      {saved && <p className="help">{t.crash.backupSaved}</p>}
+      {backupError && <FormError error={backupError} />}
     </main>
   )
 }

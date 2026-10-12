@@ -1,13 +1,15 @@
 import { useState } from 'react'
+import { useT } from '../i18n'
 
 /** Optional note, hidden behind an "Add note" button until needed. */
 export function NoteField({ id, value, onChange }: { id: string; value: string; onChange: (note: string) => void }) {
+  const t = useT()
   const [open, setOpen] = useState(value !== '')
 
   if (!open) {
     return (
       <button type="button" className="text-btn add-note" onClick={() => setOpen(true)}>
-        Add note
+        {t.trade.addNote}
       </button>
     )
   }
@@ -15,7 +17,7 @@ export function NoteField({ id, value, onChange }: { id: string; value: string; 
   return (
     <div className="card form-card">
       <div className="field note-field">
-        <label htmlFor={id}>Note</label>
+        <label htmlFor={id}>{t.trade.note}</label>
         <textarea
           id={id}
           className="input"

@@ -1,4 +1,5 @@
 import { formatPrice, formatQty, type BagSummary, type Side } from '../domain'
+import { useT, type Messages } from '../i18n'
 import { NEW_BAG } from './bagChoice'
 import { Field } from './fields'
 
@@ -12,20 +13,23 @@ interface Props {
   newNamePlaceholder: string
 }
 
-function optionLabel(s: BagSummary): string {
-  return s.status === 'open' ? `${s.bag.name} · ${formatQty(s.qty)}` : `${s.bag.name} (closed)`
+function optionLabel(t: Messages, s: BagSummary): string {
+  return s.status === 'open' ? `${s.bag.name} · ${formatQty(s.qty)}` : t.trade.bagClosed({ name: s.bag.name })
 }
 
 export function BagField({ side, options, choice, onChoice, newName, onNewName, newNamePlaceholder }: Props) {
+  const t = useT()
   // A buy with no open bag of this coin silently starts a new one.
   if (options.length === 0) return null
   const selected = options.find((s) => s.bag.id === choice)
   const hint =
-    side === 'sell' && selected ? `holding ${formatQty(selected.qty)} · avg ${formatPrice(selected.avg)}` : undefined
+    side === 'sell' && selected
+      ? t.trade.holdingHint({ qty: formatQty(selected.qty), avg: formatPrice(selected.avg) })
+      : undefined
 
   return (
     <>
-      <Field id="trade-bag" label="Bag" hint={hint}>
+      <Field id="trade-bag" label={t.trade.bag} hint={hint}>
         <select
           id="trade-bag"
           className="input select"
@@ -35,14 +39,14 @@ export function BagField({ side, options, choice, onChoice, newName, onNewName, 
         >
           {options.map((s) => (
             <option key={s.bag.id} value={s.bag.id}>
-              {optionLabel(s)}
+              {optionLabel(t, s)}
             </option>
           ))}
-          {side === 'buy' && <option value={NEW_BAG}>New bag…</option>}
+          {side === 'buy' && <option value={NEW_BAG}>{t.trade.newBag}</option>}
         </select>
       </Field>
       {side === 'buy' && choice === NEW_BAG && (
-        <Field id="trade-bag-name" label="Name">
+        <Field id="trade-bag-name" label={t.trade.newBagName}>
           <input
             id="trade-bag-name"
             className="input"

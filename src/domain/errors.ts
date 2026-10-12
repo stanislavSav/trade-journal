@@ -47,3 +47,8 @@ export class AppError extends Error {
 export function isAppError(e: unknown): e is AppError {
   return e instanceof AppError
 }
+
+/** Anything a `catch` got, as an Error (so it can be kept in state and shown later). */
+export function asError(e: unknown): Error {
+  return e instanceof Error ? e : new Error(String(e))
+}

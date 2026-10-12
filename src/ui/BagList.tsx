@@ -1,4 +1,5 @@
 import type { BagSummary } from '../domain'
+import { useT } from '../i18n'
 import { ClosedRow, OpenRow } from './BagRows'
 import type { OpenPosition } from './portfolioView'
 import { onTabKeys } from './tabKeys'
@@ -14,27 +15,28 @@ interface Props {
 }
 
 export function BagList({ tab, onTab, open, closed, onOpen }: Props) {
+  const t = useT()
   const tabs: { id: ListTab; label: string; count: number }[] = [
-    { id: 'open', label: 'Open', count: open.length },
-    { id: 'closed', label: 'Closed', count: closed.length },
+    { id: 'open', label: t.list.open, count: open.length },
+    { id: 'closed', label: t.list.closed, count: closed.length },
   ]
 
   return (
     <section className="bag-list">
-      <div className="segmented" role="tablist" aria-label="Bags" onKeyDown={onTabKeys}>
-        {tabs.map((t) => (
+      <div className="segmented" role="tablist" aria-label={t.list.label} onKeyDown={onTabKeys}>
+        {tabs.map((item) => (
           <button
-            key={t.id}
-            id={`bags-tab-${t.id}`}
+            key={item.id}
+            id={`bags-tab-${item.id}`}
             type="button"
             role="tab"
-            aria-selected={tab === t.id}
+            aria-selected={tab === item.id}
             aria-controls="bags-panel"
-            tabIndex={tab === t.id ? 0 : -1}
-            onClick={() => onTab(t.id)}
+            tabIndex={tab === item.id ? 0 : -1}
+            onClick={() => onTab(item.id)}
           >
-            {t.label}
-            <span className="segmented-count num">{t.count}</span>
+            {item.label}
+            <span className="segmented-count num">{item.count}</span>
           </button>
         ))}
       </div>
@@ -47,7 +49,7 @@ export function BagList({ tab, onTab, open, closed, onOpen }: Props) {
               ))}
             </div>
           ) : (
-            <p className="empty">No open bags. Tap + to add a trade.</p>
+            <p className="empty">{t.list.emptyOpen}</p>
           )
         ) : closed.length > 0 ? (
           <div className="card list">
@@ -56,7 +58,7 @@ export function BagList({ tab, onTab, open, closed, onOpen }: Props) {
             ))}
           </div>
         ) : (
-          <p className="empty">No closed bags yet.</p>
+          <p className="empty">{t.list.emptyClosed}</p>
         )}
       </div>
     </section>

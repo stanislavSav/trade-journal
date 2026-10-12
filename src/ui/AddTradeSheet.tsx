@@ -1,5 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import {
+  asError,
   defaultBagName,
   formatPrice,
   formatQty,
@@ -16,8 +17,8 @@ import { AssetField } from './AssetField'
 import { assetSymbol, currentPick, type AssetValue } from './assetValue'
 import { BagField } from './BagField'
 import { NEW_BAG, bagOptions, exceedsHeld, resolveBagChoice, snapToHeld } from './bagChoice'
-import { DateInput, DecimalInput, Field, SideToggle } from './fields'
-import { useT } from '../i18n'
+import { DateInput, DecimalInput, Field, FormError, SideToggle } from './fields'
+import { joinList, useLang, useT } from '../i18n'
 import { amountErrorText, dateErrorText, readAmount, readAsText } from './formValues'
 import { NoteField } from './NoteField'
 import { tone, toInputText } from './numbers'
@@ -34,7 +35,7 @@ interface Props {
   journal: Journal
   accounts: Account[]
   preset: AddPreset
-  /** May throw; the message is shown in the form. */
+  /** May throw; the error is shown in the form. */
   onSave: (input: NewTradeInput) => void
   onClose: () => void
 }
@@ -45,13 +46,9 @@ function initialAsset(symbol: string | undefined, coins: Coin[]): AssetValue {
   return { text: symbol ?? '', pick: null }
 }
 
-function listWords(words: string[]): string {
-  if (words.length <= 1) return words.join('')
-  return `${words.slice(0, -1).join(', ')} and ${words[words.length - 1]}`
-}
-
 export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Props) {
   const t = useT()
+  const { lang } = useLang()
   const coins = useMemo(() => journal.coins.filter((c) => !c.deleted), [journal])
   const [side, setSide] = useState<Side>(preset.side ?? 'buy')
   const [accountId, setAccountId] = useState(preset.accountId)
@@ -62,7 +59,7 @@ export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Pr
   const [qtyText, setQtyText] = useState('')
   const [totalText, setTotalText] = useState('')
   const [note, setNote] = useState('')
-  const [saveError, setSaveError] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<Error | null>(null)
 
   const symbol = assetSymbol(asset)
   const account = useMemo(() => summarizeAccount(journal, accountId), [journal, accountId])
@@ -77,7 +74,7 @@ export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Pr
   const total = readAmount(totalText, 'money')
   const held = side === 'sell' && selected ? selected.qty : null
   const qtyError =
-    amountErrorText(t, qty.error) ?? (exceedsHeld(qty.value, held) ? `You hold only ${formatQty(held ?? 0)}` : null)
+    amountErrorText(t, qty.error) ?? (exceedsHeld(qty.value, held) ? t.trade.holdOnly({ qty: formatQty(held ?? 0) }) : null)
   const totalError = amountErrorText(t, total.error)
   const qtyHint = readAsText(t, qtyText, qty.value, formatQty)
   const totalHint = readAsText(t, totalText, total.value, (v) => formatUsd(v))
@@ -89,11 +86,13 @@ export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Pr
       : null
   const noBagToSell = side === 'sell' && symbol !== '' && options.length === 0
   const accountName = accounts.find((a) => a.id === accountId)?.name ?? accountId
+  // A new bag without a name gets the default name in the UI language; it is then stored as is (plan D11).
+  const autoBagName = defaultBagName(date === '' ? null : date, t.trade.months, t.trade.newBagDefault)
 
   const missing = [
-    symbol === '' && 'asset',
-    qty.value === null && !qty.error && 'qty',
-    total.value === null && !total.error && 'total',
+    symbol === '' && t.trade.missingAsset,
+    qty.value === null && !qty.error && t.trade.missingQty,
+    total.value === null && !total.error && t.trade.missingTotal,
   ].filter((w): w is string => typeof w === 'string')
   const valid =
     symbol !== '' &&
@@ -114,7 +113,7 @@ export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Pr
       coinName: pick?.name,
       // Unknown coin typed without picking a search result: saved without a live price.
       geckoId: pick ? pick.geckoId : known ? undefined : null,
-      bag: choice && choice !== NEW_BAG ? { bagId: choice } : { newBagName: newBagName.trim() || undefined },
+      bag: choice && choice !== NEW_BAG ? { bagId: choice } : { newBagName: newBagName.trim() || autoBagName },
       side,
       date: date === '' ? null : date,
       qty: side === 'sell' ? snapToHeld(qty.value, held) : qty.value,
@@ -124,17 +123,17 @@ export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Pr
     try {
       onSave(input)
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : 'Could not save the trade')
+      setSaveError(asError(err))
     }
   }
 
   return (
-    <Sheet title="Add trade" onClose={onClose}>
+    <Sheet title={t.trade.addTitle} onClose={onClose}>
       <form className="trade-form" onSubmit={submit} noValidate>
         <SideToggle value={side} onChange={setSide} />
 
         <div className="card form-card">
-          <Field id="trade-account" label="Account">
+          <Field id="trade-account" label={t.trade.account}>
             <select
               id="trade-account"
               className="input select"
@@ -150,9 +149,7 @@ export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Pr
           </Field>
           <AssetField id="trade-asset" value={asset} onChange={setAsset} coins={coins} />
           {noBagToSell && (
-            <div className="field-msg error standalone">
-              No open {symbol} bag in {accountName} to sell from
-            </div>
+            <div className="field-msg error standalone">{t.trade.noBagToSell({ symbol, account: accountName })}</div>
           )}
           <BagField
             side={side}
@@ -161,12 +158,12 @@ export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Pr
             onChoice={setBagChoice}
             newName={newBagName}
             onNewName={setNewBagName}
-            newNamePlaceholder={defaultBagName(date === '' ? null : date)}
+            newNamePlaceholder={autoBagName}
           />
-          <Field id="trade-date" label="Date" error={dError} hint={date === '' ? 'Unknown date, shown as ?' : null}>
+          <Field id="trade-date" label={t.trade.date} error={dError} hint={date === '' ? t.trade.unknownDate : null}>
             <DateInput id="trade-date" value={date} onChange={setDate} />
           </Field>
-          <Field id="trade-qty" label="Qty" error={qtyError} hint={qtyHint}>
+          <Field id="trade-qty" label={t.trade.qty} error={qtyError} hint={qtyHint}>
             <div className="input-with-btn">
               <DecimalInput
                 id="trade-qty"
@@ -178,33 +175,33 @@ export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Pr
               />
               {held !== null && held > 0 && (
                 <button type="button" className="chip-btn" onClick={() => setQtyText(toInputText(held))}>
-                  Max
+                  {t.trade.max}
                 </button>
               )}
             </div>
           </Field>
-          <Field id="trade-total" label="Total $" error={totalError} hint={totalHint}>
+          <Field id="trade-total" label={t.trade.total} error={totalError} hint={totalHint}>
             <DecimalInput
               id="trade-total"
               value={totalText}
               onChange={setTotalText}
               invalid={!!totalError}
               hasMsg={!!totalError || !!totalHint}
-              placeholder={side === 'buy' ? 'paid, fees included' : 'received, after fees'}
+              placeholder={side === 'buy' ? t.trade.totalPlaceholderBuy : t.trade.totalPlaceholderSell}
             />
           </Field>
         </div>
 
         <div className="card form-card">
           <div className="field readonly">
-            <span className="field-label">Price</span>
+            <span className="field-label">{t.trade.price}</span>
             <output className="num" htmlFor="trade-qty trade-total">
-              {formatPrice(price)} <span className="muted">(auto)</span>
+              {formatPrice(price)} <span className="muted">{t.trade.auto}</span>
             </output>
           </div>
           {sellPl !== null && (
             <div className="field preview">
-              <span className="field-label">P/L on this sell</span>
+              <span className="field-label">{t.trade.sellPl}</span>
               <span className={`num ${tone(sellPl)}`}>≈ {formatUsd(sellPl, { signed: true })}</span>
             </div>
           )}
@@ -212,15 +209,13 @@ export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Pr
 
         <NoteField id="trade-note" value={note} onChange={setNote} />
 
-        {saveError && (
-          <p className="form-error" role="alert">
-            {saveError}
-          </p>
-        )}
+        {saveError && <FormError error={saveError} />}
         <button type="submit" className="btn primary block" disabled={!valid}>
-          Save
+          {t.common.save}
         </button>
-        {!valid && missing.length > 0 && <p className="form-hint">Enter {listWords(missing)}</p>}
+        {!valid && missing.length > 0 && (
+          <p className="form-hint">{t.trade.enter({ fields: joinList(lang, missing) })}</p>
+        )}
       </form>
     </Sheet>
   )

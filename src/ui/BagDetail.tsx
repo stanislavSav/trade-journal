@@ -61,44 +61,44 @@ export function BagDetail({ summary: s, coin, price, backLabel, onBack, onEditTr
       <div className="detail-head">
         <h1>
           {s.bag.symbol}
-          <span className={`badge status ${s.status}`}>{open ? 'Open' : 'Closed'}</span>
+          <span className={`badge status ${s.status}`}>{open ? t.bag.open : t.bag.closed}</span>
         </h1>
         <BagName name={s.bag.name} onRename={onRename} />
         <div className="detail-coin">
           {coin?.name ?? s.bag.symbol}
-          {!coin?.geckoId && ' · no live price'}
+          {!coin?.geckoId && ` · ${t.bag.noLivePrice}`}
         </div>
       </div>
 
       <dl className="card stats">
         {open && (
           <>
-            <Stat label="Holding">{formatQty(s.qty)}</Stat>
-            <Stat label="Avg cost">{formatPrice(s.avg)}</Stat>
-            <Stat label="Cost">{formatUsd(s.cost)}</Stat>
+            <Stat label={t.bag.holding}>{formatQty(s.qty)}</Stat>
+            <Stat label={t.bag.avgCost}>{formatPrice(s.avg)}</Stat>
+            <Stat label={t.bag.cost}>{formatUsd(s.cost)}</Stat>
           </>
         )}
         {priced && (
           <>
-            <Stat label="Price">{formatPrice(pos.price)}</Stat>
-            <Stat label="Value">{formatUsd(pos.value)}</Stat>
-            <Stat label="Unrealized" className={tone(pos.unrealized)}>
+            <Stat label={t.bag.price}>{formatPrice(pos.price)}</Stat>
+            <Stat label={t.bag.value}>{formatUsd(pos.value)}</Stat>
+            <Stat label={t.bag.unrealized} className={tone(pos.unrealized)}>
               {formatUsd(pos.unrealized, { signed: true })}
               <span className="stat-pct">{formatPct(pos.unrealizedPct)}</span>
             </Stat>
           </>
         )}
-        <Stat label="Invested">{formatUsd(s.invested)}</Stat>
-        <Stat label="Proceeds">{formatUsd(s.proceeds)}</Stat>
-        <Stat label="Realized" className={tone(s.realized)}>
+        <Stat label={t.bag.invested}>{formatUsd(s.invested)}</Stat>
+        <Stat label={t.bag.proceeds}>{formatUsd(s.proceeds)}</Stat>
+        <Stat label={t.bag.realized} className={tone(s.realized)}>
           {formatUsd(s.realized, { signed: true })}
         </Stat>
-        <Stat label="Dates">{formatBagDates(s.trades)}</Stat>
+        <Stat label={t.bag.dates}>{formatBagDates(s.trades)}</Stat>
       </dl>
 
       {s.warnings.length > 0 && (
         <div className="card warnings" role="note">
-          <h2 className="warnings-title">Check these trades</h2>
+          <h2 className="warnings-title">{t.bag.checkTrades}</h2>
           <ul>
             {s.warnings.map((w, i) => (
               <li key={i}>{warningText(t, w)}</li>
@@ -109,16 +109,16 @@ export function BagDetail({ summary: s, coin, price, backLabel, onBack, onEditTr
 
       <div className="action-row">
         <button type="button" className="btn buy" onClick={() => onTrade('buy')}>
-          Buy more
+          {t.bag.buyMore}
         </button>
         {open && (
           <button type="button" className="btn sell" onClick={() => onTrade('sell')}>
-            Sell
+            {t.bag.sell}
           </button>
         )}
       </div>
 
-      <h2 className="section-title">Trades</h2>
+      <h2 className="section-title">{t.bag.trades}</h2>
       <div className="card list">
         {s.trades.map((t) => (
           <TradeRow key={t.id} trade={t} onEdit={onEditTrade} />
