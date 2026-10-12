@@ -47,11 +47,15 @@ the glossary, and the docs describe the feature.
 
 ## Acceptance criteria
 
-- [ ] No clipped or overlapping text at 320 px in either language (list, bag screen, all sheets, header).
-- [ ] VoiceOver reads Ukrainian labels with a Ukrainian voice (`<html lang="uk">`).
+- [x] No clipped or overlapping text at 320 px in either language (list, bag screen, all sheets, header).
+      _(Checked in headless Chrome at 320, 375 and 390 px. Waiting for the owner: the same check on a real iPhone.)_
+- [ ] VoiceOver reads Ukrainian labels with a Ukrainian voice (`<html lang="uk">`). _(Waiting for the owner: needs an
+      iPhone. Prepared: `<html lang="uk">` is set, and the accessibility tree has Ukrainian names and roles.)_
 - [ ] Every i18n parking-lot item is `Decided` or explicitly left `Open` by the owner with the default kept.
-- [ ] `README.md` mentions the language switch; `docs/CONTEXT.md` points to the glossary.
-- [ ] Plan status is `Shipped`; the board shows all tasks `Done`.
+      _(Waiting for the owner. Review material: [05-owner-review-all-strings.md](../parking-lot/05-owner-review-all-strings.md).)_
+- [x] `README.md` mentions the language switch; `docs/CONTEXT.md` points to the glossary.
+- [ ] Plan status is `Shipped`; the board shows all tasks `Done`. _(Plan is `Shipped`; this task stays `Blocked` until
+      the owner review is done.)_
 
 ## Verification
 
@@ -67,8 +71,32 @@ Manual: the layout and VoiceOver passes above on an iPhone; one full English cli
 
 _(Append a dated entry before you stop, even mid-task: what is done, what is next, surprises.)_
 
+- **2026-10-12** — Everything that does not need the owner is done; the task waits for the owner review.
+  - Layout pass in headless Chrome (a script clicks through 19 screens and states and reports clipped text) at 320,
+    375 and 390 px, both languages. 375 and 390 px were clean. At 320 px in Ukrainian three things were fixed:
+    - the edit sheet title «Редагувати угоду BTC» was cut off → «Змінити угоду BTC»;
+    - the Total placeholders were cut off → «сплачено з комісією» / «чиста виручка»;
+    - «собівартість · без ціни» under an unpriced bag pushed «1,000 · сер. 0.5000» out of the row → `.row-side` is
+      at most 45 % of the row and its note wraps; «без ціни» is joined by a no-break space.
+    English has no layout change.
+  - Seen but not changed (not caused by this feature): in desktop Chrome at 320 px the native date input next to the
+    Unknown / Невідома chip shows only part of the date, in both languages. iOS draws its own date control.
+  - Screen readers: `<html lang="uk">` is set; the Chrome accessibility tree shows Ukrainian names for the header
+    buttons, tabs («Портфелі», «Позиції»), bag rows, the trade form (radio group «Тип угоди», fields) and the toast
+    (polite live region). A real VoiceOver pass needs an iPhone.
+  - Docs: a Languages line in `README.md` (Features); `docs/CONTEXT.md` points to plan §8.1 and has Settings and UI
+    language; plan status `Shipped` with a note that the word review is open; plan §8.1 has the new word choices.
+  - Owner review material: [05-owner-review-all-strings.md](../parking-lot/05-owner-review-all-strings.md) — all
+    166 texts side by side (EN / UK) and the texts changed during the layout check.
+  - **Waiting for the owner** (then set this task `Done`):
+    1. Read the Ukrainian texts (in the app or in the table) and decide the open parking-lot items: glossary, month
+       names, Russian devices, iPhone help text, all texts. Record `Decided (date): …`, apply in `uk.ts`.
+    2. On an iPhone (Safari and the installed app): the layout at the phone's width, and a VoiceOver pass in
+       Ukrainian (header, list tabs, a bag row, the trade form, a toast).
+    3. One English click-through on the iPhone.
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
 | ----------- | ---------- | ---------- | ------------ |
-| Not started | 0%         | 0h         | 0            |
+| Blocked (waiting for the owner review) | 90% | 1h | — |

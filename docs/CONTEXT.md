@@ -3,6 +3,10 @@
 The words the app, the code and these docs use. No implementation detail here; the shared data contract is
 `src/domain/types.ts`.
 
+The app is in English and Ukrainian. The Ukrainian word for each term is in the glossary in
+[i18n/plan.md §8.1](i18n/plan.md); use the same words in every new string, and add every new string to both
+`src/i18n/en.ts` and `src/i18n/uk.ts` (decision G4).
+
 | Term             | Meaning                                                                                                   |
 | ---------------- | --------------------------------------------------------------------------------------------------------- |
 | **Journal**      | Everything the app stores: accounts, coins, bags, trades (and, from the storage-tags feature, storages).  |
@@ -19,6 +23,8 @@ The words the app, the code and these docs use. No implementation detail here; t
 | **Storage tag**  | A storage attached to a bag. A bag can have several. With exactly one tag, its icon shows before the coin symbol. |
 | **Backup**       | The `trades.json` file. *Save backup* writes it; *Load backup* merges it into the device's journal.       |
 | **Tombstone**    | A record marked `deleted: true` instead of being removed, so the deletion survives a merge.                |
+| **Settings**     | The sheet behind the gear button in the header: Language and About (feature 3 adds Accounts). Ukrainian UI: «Налаштування». |
+| **UI language**  | English or Ukrainian. Follows the device until the user picks one in Settings; then it is a device preference. Stored data (names, notes) is never translated. |
 | **Device preference** | A setting stored only on one device (sort order, storage filter, language). Not in backups.          |
 | **Demo mode**    | The app opened with `?demo`: sample data, nothing saved, the user's real data untouched.                   |
 | **Whitelabel / brand** | A copy of the app with another name, icon, colours and links (a branded copy, e.g. for a community). |

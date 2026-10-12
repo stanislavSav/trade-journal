@@ -14,7 +14,7 @@ truth.** Update both in the same change.
 | 02  | [Settings sheet: gear button, Language, About](02-settings-sheet.md)      | 01         | Done        | 100%     |
 | 03  | [Domain messages as data (error codes, warnings, price problems)](03-domain-messages-as-data.md) | 01 | Done | 100% |
 | 04  | [Translate every screen](04-translate-every-screen.md)                    | 02, 03     | Done        | 100%     |
-| 05  | [QA in both languages, docs, owner review](05-qa-and-owner-review.md)     | 04         | Not started | 0%       |
+| 05  | [QA in both languages, docs, owner review](05-qa-and-owner-review.md)     | 04         | Blocked (owner review) | 90% |
 
 ## How to pick up a task (also for a new agent session)
 

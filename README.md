@@ -14,6 +14,8 @@ https://stanislavsav.github.io/trade-journal/.
 - Backups that merge and never lose trades.
 - Works offline after the first visit.
 - Installs to the iPhone Home Screen like an app.
+- English and Ukrainian. The app follows the language of the device; change it in **Settings** (the gear button next
+  to Backup).
 
 ## Privacy
 

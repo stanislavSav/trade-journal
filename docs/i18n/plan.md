@@ -1,6 +1,7 @@
 # Ukrainian / English (i18n) — plan
 
-> **Status:** Planned · **Owner:** @stanislavSav · **Decided:** 2026-10-12
+> **Status:** Shipped (2026-10-12; the owner's review of the Ukrainian words is still open, see task 05) ·
+> **Owner:** @stanislavSav · **Decided:** 2026-10-12
 > **Vocabulary:** [docs/CONTEXT.md](../CONTEXT.md) · **Decisions:** [docs/README.md](../README.md) G4, G5, G6, G7 ·
 > **Tasks:** [tasks/](tasks/README.md) · **Parking lot:** [parking-lot/](parking-lot/README.md)
 
@@ -321,7 +322,7 @@ stamps; the `segmented` CSS of the Open/Closed switch (`src/ui/BagList.tsx:24`) 
 | BUY / SELL (toggle, badges)  | КУПІВЛЯ / ПРОДАЖ                | Check the width of the badge at 320 px. |
 | Buy more                     | Докупити                        | |
 | Sell (button)                | Продати                         | |
-| Qty                          | К-сть                           | "Кількість" where there is room. |
+| Qty                          | Кількість                       | Fits at 320 px (task 05), so the short «К-сть» is not used. |
 | Total $                      | Сума $                          | |
 | Price                        | Ціна                            | |
 | Holding                      | Залишок                         | Coins still held. |
@@ -356,6 +357,9 @@ stamps; the `segmented` CSS of the Open/Closed switch (`src/ui/BagList.tsx:24`) 
 | Save / Save changes          | Зберегти / Зберегти зміни       | |
 | Cancel / Close               | Скасувати / Закрити             | |
 | Delete trade                 | Видалити угоду                  | |
+| Edit BTC trade (sheet title) | Змінити угоду BTC ?             | «Редагувати угоду BTC» did not fit at 320 px (task 05). |
+| paid, fees included / received, after fees (Total placeholders) | сплачено з комісією / чиста виручка ? | Shortened to fit at 320 px (task 05). |
+| Offline                      | Немає мережі                    | Coin search status. |
 | Tap again to delete          | Натисніть ще раз, щоб видалити  | Polite Ви form (D17). |
 | Check these trades           | Перевірте ці угоди              | |
 | Merged: 3 new, 1 updated     | Об'єднано: 3 нові, 1 оновлена   | Plural (D4): 1 нова · 2 нові · 5 нових. |
@@ -390,8 +394,8 @@ stamps; the `segmented` CSS of the Open/Closed switch (`src/ui/BagList.tsx:24`) 
   `uk` nor `en`. That plan decides; a build-time `VITE_DEFAULT_LANG` would be enough.
 - **A `?lang=uk` URL parameter** for links shared in Telegram. Not needed for this feature; see the demo-data parking
   lot ([docs/demo-data/parking-lot/](../demo-data/parking-lot/README.md)).
-- **Roadmap wording:** [docs/README.md](../README.md) says feature 3 brings the "Settings screen". This feature now
-  introduces the Settings sheet; feature 3 adds its Accounts section to it.
+- **Roadmap wording:** done. [docs/README.md](../README.md) says that this feature introduces the Settings sheet;
+  feature 3 adds its Accounts section to it.
 
 Questions that come up while building go to [parking-lot/](parking-lot/README.md), one file each (template:
 `docs/_templates/parking-lot.md`).

@@ -50,7 +50,7 @@ export const uk: Messages = {
     emptyOpen: 'Відкритих позицій немає. Натисніть +, щоб додати угоду.',
     emptyClosed: 'Закритих позицій поки немає.',
     qtyAvg: (p) => `${p.qty} · сер. ${p.avg}`,
-    costNoPrice: 'собівартість · без ціни',
+    costNoPrice: 'собівартість · без\u00a0ціни', // no break inside «без ціни»
     hasWarnings: 'Є попередження',
     hasWarningsSr: ', є попередження',
   },
@@ -79,7 +79,7 @@ export const uk: Messages = {
   },
   trade: {
     addTitle: 'Додати угоду',
-    editTitle: (p) => `Редагувати угоду ${p.symbol}`,
+    editTitle: (p) => `Змінити угоду ${p.symbol}`,
     side: 'Тип угоди',
     buy: 'КУПІВЛЯ',
     sell: 'ПРОДАЖ',
@@ -98,8 +98,8 @@ export const uk: Messages = {
     qty: 'Кількість',
     max: 'Макс.',
     total: 'Сума $',
-    totalPlaceholderBuy: 'сплачено, з комісією',
-    totalPlaceholderSell: 'отримано, після комісії',
+    totalPlaceholderBuy: 'сплачено з комісією',
+    totalPlaceholderSell: 'чиста виручка', // after fees; fits a 320 px screen
     price: 'Ціна',
     auto: '(авто)',
     sellPl: 'P/L цього продажу',

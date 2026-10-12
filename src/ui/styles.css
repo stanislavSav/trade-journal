@@ -423,7 +423,13 @@ button:disabled {
   flex-direction: column;
   align-items: flex-end;
   gap: 1px;
+  max-width: 45%;
   text-align: right;
+}
+
+/* A longer note under the amount (Ukrainian «собівартість · без ціни») wraps instead of pushing the row text out. */
+.row-side .row-sub {
+  white-space: normal;
 }
 
 .row-value {

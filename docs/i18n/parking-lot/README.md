@@ -35,3 +35,4 @@ Update the index below in the same change.
 | [Which Ukrainian word should the app use for "Account"?](04-term-for-account.md)                                  | 04   | Decided (2026-10-12): Портфель |
 | [Should the Ukrainian UI address the user as "ви" or "ти"?](04-formal-or-informal-address.md)                     | 04   | Decided (2026-10-12): polite Ви |
 | [What should the iPhone backup help text say in Ukrainian, given iOS shows its own labels in the device language?](04-iphone-help-text-in-ukrainian.md) | 04 | Open |
+| [Do all Ukrainian texts in the app read right?](05-owner-review-all-strings.md) (full EN/UK table for the owner review) | 05 | Open |
