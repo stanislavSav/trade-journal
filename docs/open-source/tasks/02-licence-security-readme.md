@@ -80,17 +80,17 @@ how to install and try it, how to develop it, and that they may reuse it under M
 
 ## Acceptance criteria
 
-- [ ] `LICENSE` is the MIT text with `Copyright (c) 2026 Stanislav Savchuk`; GitHub shows "MIT license" in the repo
+- [x] `LICENSE` is the MIT text with `Copyright (c) 2026 Stanislav Savchuk`; GitHub shows "MIT license" in the repo
       sidebar after the push.
-- [ ] `package.json` has `"license": "MIT"`.
-- [ ] `SECURITY.md` has the four parts: supported version, how to report, threat model, scope. GitHub shows
+- [x] `package.json` has `"license": "MIT"`.
+- [x] `SECURITY.md` has the four parts: supported version, how to report, threat model, scope. GitHub shows
       "Security policy" in the sidebar.
-- [ ] `README.md` has the sections of step 5 in that order; every privacy claim matches plan §6 (no server, no
+- [x] `README.md` has the sections of step 5 in that order; every privacy claim matches plan §6 (no server, no
       tracking, only CoinGecko, plain-JSON backup).
-- [ ] No file contains the work email or the employer's domain
+- [x] No file contains the work email or the employer's domain
       (`git grep -niF "<work email domain>"` prints nothing).
-- [ ] The commit author is the noreply address (`git log -1 --format='%an <%ae>'`).
-- [ ] `npm test`, `npm run typecheck`, `npm run build` pass (no code changed, but CI runs them on push).
+- [x] The commit author is the noreply address (`git log -1 --format='%an <%ae>'`).
+- [x] `npm test`, `npm run typecheck`, `npm run build` pass (no code changed, but CI runs them on push).
 
 ## Verification
 
@@ -108,8 +108,10 @@ license" and "Security policy", every link in the README opens.
 
 _(Append a dated entry before you stop, even mid-task: what is done, what is next, surprises.)_
 
+**2026-10-12 — done** in commit 45d2a00: LICENSE (MIT), SECURITY.md, README rewritten, `"license": "MIT"`. Tests (168), typecheck and build pass.
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
 | ----------- | ---------- | ---------- | ------------ |
-| Not started | 0%         | 0h         | 0            |
+| Done        | 100%       | —          | —            |

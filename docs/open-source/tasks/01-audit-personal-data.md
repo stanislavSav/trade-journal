@@ -58,13 +58,13 @@ nothing else needs fixing before the repo is announced.
 
 ## Acceptance criteria
 
-- [ ] The hand-off log lists the audit commands and their result.
-- [ ] No secret or personal data in tracked files, history, or `docs/` (or each finding has a parking-lot item and a
+- [x] The hand-off log lists the audit commands and their result.
+- [x] No secret or personal data in tracked files, history, or `docs/` (or each finding has a parking-lot item and a
       decision).
-- [ ] `git log --all --format='%ae%n%ce' | sort -u` prints only `103412957+stanislavSav@users.noreply.github.com`.
-- [ ] No commit message has a co-author trailer.
-- [ ] `git config --local user.email` is the noreply address and `git config core.hooksPath` is `.githooks`.
-- [ ] The parking-lot item about old commits on GitHub has today's observation.
+- [x] `git log --all --format='%ae%n%ce' | sort -u` prints only `103412957+stanislavSav@users.noreply.github.com`.
+- [x] No commit message has a co-author trailer.
+- [x] `git config --local user.email` is the noreply address and `git config core.hooksPath` is `.githooks`.
+- [x] The parking-lot item about old commits on GitHub has today's observation.
 
 ## Verification
 
@@ -85,8 +85,10 @@ and removed co-author lines from messages; repo-local identity set; `git push --
 hashes `f961d0f`, `b24f49c`, then `d540f39` (commit rules: `CLAUDE.md`, `.claude/settings.json`,
 `.githooks/commit-msg`). Pages deploy green. Details: [runbook](../history-rewrite-runbook.md).
 
+**2026-10-12 — done.** Authors: one identity (noreply). Messages: no co-author or tool lines. History grep: no secrets; the only email is an npm author in package-lock.json. No trades/.env/key files in any commit. docs/: no work email or domain; the partner folder is excluded via .git/info/exclude. gitleaks not installed (skipped). GitHub: old commit e91e3a8 still opens by hash with the old email; Contributors shows only stanislavSav.
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
 | ----------- | ---------- | ---------- | ------------ |
-| Not started | 0%         | 0h         | 0            |
+| Done        | 100%       | —          | —            |

@@ -1,7 +1,7 @@
 # Open source — plan
 
-> **Status:** In progress — the history rewrite is done (2026-10-12, [runbook](history-rewrite-runbook.md) run log);
-> tasks 01 (audit), 02 and 03 are open. **Owner:** @stanislavSav · **Decided:** 2026-10-12
+> **Status:** Shipped — the history rewrite is done (2026-10-12, [runbook](history-rewrite-runbook.md) run log);
+> tasks 01–03 are done (2026-10-12). **Owner:** @stanislavSav · **Decided:** 2026-10-12
 > **Vocabulary:** [docs/CONTEXT.md](../CONTEXT.md) · **Decisions:** [docs/README.md](../README.md) G1, G2, G3, G7 ·
 > **Runbook:** [history-rewrite-runbook.md](history-rewrite-runbook.md) · **Tasks:** [tasks/](tasks/README.md)
 > · **Parking lot:** [parking-lot/](parking-lot/README.md)

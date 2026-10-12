@@ -10,9 +10,9 @@ truth.** Update both in the same change.
 
 | #   | Task                                                                     | Depends on | Status      | Progress |
 | --- | ------------------------------------------------------------------------ | ---------- | ----------- | -------- |
-| 01  | [Audit files and history for personal data](01-audit-personal-data.md) | —          | Not started | 0%       |
-| 02  | [LICENSE, SECURITY.md and a README for strangers](02-licence-security-readme.md) | 01         | Not started | 0%       |
-| 03  | [GitHub repo settings](03-github-repo-settings.md)                       | 02         | Not started | 0%       |
+| 01  | [Audit files and history for personal data](01-audit-personal-data.md) | —          | Done        | 100%     |
+| 02  | [LICENSE, SECURITY.md and a README for strangers](02-licence-security-readme.md) | 01         | Done        | 100%     |
+| 03  | [GitHub repo settings](03-github-repo-settings.md)                       | 02         | Done        | 100%     |
 
 ## How to pick up a task (also for a new agent session)
 

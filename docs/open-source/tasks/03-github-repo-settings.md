@@ -67,13 +67,13 @@ All commands are for the **owner**; an agent only prepares them. Check the accou
 
 ## Acceptance criteria
 
-- [ ] `gh repo view stanislavSav/trade-journal --json description,homepageUrl,repositoryTopics` shows the description,
+- [x] `gh repo view stanislavSav/trade-journal --json description,homepageUrl,repositoryTopics` shows the description,
       `https://stanislavsav.github.io/trade-journal/` and the 10 topics.
-- [ ] The repo page sidebar shows the description, the live link, the topics, "MIT license" and "Security policy".
-- [ ] `gh api repos/stanislavSav/trade-journal/private-vulnerability-reporting --jq .enabled` prints `true`; the
+- [x] The repo page sidebar shows the description, the live link, the topics, "MIT license" and "Security policy".
+- [x] `gh api repos/stanislavSav/trade-journal/private-vulnerability-reporting --jq .enabled` prints `true`; the
       Security tab shows "Report a vulnerability".
-- [ ] Secret scanning and push protection are on (Settings → Code security).
-- [ ] Wiki and Projects tabs are gone.
+- [x] Secret scanning and push protection are on (Settings → Code security).
+- [x] Wiki and Projects tabs are gone.
 
 ## Verification
 
@@ -91,8 +91,10 @@ stranger. Click one topic (e.g. `trade-journal`); the topic page lists the repo.
 
 _(Append a dated entry before you stop, even mid-task: what is done, what is next, surprises.)_
 
+**2026-10-12 — done.** Description, homepage and 10 topics set; wiki and projects off; private vulnerability reporting enabled (`true`); secret scanning and push protection on. `gh repo view` shows license `mit`.
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
 | ----------- | ---------- | ---------- | ------------ |
-| Not started | 0%         | 0h         | 0            |
+| Done        | 100%       | —          | —            |
