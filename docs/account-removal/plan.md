@@ -1,6 +1,6 @@
 # Remove an account — plan
 
-> **Status:** In progress · **Owner:** @stanislavSav · **Decided:** 2026-10-12
+> **Status:** Shipped (2026-10-12) · **Owner:** @stanislavSav · **Decided:** 2026-10-12
 > **Vocabulary:** [docs/CONTEXT.md](../CONTEXT.md) · **Decisions:** [docs/README.md](../README.md) G4, G5, G6 ·
 > **Depends on:** feature 2 ([docs/i18n/plan.md](../i18n/plan.md): Settings sheet, `useT()`) ·
 > **Tasks:** [tasks/](tasks/README.md) · **Parking lot:** [parking-lot/](parking-lot/README.md)
@@ -140,6 +140,10 @@ With no accounts, the section shows "No accounts." and no list.
 ### 5.3 Strings (EN + UK)
 
 Use the keys style that feature 2 sets up in `src/i18n/en.ts` / `src/i18n/uk.ts`; the keys below are suggestions.
+**As shipped:** every string is in one group `accounts` (`accounts.title`, `.empty`, `.counts`, `.remove`,
+`.removeLabel`, `.removeTitle`, `.what`, `.final`, `.backupHint`, `.saveBackup`, `.backupSaved`, `.typeToConfirm`,
+`.confirm`, `.removed`); the bag and trade counts are plural helpers inside the two files. Two Ukrainian texts read
+more naturally than the draft: «Цю дію не можна скасувати. …» and «Щоб підтвердити, введіть {name}».
 The Ukrainian words are the ones the owner decided on 2026-10-12 for the whole app (feature 2 plan D17, D18): account =
 «портфель» (masculine), bag = «позиція» (feminine), trade = «угода», and the polite Ви form. Counts use the plural
 helper from feature 2 (Ukrainian has one / few / many forms).

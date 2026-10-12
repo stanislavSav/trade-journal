@@ -4,7 +4,9 @@ import {
   addAccount,
   addTrade,
   deleteTrade,
+  countAccountData,
   formatQty,
+  removeAccount,
   renameBag,
   summarizeAccount,
   updateTrade,
@@ -26,6 +28,7 @@ import { EditTradeSheet } from './EditTradeSheet'
 import { Header } from './Header'
 import { PlusIcon } from './icons'
 import { coinMap, findBagSummary, geckoIdsFor, liveAccounts, openPositions, openTotals, priceFor } from './portfolioView'
+import { RemoveAccountSheet } from './RemoveAccountSheet'
 import { useBagRoute } from './route'
 import { SettingsSheet } from './SettingsSheet'
 import { SummaryCard } from './SummaryCard'
@@ -38,6 +41,7 @@ type SheetState =
   | { kind: 'backup' }
   | { kind: 'account' }
   | { kind: 'settings' }
+  | { kind: 'removeAccount'; accountId: string }
   | null
 
 export function JournalApp() {
@@ -113,6 +117,21 @@ export function JournalApp() {
     rememberAccount(accountIdFor(name))
     setSheet(null)
   }
+
+  // docs/account-removal/plan.md §6.2: one apply, then the first remaining account (D6), close, toast.
+  const dropAccount = (id: string) => {
+    const name = accounts.find((a) => a.id === id)?.name ?? id
+    const next = apply((j, now) => removeAccount(j, id, now))
+    const first = liveAccounts(next)[0]
+    if (first) rememberAccount(first.id)
+    setSheet(null)
+    notify(t.accounts.removed({ name }))
+  }
+  const removing = sheet?.kind === 'removeAccount' ? accounts.find((a) => a.id === sheet.accountId) : undefined
+  // Another tab removed it meanwhile: nothing left to confirm.
+  useEffect(() => {
+    if (sheet?.kind === 'removeAccount' && !removing) setSheet(null)
+  }, [sheet, removing])
 
   const editing = sheet?.kind === 'edit' ? journal.trades.find((t) => t.id === sheet.tradeId && !t.deleted) : undefined
   const editingBag = editing ? journal.bags.find((b) => b.id === editing.bagId) : undefined
@@ -214,7 +233,24 @@ export function JournalApp() {
       {sheet?.kind === 'account' && (
         <AddAccountSheet accounts={accounts} onAdd={createAccount} onClose={() => setSheet(null)} />
       )}
-      {sheet?.kind === 'settings' && <SettingsSheet onClose={() => setSheet(null)} />}
+      {sheet?.kind === 'settings' && (
+        <SettingsSheet
+          accounts={accounts}
+          journal={journal}
+          onRemoveAccount={(id) => setSheet({ kind: 'removeAccount', accountId: id })}
+          onClose={() => setSheet(null)}
+        />
+      )}
+      {removing && (
+        <RemoveAccountSheet
+          key={removing.id}
+          account={removing}
+          counts={countAccountData(journal, removing.id)}
+          onExport={api.exportNow}
+          onConfirm={() => dropAccount(removing.id)}
+          onClose={() => setSheet({ kind: 'settings' })}
+        />
+      )}
 
       <Toast message={toast} onDone={() => setToast(null)} />
     </>

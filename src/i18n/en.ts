@@ -7,6 +7,9 @@ import { pluralEn } from './plural'
 
 const newTrades = pluralEn({ one: (n) => `${n} new`, other: (n) => `${n} new` })
 const updatedTrades = pluralEn({ one: (n) => `${n} updated`, other: (n) => `${n} updated` })
+// A no-break space keeps the number on the same line as its word.
+const bagCount = pluralEn({ one: (n) => `${n}\u00a0bag`, other: (n) => `${n}\u00a0bags` })
+const tradeCount = pluralEn({ one: (n) => `${n}\u00a0trade`, other: (n) => `${n}\u00a0trades` })
 
 export const en = {
   common: {
@@ -160,6 +163,24 @@ export const en = {
     sourceCode: 'Source code on GitHub',
     licence: 'MIT licence',
     opensInNewTab: '(opens in a new tab)',
+  },
+  // Settings → Accounts and the remove-account confirmation (docs/account-removal/plan.md §5).
+  accounts: {
+    title: 'Accounts',
+    empty: 'No accounts.',
+    counts: (p: { bags: number; trades: number }) => `${bagCount(p.bags)} · ${tradeCount(p.trades)}`,
+    remove: 'Remove',
+    removeLabel: (p: { name: string }) => `Remove account ${p.name}`,
+    removeTitle: (p: { name: string }) => `Remove "${p.name}"`,
+    what: (p: { bags: number; trades: number }) =>
+      `This deletes the account and everything in it: ${bagCount(p.bags)}, ${tradeCount(p.trades)}.`,
+    final: 'It cannot be undone. Loading an older backup will not bring it back.',
+    backupHint: 'Save a backup first, so you still have the trades in a file.',
+    saveBackup: 'Save backup now',
+    backupSaved: 'Backup saved',
+    typeToConfirm: (p: { name: string }) => `Type ${p.name} to confirm`,
+    confirm: 'Remove account',
+    removed: (p: { name: string }) => `Account "${p.name}" removed`,
   },
   crash: {
     stillStored: 'Your trades are still stored on this device.',

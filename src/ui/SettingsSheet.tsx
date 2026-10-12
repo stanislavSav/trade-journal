@@ -1,12 +1,22 @@
 import { useId } from 'react'
+import type { Account, Journal } from '../domain'
 import { LANG_NAMES, LANGS, useLang, useT } from '../i18n'
+import { AccountsSection } from './AccountsSection'
 import { Sheet } from './Sheet'
 
 const REPO_URL = 'https://github.com/stanislavSav/trade-journal'
 const LICENCE_URL = `${REPO_URL}/blob/main/LICENSE`
 
-/** Device settings and information about the app (docs/i18n/plan.md §5.2). */
-export function SettingsSheet({ onClose }: { onClose: () => void }) {
+interface Props {
+  /** Live accounts in header order. */
+  accounts: Account[]
+  journal: Journal
+  onRemoveAccount: (accountId: string) => void
+  onClose: () => void
+}
+
+/** Device settings, the accounts, and information about the app (docs/i18n/plan.md §5.2). */
+export function SettingsSheet({ accounts, journal, onRemoveAccount, onClose }: Props) {
   const t = useT()
   const { lang, setLang, chosen } = useLang()
   const languageId = useId()
@@ -41,7 +51,7 @@ export function SettingsSheet({ onClose }: { onClose: () => void }) {
           {!chosen && <p className="help settings-hint">{t.settings.languageHint}</p>}
         </section>
 
-        {/* Feature 3 adds the Accounts section here; order: Language, Accounts, About (docs/account-removal/plan.md). */}
+        <AccountsSection accounts={accounts} journal={journal} onRemove={onRemoveAccount} />
 
         <section aria-labelledby={aboutId}>
           <h3 id={aboutId} className="section-title">

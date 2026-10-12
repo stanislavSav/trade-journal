@@ -18,6 +18,20 @@ const updatedTrades = pluralUk({
   other: (n) => `${n} оновленої`,
 })
 
+// A bag is «позиція» (feminine), a trade is «угода» (feminine). A no-break space keeps the number with its word.
+const bagCount = pluralUk({
+  one: (n) => `${n}\u00a0позиція`,
+  few: (n) => `${n}\u00a0позиції`,
+  many: (n) => `${n}\u00a0позицій`,
+  other: (n) => `${n}\u00a0позиції`,
+})
+const tradeCount = pluralUk({
+  one: (n) => `${n}\u00a0угода`,
+  few: (n) => `${n}\u00a0угоди`,
+  many: (n) => `${n}\u00a0угод`,
+  other: (n) => `${n}\u00a0угоди`,
+})
+
 export const uk: Messages = {
   common: {
     close: 'Закрити',
@@ -171,6 +185,22 @@ export const uk: Messages = {
     sourceCode: 'Вихідний код на GitHub',
     licence: 'Ліцензія MIT',
     opensInNewTab: '(відкриється в новій вкладці)',
+  },
+  accounts: {
+    title: 'Портфелі',
+    empty: 'Немає портфелів.',
+    counts: (p) => `${bagCount(p.bags)} · ${tradeCount(p.trades)}`,
+    remove: 'Видалити',
+    removeLabel: (p) => `Видалити портфель ${p.name}`,
+    removeTitle: (p) => `Видалити «${p.name}»`,
+    what: (p) => `Буде видалено портфель і все, що в ньому: ${bagCount(p.bags)}, ${tradeCount(p.trades)}.`,
+    final: 'Цю дію не можна скасувати. Завантаження старішої резервної копії його не поверне.',
+    backupHint: 'Спершу збережіть резервну копію, щоб угоди залишилися у файлі.',
+    saveBackup: 'Зберегти копію зараз',
+    backupSaved: 'Копію збережено',
+    typeToConfirm: (p) => `Щоб підтвердити, введіть ${p.name}`,
+    confirm: 'Видалити портфель',
+    removed: (p) => `Портфель «${p.name}» видалено`,
   },
   crash: {
     stillStored: 'Ваші угоди досі збережені на цьому пристрої.',

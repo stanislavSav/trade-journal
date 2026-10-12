@@ -73,23 +73,23 @@ first remaining account (or the empty state) and a toast. Every new text exists 
 
 ## Acceptance criteria
 
-- [ ] Settings shows an **Accounts** section with every live account, its bag and trade counts, and **Remove**.
-- [ ] The confirmation sheet shows the right counts, the warning, **Save backup now**, the name field and a disabled
+- [x] Settings shows an **Accounts** section with every live account, its bag and trade counts, and **Remove**.
+- [x] The confirmation sheet shows the right counts, the warning, **Save backup now**, the name field and a disabled
       **Remove account**.
-- [ ] **Remove account** is enabled only when the typed text equals the name (trimmed, case-sensitive);
+- [x] **Remove account** is enabled only when the typed text equals the name (trimmed, case-sensitive);
       `nameMatches` tests pass.
-- [ ] After removal: the account tab is gone; the first remaining account (by name) is selected; the toast shows; the
+- [x] After removal: the account tab is gone; the first remaining account (by name) is selected; the toast shows; the
       Backup button shows the unsaved dot.
-- [ ] Removing the last account shows "No accounts yet." with **Add account**; adding an account with the same name
+- [x] Removing the last account shows "No accounts yet." with **Add account**; adding an account with the same name
       gives an empty account.
-- [ ] **Close** on the confirmation sheet goes back to Settings; nothing is deleted.
-- [ ] **Save backup now** opens the share sheet (iPhone) or downloads `trades.json` (desktop) and shows "Backup saved".
-- [ ] Every new text appears in English and in Ukrainian when the language is switched; no English text left in the
+- [x] **Close** on the confirmation sheet goes back to Settings; nothing is deleted.
+- [x] **Save backup now** opens the share sheet (iPhone) or downloads `trades.json` (desktop) and shows "Backup saved".
+- [x] Every new text appears in English and in Ukrainian when the language is switched; no English text left in the
       Ukrainian UI of this feature.
-- [ ] The Ukrainian section title is «Портфелі» and every Ukrainian text says «портфель» (never «рахунок»), with the
+- [x] The Ukrainian section title is «Портфелі» and every Ukrainian text says «портфель» (never «рахунок»), with the
       right case and gender ("Видалити портфель", "Портфель «…» видалено").
-- [ ] Screen reader: each **Remove** button says which account; the confirm button's disabled state is announced.
-- [ ] `npm test`, `npm run typecheck`, `npm run build` pass.
+- [x] Screen reader: each **Remove** button says which account; the confirm button's disabled state is announced.
+- [x] `npm test`, `npm run typecheck`, `npm run build` pass.
 
 ## Verification
 
@@ -113,8 +113,29 @@ Manual checks (dev with `?demo`, then the live app on the iPhone with a throwawa
 
 _(Append a dated entry before you stop, even mid-task: what is done, what is next, surprises.)_
 
+- **2026-10-12** — Done.
+  - New: `src/ui/accountName.ts` (`nameMatches`) with `src/ui/accountName.test.ts`; `src/ui/AccountsSection.tsx`;
+    `src/ui/RemoveAccountSheet.tsx`; `src/i18n/accountCounts.test.ts` (plural forms for 1, 3, 5, 21 in Ukrainian).
+  - `SettingsSheet` takes `accounts`, `journal`, `onRemoveAccount` and renders the Accounts section between Language
+    and About. `JournalApp` has the `removeAccount` sheet kind, the `dropAccount` handler (one `apply`, then the first
+    remaining account is stored, sheet closed, toast) and closes the sheet when the account is already gone.
+  - **Key names differ from plan §5.3:** all strings are in one new group `accounts` in `en.ts` / `uk.ts`
+    (`accounts.title`, `.counts`, `.removeTitle`, `.what`, `.typeToConfirm`, `.confirm`, `.removed`, …). The plan
+    now says so. The counts use a no-break space between the number and the word, so "1 bag" never breaks.
+  - Ukrainian wording changed a little from the plan draft: «Цю дію не можна скасувати. …» and «Щоб підтвердити,
+    введіть {name}» read more naturally.
+  - The "Type … to confirm" label sits above the input (not in a `Field` row), because the label column is too narrow
+    for the sentence.
+  - Manual checks with headless Chrome driven over the DevTools protocol (dev server, `?demo`, 430 px; English and
+    Ukrainian; Ukrainian also at 320 px in dark mode): steps 1–4 and 6 of the list above pass. Step 5 was done with two
+    fresh browser profiles and the real Backup sheet (add "Tmp" on A, save, load on B; remove on A, save, load on B →
+    "Tmp" gone on B). The unsaved dot appears after a removal (checked without `?demo`, where it is always off).
+  - Not checked: the iPhone share sheet (desktop download path only). Do it after the deploy.
+  - Small known gap: after the confirmation sheet replaces Settings, focus goes back to the page body when the
+    sheets close (the button that opened the sheet is gone). Same for other sheet-to-sheet switches; not fixed here.
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
 | ----------- | ---------- | ---------- | ------------ |
-| Not started | 0%         | 0h         | 0            |
+| Done        | 100%       | 1h         | —            |
