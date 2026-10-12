@@ -30,3 +30,4 @@ Update the index below in the same change.
 | [Some brand kits set rules that a small logo tile cannot meet (minimum size, "no mark without the wordmark"). Is that acceptable?](02-kit-rules-at-small-size.md) | 02   | Open   |
 | [Four brands that were planned with a logo now show a letter badge. Should we ask them for a usable logo file?](02-letter-badge-fallbacks.md) | 02   | Open   |
 | [Should the two generic catalogue entries ("Paper / steel backup", "Other hardware wallet") get Ukrainian names?](04-generic-entry-names.md) | 04   | Open   |
+| [After Load backup, should the message also count bags and storages that changed, not only trades?](06-merge-toast-counts.md) | 06   | Open   |

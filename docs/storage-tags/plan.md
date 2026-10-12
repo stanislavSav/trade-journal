@@ -1,6 +1,6 @@
 # Storage tags — plan
 
-> **Status:** In progress · **Owner:** @stanislavSav · **Decided:** 2026-10-12
+> **Status:** Shipped (2026-10-12; iPhone checks of task 06 left for the owner) · **Owner:** @stanislavSav · **Decided:** 2026-10-12
 > **Vocabulary:** [docs/CONTEXT.md](../CONTEXT.md) (Bag, Storage, Storage tag, Tombstone, Device preference) ·
 > **Decisions:** §3 below and the global decisions G1–G7 in [docs/README.md](../README.md) · **Mockup:** none, the
 > wireframes in §5 are the contract · **Catalogue:** [catalogue.md](catalogue.md) · **Tasks:** [tasks/](tasks/README.md)

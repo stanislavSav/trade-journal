@@ -15,7 +15,7 @@ truth.** Update both in the same change.
 | 03  | [Storage picker and custom storages](03-picker-and-custom-storages.md)       | 02         | Done        | 100%     |
 | 04  | [Bag screen tags and Stored at in Add trade](04-bag-screen-and-add-trade.md)  | 03         | Done        | 100%     |
 | 05  | [List icon, filter chips and filtered totals](05-list-icon-and-filter.md)     | 04         | Done        | 100%     |
-| 06  | [QA and hardening](06-qa.md)                                                  | 05         | Not started | 0%       |
+| 06  | [QA and hardening](06-qa.md)                                                  | 05         | Done        | 100%     |
 
 ## How to pick up a task (also for a new agent session)
 
