@@ -1,27 +1,67 @@
 # Trade Journal
 
-A personal crypto trade journal. It is a PWA: add it to the iPhone Home Screen or open it in a desktop browser. Live prices come from the public CoinGecko API.
+A private crypto trade journal that runs in your browser. Group your buys and sells into bags, see the average cost and
+the realized and unrealized profit or loss of each one, with live prices from CoinGecko. Open it at
+https://stanislavsav.github.io/trade-journal/.
+
+<!-- Screenshots: list, bag, add trade. Sample data only. -->
+
+## Features
+
+- Bags: one trade idea for one coin, with its own average cost. A coin can have several bags.
+- Open and closed bags, realized and unrealized P/L.
+- Live prices from CoinGecko; the last known prices are kept for offline use.
+- Backups that merge and never lose trades.
+- Works offline after the first visit.
+- Installs to the iPhone Home Screen like an app.
+
+## Privacy
+
+There is no server, no account and no tracking: your trades stay in this browser on this device. The only network calls
+go to CoinGecko for prices and coin search. Your backup file is plain JSON, so keep it private. Details:
+[SECURITY.md](SECURITY.md).
+
+## Install on iPhone
+
+Open the live link in Safari → tap **Share** → **Add to Home Screen** → **Add**. On a desktop, the app works in a
+browser tab, or use the browser's install button if it shows one.
+
+## Try it
+
+Open the live app. Your data stays on your device. A demo link with sample data is coming.
+
+## How data works
+
+- Trades are stored only in the browser of each device (localStorage). There is no server.
+- **Save backup** writes `trades.json`. On iPhone the share sheet opens: for example, choose **Save to Files → iCloud
+  Drive** and replace the old file. On a desktop the file is downloaded.
+- **Load backup** reads `trades.json` and merges it with the data on the device. The merge never loses trades: records
+  are matched by id, the newest edit wins, and deletions are kept as tombstones.
+- To move data to another device: Save backup on one device, Load backup on the other.
+
+Trade data is never committed to this repository: `trades*.json` is in `.gitignore`.
 
 ## Develop
 
 ```sh
 npm install
-npm run dev     # local dev server
-npm test        # unit tests (Vitest)
-npm run build   # type check + production build in dist/
+npm run dev        # local dev server; add ?demo to the URL for sample data
+npm test           # unit tests (Vitest)
+npm run typecheck  # TypeScript check
+npm run build      # type check + production build in dist/
 ```
+
+After cloning, run `git config core.hooksPath .githooks` once. Commit rules: [CLAUDE.md](CLAUDE.md). Plans and task
+briefs: [docs/](docs/README.md).
 
 ## Deploy
 
-Push to `main`. The workflow in `.github/workflows/deploy.yml` tests, builds and publishes to GitHub Pages at `https://<user>.github.io/trade-journal/`.
+Push to `main`. The workflow in `.github/workflows/deploy.yml` tests, builds and publishes to GitHub Pages at
+https://stanislavsav.github.io/trade-journal/. For a fork, the address is `https://<your-user>.github.io/trade-journal/`.
 
-One-time setup: in the repository settings, set **Pages → Build and deployment → Source** to **GitHub Actions**.
+One-time setup for a fork: in the repository settings, set **Pages → Build and deployment → Source** to **GitHub
+Actions**.
 
-## How data works
+## Licence
 
-- Trades are stored only in the browser of each device (localStorage). There is no server.
-- **Save backup** writes `trades.json`. On iPhone the share sheet opens: choose **Save to Files → iCloud Drive → Trades** and replace the old file. On desktop the file is downloaded; move it to `iCloud Drive/Trades/trades.json`.
-- **Load backup** reads `trades.json` and merges it with the data on the device. The merge never loses trades: records are matched by id, the newest edit wins, and deletions are kept as tombstones.
-- To move data to another device: Save backup on one device, Load backup on the other.
-
-Trade data is never committed to this repository: `trades*.json` is in `.gitignore`.
+MIT, see [LICENSE](LICENSE).

@@ -1,6 +1,7 @@
 {
   "name": "trade-journal",
   "version": "0.1.0",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
