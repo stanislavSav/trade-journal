@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { asError, mergeJournals, type Journal } from '../domain'
+import { asError, mergeJournals, todayIso, type Journal } from '../domain'
 import {
   exportBackup,
   getBackupState,
@@ -11,7 +11,8 @@ import {
   type BackupState,
 } from '../storage'
 import { countMergedTrades, type MergeCounts } from './mergeCounts'
-import { demoJournal, isDemo } from './demo'
+import { isDemo } from './demo'
+import { demoJournal } from './demoData'
 
 export interface JournalApi {
   journal: Journal
@@ -35,7 +36,7 @@ function readBackupState(): BackupState {
 }
 
 export function useJournal(): JournalApi {
-  const [journal, setJournal] = useState<Journal>(() => (isDemo ? demoJournal() : loadJournal()))
+  const [journal, setJournal] = useState<Journal>(() => (isDemo ? demoJournal(todayIso()) : loadJournal()))
   const [backup, setBackup] = useState<BackupState>(readBackupState)
   const [saveError, setSaveError] = useState<Error | null>(null)
   // The ref always holds the newest journal, so several apply() calls in one tick chain correctly.

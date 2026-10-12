@@ -29,7 +29,7 @@
   - Rows as data (one row per trade: bag key, side, days-before-today or `null`, qty, total, optional note), plus a bag
     table (id, account, symbol, name, storage ids) and the coins (symbol, name, geckoId).
   - Fixed ids (`demo`, `demo-family`, `demo-swing`, `demo-bag-01`…`15`, `demo-trade-001`…,
-    `demo-storage-family-safe`).
+    `custom-demo-family-safe`; plan §6.2 note).
   - `createdAt` / `updatedAt` from the reference date: e.g. `Date.UTC(<today>) - 86_400_000 * daysBefore + rowIndex`
     for trades, and the reference date at 00:00 UTC + index for accounts, coins, bags, storages. Unknown-date trades
     use the bag's first known date for their timestamps.
@@ -61,12 +61,14 @@
 
 ## Acceptance criteria
 
-- [ ] All tests in step 1 pass.
-- [ ] `src/state/demoData.ts` has no call to `Date.now`, `new Date()` without an argument, `Math.random` or
-      `crypto.randomUUID`.
-- [ ] In `npm run dev` with `?demo`: the three accounts show; Open and Closed tabs both have bags; the LINK bag shows
-      the warning; FAKE shows "no live price"; storage chips (feature 5) show single tags, Mixed and No tag.
-- [ ] The plan §6.2 table matches the code (update the plan if the catalogue ids differ).
+- [x] All tests in step 1 pass (`src/state/demoData.test.ts`, 12 tests).
+- [x] `src/state/demoData.ts` has no call to `Date.now`, `new Date()` without an argument, `Math.random` or
+      `crypto.randomUUID` (a test reads the source and checks it).
+- [x] In `npm run dev` with `?demo`: the three accounts show; Open and Closed tabs both have bags; the LINK bag shows
+      the warning; FAKE shows "no live price". Storage chips: **not checked**, because the storage-tags UI (feature 5
+      tasks 02–05) is not on `main` yet. The data has single tags, two tags (Mixed), `[]`, no field, and the custom
+      storage; check the chips when the storage UI lands.
+- [x] The plan §6.2 table matches the code (plan updated: real catalogue ids and the `custom-` id prefix).
 
 ## Verification
 
@@ -83,8 +85,17 @@ oversold bag, the storage filter chips and the sort options in both languages.
 
 _(Append a dated entry before you stop, even mid-task: what is done, what is next, surprises.)_
 
+- **2026-10-12** — Done. `src/state/demoData.ts` builds the journal from three tables (accounts, bags, trade rows)
+  with fixed ids and timestamps; `useJournal` calls `demoJournal(todayIso())`; the old rows in `src/state/demo.ts`
+  are gone (it keeps only `isDemo`, still dev-only until task 02). Surprises: (1) the storage-tags domain requires
+  custom ids to start with `custom-`, so the custom storage is `custom-demo-family-safe` (plan updated). (2) The
+  storage-tags UI is still being built in parallel, so the storage chips could not be checked in the browser.
+  (3) Live prices (October 2026) are lower than the first ADA and TON buy prices I picked; I lowered those so the
+  demo does not show three −60 % bags. Every gecko id returned a live price in `npm run dev` (only FAKE has none).
+  Next: task 02.
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
 | ----------- | ---------- | ---------- | ------------ |
-| Not started | 0%         | 0h         | 0            |
+| Done        | 100%       | 1h         | —            |

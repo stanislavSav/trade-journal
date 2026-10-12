@@ -1,6 +1,6 @@
 # Demo data — plan
 
-> **Status:** Planned · **Owner:** @stanislavSav · **Decided:** 2026-10-12
+> **Status:** In progress · **Owner:** @stanislavSav · **Decided:** 2026-10-12
 > **Vocabulary:** [docs/CONTEXT.md](../CONTEXT.md) (Demo mode, Backup, Device preference, Storage tag) ·
 > **Decisions:** [docs/README.md](../README.md) G4, G5, G6, G7 · **Depends on:** features 1–5, especially
 > [i18n](../i18n/plan.md) (Settings sheet, `useT()`) and [storage tags](../storage-tags/plan.md) ·
@@ -58,7 +58,7 @@ Load backup, for example in a private window, to test backups and merging. Both 
 | D8  | Settings sheet in demo                             | Same as normal: language switch and About work. Account removal (feature 3) works on the in-memory demo journal. No extra demo section. |
 | D9  | Crash screen in demo                               | The crash screen (`src/ui/ErrorBoundary.tsx:22-52`) hides "Save backup" (it would export the real journal, not what the tester saw) and shows **Reload** and **Exit demo**. |
 | D10 | Dates: relative or fixed?                          | **Both, from one function.** `demoJournal(today: string)` places every trade "N days before `today`" (or on an unknown date). The live demo passes `todayIso()`, so it never looks stale. The sample file and the tests pass the fixed `DEMO_SAMPLE_DATE` (`'2026-10-01'`), so they are deterministic. No trade is ever after `today`. |
-| D11 | Ids and timestamps                                 | Fixed, readable ids: `demo-family` style account ids, `demo-bag-01` … `demo-bag-15`, `demo-trade-001` …, custom storage `demo-storage-family-safe`. `createdAt` / `updatedAt` are computed from the reference date and the row order. So: (1) the sample file is byte-stable for the drift test; (2) loading the sample file twice adds nothing (same ids, same `updatedAt`, G6); (3) a tester's later edits to sample trades win the merge (newer `updatedAt`). When the demo data changes, **move `DEMO_SAMPLE_DATE` forward**, so the new sample's records win over an older loaded copy. |
+| D11 | Ids and timestamps                                 | Fixed, readable ids: `demo-family` style account ids, `demo-bag-01` … `demo-bag-15`, `demo-trade-001` …, custom storage `custom-demo-family-safe`. `createdAt` / `updatedAt` are computed from the reference date and the row order. So: (1) the sample file is byte-stable for the drift test; (2) loading the sample file twice adds nothing (same ids, same `updatedAt`, G6); (3) a tester's later edits to sample trades win the merge (newer `updatedAt`). When the demo data changes, **move `DEMO_SAMPLE_DATE` forward**, so the new sample's records win over an older loaded copy. |
 | D12 | Account names                                      | `Demo`, `Demo Family`, `Demo Swing` (ids `demo`, `demo-family`, `demo-swing`). Account ids are name slugs (`src/domain/journal.ts:4-10`), so a sample account named `Family` would **merge into a tester's real `Family` account**. The `Demo` prefix avoids that. The sample never contains the default account `cs`. |
 | D13 | Demo content                                       | §6.2 table: 15 bags in 3 accounts. Every case the UI can show appears at least once. Numbers are made up and plausible. Only one trade has a note: the coin without a price ("Demo data, not a real trade"). |
 | D14 | Sample file                                        | `public/sample-backup.json` (served at `/trade-journal/sample-backup.json`). The name does not match `.gitignore`'s `trades*.json`, so it is committed. Content: `JSON.stringify(demoJournal(DEMO_SAMPLE_DATE), null, 2)` plus a final newline, the same shape as a real backup (`src/storage/index.ts:123`). |
@@ -201,29 +201,35 @@ flowchart LR
 
 ### 6.2 Demo content (contract for task 01)
 
-"−N" = N days before `today`; "?" = unknown date. Storage ids are examples from the storage-tags catalogue
-(`docs/storage-tags/plan.md` §6: predefined lower-case ids such as `binance`, `ledger`); task 01 uses the ids that
-really exist in the shipped catalogue and adjusts this table.
+"−N" = N days before `today`; "?" = unknown date. Storage ids are real ids from the shipped catalogue
+(`src/storage-tags/catalogue.ts`).
+
+> **Adjusted while building (2026-10-12, task 01):** the "hot wallet" and "DEX" placeholders are now real ids
+> (`rabby`, `keeper` = Tonkeeper, `jupiter`). The custom storage id is `custom-demo-family-safe`, not
+> `demo-storage-family-safe`: the storage-tags domain says every custom id starts with `custom-`
+> (`CUSTOM_ID_PREFIX`, `src/domain/storages.ts`), so the demo follows that rule. Bag #03 stores `storageIds: []`
+> ("no tags" chosen); bag #07 has no `storageIds` at all (never set). Both show as "No tag".
 
 | #  | Account     | Coin (geckoId)                | Bag name     | Trades                                           | Storage tags              | Case it shows |
 | -- | ----------- | ----------------------------- | ------------ | ------------------------------------------------ | ------------------------- | ------------- |
 | 01 | Demo        | BTC (`bitcoin`)               | Long-term    | buy −420, buy −300, buy −120                     | ledger                    | open; average of 3 buys; single tag icon |
 | 02 | Demo        | ETH (`ethereum`)              | Main         | buy −360, sell −200 (part), sell −30 (part)      | binance + ledger          | open after partial sells; Mixed |
-| 03 | Demo        | SOL (`solana`)                | Unknown date | buy ?, buy −90                                   | —                         | unknown date "?"; No tag |
+| 03 | Demo        | SOL (`solana`)                | Unknown date | buy ?, buy −90                                   | — (`[]`)                  | unknown date "?"; No tag |
 | 04 | Demo        | BTC (`bitcoin`)               | Swing        | buy −150, sell −110 (all)                        | binance                   | closed with profit; 2nd bag of the same coin |
 | 05 | Demo        | DOGE (`dogecoin`)             | Fun          | buy −250, sell −180 (all)                        | binance                   | closed with loss |
 | 06 | Demo        | LINK (`chainlink`)            | Oversold     | buy −100 (50), sell −60 (60)                     | binance                   | **warning** "Sold 10 more than held" |
 | 07 | Demo        | FAKE (no geckoId)             | Test coin    | buy −40, note "Demo data, not a real trade"      | —                         | **no live price**; note on a trade |
-| 08 | Demo Family | BTC (`bitcoin`)               | Kids fund    | 6 monthly buys −180 … −30                        | custom "Family safe" (other) | DCA; custom storage |
+| 08 | Demo Family | BTC (`bitcoin`)               | Kids fund    | 6 monthly buys −180 … −30                        | custom "Family safe" (other, `custom-demo-family-safe`) | DCA; custom storage |
 | 09 | Demo Family | ETH (`ethereum`)              | Staking      | buy −300                                         | ledger                    | one trade |
 | 10 | Demo Family | ADA (`cardano`)               | DCA          | 5 small buys −150 … −10                          | binance                   | many small buys |
 | 11 | Demo Family | XRP (`ripple`)                | Two sells    | buy −280, sell −200 (40 %), sell −140 (60 %)     | binance                   | closed through partial sells |
-| 12 | Demo Swing  | HYPE (`hyperliquid`)          | Breakout     | buy −45, buy −20                                 | a hot wallet              | recent, open |
+| 12 | Demo Swing  | HYPE (`hyperliquid`)          | Breakout     | buy −45, buy −20                                 | rabby                     | recent, open |
 | 13 | Demo Swing  | PEPE (`pepe`)                 | Meme         | buy −75 (huge qty, tiny price)                   | binance                   | tiny price format (`0.00001234`) |
-| 14 | Demo Swing  | SOL (`solana`)                | Breakout     | buy −130, sell −125 (all)                        | a DEX                     | closed with loss; same coin as #03 in another account |
-| 15 | Demo Swing  | TON (`the-open-network`)      | Airdrop      | buy −35, sell ? (half)                           | a hot wallet              | open; date range "dd.mm.yy – ?" |
+| 14 | Demo Swing  | SOL (`solana`)                | Breakout     | buy −130, sell −125 (all)                        | jupiter                   | closed with loss; same coin as #03 in another account |
+| 15 | Demo Swing  | TON (`the-open-network`)      | Airdrop      | buy −35, sell ? (half)                           | keeper                    | open; date range "dd.mm.yy – ?" |
 
-Totals: 3 accounts, 15 bags (10 open, 5 closed by design: #04, #05, #06, #11, #14), about 40 trades, 1 custom storage.
+Totals: 3 accounts, 15 bags (10 open, 5 closed by design: #04, #05, #06, #11, #14), 37 trades, 11 coins, 1 custom
+storage.
 The task checks the gecko ids against CoinGecko once (they are the ids the app's search returns today).
 
 ### 6.3 Data model
