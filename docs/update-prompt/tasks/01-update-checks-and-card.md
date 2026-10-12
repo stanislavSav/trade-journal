@@ -68,6 +68,10 @@ from the running commit to `main`, `src/pwa/changes.ts` + test) and the README s
 (fork at a checked commit, own GitHub Pages, Sync fork after reading the compare page). Checked in headless Chrome: the
 card with the link over Settings in dark mode; the Settings link points to `compare/<commit>...main`.
 
+**2026-10-12 — owner iPhone check.** The installed app, still on an old build, reloaded itself into the new build on
+open, without the card. Expected: the old client has no card and reloads on activation (plan D1). This commit is a new
+build, so the next open on the iPhone should show the card instead of reloading.
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
