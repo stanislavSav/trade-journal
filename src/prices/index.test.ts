@@ -136,7 +136,7 @@ describe('refreshPrices', () => {
     expect(prices.getCachedPrices().prices).toEqual({ bitcoin: 2, dogecoin: 0.1 })
   })
 
-  it('returns cached prices with a readable error on HTTP 429', async () => {
+  it('returns cached prices with the problem on HTTP 429', async () => {
     const fetchedAt = new Date(2026, 8, 30, 11, 2).getTime()
     seedCache({ prices: { bitcoin: 1 }, fetchedAt })
     fetchMock.mockResolvedValue(json({ status: { error_code: 429 } }, 429))
@@ -145,8 +145,7 @@ describe('refreshPrices', () => {
 
     expect(snap.prices).toEqual({ bitcoin: 1 })
     expect(snap.fetchedAt).toBe(fetchedAt)
-    const time = new Date(fetchedAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
-    expect(snap.error).toBe(`Rate limited — showing prices from ${time}`)
+    expect(snap.error).toEqual({ kind: 'rateLimited' })
     // The failure is not written into the cache.
     expect(prices.getCachedPrices()).toEqual({ prices: { bitcoin: 1 }, fetchedAt, error: null })
   })
@@ -154,7 +153,7 @@ describe('refreshPrices', () => {
   it('reports a rate limit even when nothing is cached yet', async () => {
     fetchMock.mockResolvedValue(json({}, 429))
     const snap = await prices.refreshPrices(['bitcoin'])
-    expect(snap).toEqual({ prices: {}, fetchedAt: null, error: 'Rate limited — no prices yet' })
+    expect(snap).toEqual({ prices: {}, fetchedAt: null, error: { kind: 'rateLimited' } })
   })
 
   it('never throws on network errors or bad responses', async () => {
@@ -162,15 +161,15 @@ describe('refreshPrices', () => {
     fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'))
     const offline = await prices.refreshPrices(['bitcoin'])
     expect(offline.prices).toEqual({ bitcoin: 1 })
-    expect(offline.error).toMatch(/^Could not reach CoinGecko — showing prices from /)
+    expect(offline.error).toEqual({ kind: 'offline' })
 
     fetchMock.mockResolvedValueOnce(new Response('<html>', { status: 200 }))
     const garbled = await prices.refreshPrices(['bitcoin'])
-    expect(garbled.error).toMatch(/^Price update failed/)
+    expect(garbled.error).toEqual({ kind: 'badResponse' })
 
     fetchMock.mockResolvedValueOnce(json({}, 500))
     const serverError = await prices.refreshPrices(['bitcoin'])
-    expect(serverError.error).toMatch(/^Price update failed \(HTTP 500\)/)
+    expect(serverError.error).toEqual({ kind: 'http', status: 500 })
   })
 
   it('shares one request between concurrent refreshes of the same ids', async () => {
@@ -234,5 +233,14 @@ describe('searchCoins', () => {
   it('throws a readable error when rate limited', async () => {
     fetchMock.mockResolvedValue(json({}, 429))
     await expect(prices.searchCoins('eth')).rejects.toThrow('Rate limited')
+  })
+
+  it('throws AppErrors with codes', async () => {
+    fetchMock.mockResolvedValueOnce(json({}, 429))
+    await expect(prices.searchCoins('eth')).rejects.toMatchObject({ code: 'searchRateLimited' })
+    fetchMock.mockResolvedValueOnce(json({}, 503))
+    await expect(prices.searchCoins('eth')).rejects.toMatchObject({ code: 'searchHttp', params: { status: 503 } })
+    fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'))
+    await expect(prices.searchCoins('eth')).rejects.toMatchObject({ code: 'searchOffline' })
   })
 })

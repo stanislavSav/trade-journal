@@ -1,5 +1,6 @@
 // Local persistence (this device only) and iCloud backup files.
 import { emptyJournal, parseJournal, type Journal } from '../domain'
+import { AppError } from '../domain/errors'
 
 export interface BackupState {
   lastChangeAt: number | null // last saveJournal() call
@@ -45,7 +46,7 @@ export function loadJournal(): Journal {
 /** Persist the journal and record lastChangeAt = now. */
 export function saveJournal(journal: Journal): void {
   if (!writeItem(JOURNAL_KEY, JSON.stringify(journal))) {
-    throw new Error('Could not save on this device (storage is full or blocked)')
+    throw new AppError('storageFull', 'Could not save on this device (storage is full or blocked)')
   }
   writeBackupState({ ...getBackupState(), lastChangeAt: Date.now() })
 }
@@ -128,7 +129,7 @@ export async function exportBackup(journal: Journal): Promise<'shared' | 'downlo
     } catch (err) {
       if (isAbortError(err)) return 'cancelled'
       const reason = err instanceof Error ? err.message : String(err)
-      throw new Error(`Could not open the share sheet: ${reason}`)
+      throw new AppError('shareFailed', `Could not open the share sheet: ${reason}`, { reason })
     }
     result = 'shared'
   } else {
@@ -139,19 +140,19 @@ export async function exportBackup(journal: Journal): Promise<'shared' | 'downlo
   return result
 }
 
-/** Read and validate a backup file picked by the user. Throws a readable Error on bad files. */
+/** Read and validate a backup file picked by the user. Throws an AppError on bad files. */
 export async function readBackupFile(file: File): Promise<Journal> {
   let text: string
   try {
     text = await file.text()
   } catch {
-    throw new Error('Could not read the file')
+    throw new AppError('fileUnreadable', 'Could not read the file')
   }
   let json: unknown
   try {
     json = JSON.parse(text)
   } catch {
-    throw new Error('File is not valid JSON')
+    throw new AppError('fileNotJson', 'File is not valid JSON')
   }
   return parseJournal(json)
 }

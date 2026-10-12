@@ -71,7 +71,14 @@ export interface BagSummary {
   realized: number // realized P/L of all sells in this bag
   firstDate: string | null
   lastDate: string | null
-  warnings: string[] // human-readable, e.g. "Sold 0.5 more than held"
+  warnings: BagWarning[] // data; the UI writes the sentence
+}
+
+/** Something in a bag's trades that the user should check. `oversold`: a sell of `qty` more coins than held. */
+export interface BagWarning {
+  kind: 'oversold'
+  qty: number
+  date: string | null // ISO date of the sell; null when unknown
 }
 
 /** Market value of an open bag at a given price. All null when the price is unknown. */

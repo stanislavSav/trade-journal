@@ -75,15 +75,15 @@ return **codes and numbers**; the UI turns them into text in the active language
 
 ## Acceptance criteria
 
-- [ ] `grep -rn "new Error(" src/domain src/storage src/prices` finds no user-visible message (only `AppError`).
-- [ ] `grep -rn "toLocaleString(undefined\|toLocaleTimeString(undefined" src` finds nothing.
-- [ ] `BagSummary.warnings` is `BagWarning[]`; the bag screen still lists the warning in English.
-- [ ] `PriceSnapshot.error` is `PriceProblem | null`; the summary card still shows the problem and the time of the last
+- [x] `grep -rn "new Error(" src/domain src/storage src/prices` finds no user-visible message (only `AppError`).
+- [x] `grep -rn "toLocaleString(undefined\|toLocaleTimeString(undefined" src` finds nothing.
+- [x] `BagSummary.warnings` is `BagWarning[]`; the bag screen still lists the warning in English.
+- [x] `PriceSnapshot.error` is `PriceProblem | null`; the summary card still shows the problem and the time of the last
       prices.
-- [ ] `defaultBagName('2026-06-03')` is still `Jun 26`; `defaultBagName('2026-06-03', UK_MONTHS)` uses the given list.
-- [ ] `errorText` test: an `AppError('qtyInvalid')` gives the catalog text in each language; `backupDamaged` gives a
+- [x] `defaultBagName('2026-06-03')` is still `Jun 26`; `defaultBagName('2026-06-03', UK_MONTHS)` uses the given list.
+- [x] `errorText` test: an `AppError('qtyInvalid')` gives the catalog text in each language; `backupDamaged` gives a
       headline plus `detail`; a plain `Error('x')` gives the generic headline with detail `x`.
-- [ ] All existing tests pass (updated where the type changed).
+- [x] All existing tests pass (updated where the type changed).
 
 ## Verification
 
@@ -101,8 +101,35 @@ on `main`.
 
 _(Append a dated entry before you stop, even mid-task: what is done, what is next, surprises.)_
 
+- **2026-10-12** — Done.
+  - `src/domain/errors.ts`: `ErrorCode`, `AppError(code, message, params)`, `isAppError`; exported from
+    `src/domain/index.ts`. Every user-visible `throw` in `actions.ts`, `journal.ts`, `storage/index.ts` and
+    `prices/index.ts` (search) is an `AppError` with today's English message.
+  - `storage/index.ts` and `prices/index.ts` import `AppError` from `../domain/errors` (not `../domain`), because
+    `storage/index.test.ts` mocks the whole `../domain` module.
+  - Codes: the list in Scope, plus `searchFailed` and `deviceOffline` for `useCoinSearch` (plan D16 has a note).
+    `useCoinSearch.error` is now an `AppError`; an error without a code shows "Search failed" instead of its raw
+    message (only odd failures, such as a broken CoinGecko response).
+  - `parseJournal`: `backupNotJournal` (with `detail: "<key> missing"` when a list is missing), `backupVersion`
+    `{ version }`, `backupDamaged` `{ detail }`. The messages are unchanged.
+  - `BagSummary.warnings: BagWarning[]`, `PriceSnapshot.error: PriceProblem | null`, `formatFetchedAt` removed; the
+    price line now uses `formatStamp` ("14:02" / "28.09.26 14:02").
+  - `defaultBagName(date, months = EN_MONTHS, newName = 'New')`; `EN_MONTHS` exported. `NUMBER_LOCALE` in
+    `format.ts`, also used by `numbers.ts`.
+  - `formValues.ts` returns codes; small helpers `amountErrorText`, `dateErrorText`, `readAsText` turn them into text.
+  - Deviation: instead of temporary English sentences, the texts this task touches (bag warning, price problem, form
+    errors, "read as", coin-search error) come from the catalogs already (`bag.oversold*`, `prices.*`, `trade.*`,
+    `errors.*`), with the same English. This saves writing them twice. Task 04 still owns the rest of each screen.
+  - `src/i18n/errorText.ts` + test. `errors` in `en.ts` uses `satisfies Record<ErrorCode, …>`, so a new code without
+    a text fails the type check.
+  - The `catch` blocks still show `err.message` (English, unchanged). Task 04 switches them to `errorText`; then Load
+    backup shows the D13 headlines, which is a planned English wording change.
+  - Checked in headless Chrome (English): bag warning, price problem with and without cached prices, coin search
+    offline, form errors, "read as", and four broken backup files all read as before (except the price time).
+  - Next: task 04.
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
 | ----------- | ---------- | ---------- | ------------ |
-| Not started | 0%         | 0h         | 0            |
+| Done        | 100%       | 1.5h       | —            |

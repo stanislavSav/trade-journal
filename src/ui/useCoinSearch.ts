@@ -1,16 +1,23 @@
 import { useEffect, useState } from 'react'
+import { AppError, isAppError } from '../domain/errors'
 import { searchCoins, type CoinSearchResult } from '../prices'
 
 export interface CoinSearch {
   results: CoinSearchResult[]
   loading: boolean
-  error: string | null
+  error: AppError | null // the UI writes the text (errorText)
 }
 
 interface Answer {
   query: string
   results: CoinSearchResult[]
-  error: string | null
+  error: AppError | null
+}
+
+/** Offline beats whatever the request said; an unknown failure becomes searchFailed. */
+function searchError(err: unknown): AppError {
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return new AppError('deviceOffline', 'Offline')
+  return isAppError(err) ? err : new AppError('searchFailed', 'Search failed')
 }
 
 const idle: CoinSearch = { results: [], loading: false, error: null }
@@ -29,9 +36,7 @@ export function useCoinSearch(query: string, enabled: boolean): CoinSearch {
         },
         (err: unknown) => {
           if (ctrl.signal.aborted) return
-          const offline = typeof navigator !== 'undefined' && navigator.onLine === false
-          const error = offline ? 'Offline' : err instanceof Error ? err.message : 'Search failed'
-          setAnswer({ query, results: [], error })
+          setAnswer({ query, results: [], error: searchError(err) })
         },
       )
     }, 400)

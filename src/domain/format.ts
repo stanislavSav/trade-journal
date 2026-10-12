@@ -1,11 +1,17 @@
 // Display formatting. All functions are pure; none throw on odd input.
 import type { Trade } from './types'
 
+/**
+ * Numbers and USD look the same in every UI language: "$1,234.56" (docs/i18n/plan.md D8, owner decision
+ * 2026-10-12). Changing the number style later is this one line.
+ */
+export const NUMBER_LOCALE = 'en-US'
+
 const DASH = '—'
 const MINUS = '−'
 
 function grouped(value: number, minDecimals: number, maxDecimals: number): string {
-  return value.toLocaleString('en-US', { minimumFractionDigits: minDecimals, maximumFractionDigits: maxDecimals })
+  return value.toLocaleString(NUMBER_LOCALE, { minimumFractionDigits: minDecimals, maximumFractionDigits: maxDecimals })
 }
 
 // Sign is decided on the rounded value so a tiny negative never prints as "−$0.00".
@@ -28,7 +34,7 @@ export function formatQty(value: number): string {
   const abs = Math.abs(value)
   if (abs >= 1000) return grouped(value, 0, 2)
   if (abs >= 1) return grouped(value, 0, 4)
-  return value.toLocaleString('en-US', { maximumSignificantDigits: 8 })
+  return value.toLocaleString(NUMBER_LOCALE, { maximumSignificantDigits: 8 })
 }
 
 /** Per-coin price with sensible precision: 12,346 · 45.68 · 3.1416 · 0.03457. null -> "—". */
@@ -39,7 +45,7 @@ export function formatPrice(value: number | null): string {
   if (abs >= 1000) return grouped(value, 0, 0)
   if (abs >= 10) return grouped(value, 2, 2)
   if (abs >= 1) return grouped(value, 4, 4)
-  return value.toLocaleString('en-US', { minimumSignificantDigits: 4, maximumSignificantDigits: 4 })
+  return value.toLocaleString(NUMBER_LOCALE, { minimumSignificantDigits: 4, maximumSignificantDigits: 4 })
 }
 
 /** "+6.7%" / "−14.5%". null -> "—". */

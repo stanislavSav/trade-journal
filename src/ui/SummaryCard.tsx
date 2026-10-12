@@ -1,4 +1,6 @@
 import { formatPct, formatUsd } from '../domain'
+import { useT, type Messages } from '../i18n'
+import type { PriceProblem } from '../prices'
 import type { UsePrices } from '../prices/usePrices'
 import { RefreshIcon } from './icons'
 import { tone } from './numbers'
@@ -11,7 +13,16 @@ interface Props {
   prices: UsePrices
 }
 
+/** "Rate limited — showing prices from 14:02": the problem, then how old the prices on screen are. */
+function priceProblemText(t: Messages, problem: PriceProblem, fetchedAt: number | null): string {
+  const what =
+    problem.kind === 'http' ? t.prices.http({ status: problem.status ?? 0 }) : t.prices[problem.kind]
+  const age = fetchedAt === null ? t.prices.noPricesYet : t.prices.showingFrom({ time: formatStamp(fetchedAt) })
+  return `${what} — ${age}`
+}
+
 export function SummaryCard({ totals, realized, prices }: Props) {
+  const t = useT()
   const { snapshot, refreshing, refresh } = prices
   const value = totals.count === 0 ? 0 : totals.value
   const plTone = tone(totals.pl)
@@ -51,7 +62,9 @@ export function SummaryCard({ totals, realized, prices }: Props) {
           <RefreshIcon />
         </button>
       </div>
-      {snapshot.error && <div className="price-error">{snapshot.error}</div>}
+      {snapshot.error && (
+        <div className="price-error">{priceProblemText(t, snapshot.error, snapshot.fetchedAt)}</div>
+      )}
     </section>
   )
 }

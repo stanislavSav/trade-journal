@@ -1,4 +1,5 @@
 // Live prices and coin search via the public CoinGecko API (no key, heavily rate limited).
+import { AppError } from '../domain/errors'
 
 export interface CoinSearchResult {
   geckoId: string
@@ -8,10 +9,16 @@ export interface CoinSearchResult {
   thumb: string | null // small logo URL
 }
 
+/** Why the last price refresh failed. The UI writes the sentence (docs/i18n/plan.md D16). */
+export interface PriceProblem {
+  kind: 'offline' | 'rateLimited' | 'http' | 'badResponse' | 'failed'
+  status?: number // HTTP status, for 'http'
+}
+
 export interface PriceSnapshot {
   prices: Record<string, number> // geckoId -> USD
   fetchedAt: number | null // when these prices were fetched
-  error: string | null // last refresh error, e.g. "Rate limited, showing prices from 14:02"
+  error: PriceProblem | null // last refresh error; the prices shown are from fetchedAt
 }
 
 const API = 'https://api.coingecko.com/api/v3'
@@ -55,10 +62,10 @@ export async function searchCoins(query: string, signal?: AbortSignal): Promise<
     res = await fetch(`${API}/search?query=${encodeURIComponent(q)}`, { signal })
   } catch (err) {
     if (signal?.aborted) throw err
-    throw new Error('Could not reach CoinGecko')
+    throw new AppError('searchOffline', 'Could not reach CoinGecko')
   }
-  if (res.status === 429) throw new Error('Rate limited by CoinGecko, try again in a minute')
-  if (!res.ok) throw new Error(`Coin search failed (HTTP ${res.status})`)
+  if (res.status === 429) throw new AppError('searchRateLimited', 'Rate limited by CoinGecko, try again in a minute')
+  if (!res.ok) throw new AppError('searchHttp', `Coin search failed (HTTP ${res.status})`, { status: res.status })
   const data: unknown = await res.json()
   const coins = isObject(data) && Array.isArray(data.coins) ? data.coins : []
   const wanted = q.toUpperCase()
@@ -102,16 +109,8 @@ function saveCache(snapshot: PriceSnapshot): void {
   }
 }
 
-function formatFetchedAt(at: number): string {
-  const date = new Date(at)
-  const time: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' }
-  if (date.toDateString() === new Date().toDateString()) return date.toLocaleTimeString(undefined, time)
-  return date.toLocaleString(undefined, { month: 'short', day: 'numeric', ...time })
-}
-
-function withError(cached: PriceSnapshot, problem: string): PriceSnapshot {
-  const detail = cached.fetchedAt === null ? 'no prices yet' : `showing prices from ${formatFetchedAt(cached.fetchedAt)}`
-  return { ...cached, error: `${problem} — ${detail}` }
+function withError(cached: PriceSnapshot, problem: PriceProblem): PriceSnapshot {
+  return { ...cached, error: problem }
 }
 
 async function fetchPrices(ids: string[]): Promise<PriceSnapshot> {
@@ -120,17 +119,17 @@ async function fetchPrices(ids: string[]): Promise<PriceSnapshot> {
     const url = `${API}/simple/price?ids=${ids.map(encodeURIComponent).join(',')}&vs_currencies=usd`
     res = await fetch(url, { signal: timeoutSignal() })
   } catch {
-    return withError(getCachedPrices(), 'Could not reach CoinGecko')
+    return withError(getCachedPrices(), { kind: 'offline' })
   }
-  if (res.status === 429) return withError(getCachedPrices(), 'Rate limited')
-  if (!res.ok) return withError(getCachedPrices(), `Price update failed (HTTP ${res.status})`)
+  if (res.status === 429) return withError(getCachedPrices(), { kind: 'rateLimited' })
+  if (!res.ok) return withError(getCachedPrices(), { kind: 'http', status: res.status })
   let data: unknown
   try {
     data = await res.json()
   } catch {
-    return withError(getCachedPrices(), 'Price update failed (bad response)')
+    return withError(getCachedPrices(), { kind: 'badResponse' })
   }
-  if (!isObject(data)) return withError(getCachedPrices(), 'Price update failed (bad response)')
+  if (!isObject(data)) return withError(getCachedPrices(), { kind: 'badResponse' })
 
   // Re-read the cache so prices written by another refresh in the meantime are kept.
   const cached = getCachedPrices()
@@ -171,6 +170,6 @@ export async function refreshPrices(geckoIds: string[], opts?: { force?: boolean
     }
     return await request
   } catch {
-    return withError(getCachedPrices(), 'Price update failed')
+    return withError(getCachedPrices(), { kind: 'failed' })
   }
 }

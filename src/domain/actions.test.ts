@@ -111,6 +111,13 @@ describe('addTrade', () => {
     expect(() => addTrade(j, { ...btcBuy, accountId: 'nobody' }, NOW)).toThrow('Account not found')
   })
 
+  it('throws AppErrors with codes the UI can translate', () => {
+    const j = emptyJournal()
+    expect(() => addTrade(j, { ...btcBuy, qty: 0 }, NOW)).toThrow(expect.objectContaining({ code: 'qtyInvalid' }))
+    expect(() => renameBag(j, 'missing', 'Swing', NOW)).toThrow(expect.objectContaining({ code: 'bagNotFound' }))
+    expect(() => addAccount(j, ' - ', NOW)).toThrow(expect.objectContaining({ code: 'accountNameRequired' }))
+  })
+
   it('names a blank new bag after the date', () => {
     const { journal } = addTrade(emptyJournal(), { ...btcBuy, date: null, bag: { newBagName: '   ' } }, NOW)
     expect(journal.bags[0]!.name).toBe('New')
@@ -126,6 +133,12 @@ describe('defaultBagName', () => {
 
   it('is "New" when the date is unknown', () => {
     expect(defaultBagName(null)).toBe('New')
+  })
+
+  it('uses the month list and the "New" word it is given', () => {
+    const months = ['Січ', 'Лют', 'Бер', 'Квіт', 'Трав', 'Черв', 'Лип', 'Серп', 'Вер', 'Жовт', 'Лист', 'Груд']
+    expect(defaultBagName('2026-06-03', months, 'Нова')).toBe('Черв 26')
+    expect(defaultBagName(null, months, 'Нова')).toBe('Нова')
   })
 })
 

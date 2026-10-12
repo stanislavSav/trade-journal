@@ -1,3 +1,4 @@
+import { AppError } from './errors'
 import type { Journal, Side, Synced } from './types'
 
 /** Lower-case slug used as the Account id, e.g. "CS" -> "cs", "My Fund" -> "my-fund". */
@@ -16,11 +17,15 @@ export function emptyJournal(): Journal {
 
 /**
  * Validate unknown JSON (e.g. a loaded backup file) and return a Journal.
- * Throws an Error with a short human-readable message when the shape is wrong.
+ * Throws an AppError (backupNotJournal, backupVersion or backupDamaged) when the shape is wrong; its message and
+ * `detail` say where, in English (docs/i18n/plan.md D13).
  */
 export function parseJournal(json: unknown): Journal {
-  if (!isObject(json) || !('version' in json)) throw new Error('Not a trade journal backup')
-  if (json.version !== 1) throw new Error(`Unsupported backup version: ${String(json.version)}`)
+  if (!isObject(json) || !('version' in json)) throw new AppError('backupNotJournal', 'Not a trade journal backup')
+  if (json.version !== 1) {
+    const version = String(json.version)
+    throw new AppError('backupVersion', `Unsupported backup version: ${version}`, { version })
+  }
   return {
     version: 1,
     accounts: parseList(json, 'accounts', 'Account', (f) => ({ ...f.synced(), name: f.string('name') })),
@@ -60,11 +65,9 @@ function isObject(value: unknown): value is Obj {
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
 
-// Typed field readers for one record; each throws "<where>: <problem>".
+// Typed field readers for one record; each throws backupDamaged with the detail "<where>: <problem>".
 function fields(record: Obj, where: string) {
-  const fail = (problem: string): never => {
-    throw new Error(`${where}: ${problem}`)
-  }
+  const fail = (problem: string): never => damaged(`${where}: ${problem}`)
   const id = (key: string): string => {
     const v = record[key]
     return typeof v === 'string' && v !== '' ? v : fail(`${key} must be a non-empty string`)
@@ -111,15 +114,21 @@ function fields(record: Obj, where: string) {
 
 type Fields = ReturnType<typeof fields>
 
+function damaged(detail: string): never {
+  throw new AppError('backupDamaged', detail, { detail })
+}
+
 function parseList<T extends Synced>(json: Obj, key: string, label: string, parse: (f: Fields) => T): T[] {
   const list = json[key]
-  if (!Array.isArray(list)) throw new Error(`Not a trade journal backup: ${key} missing`)
+  if (!Array.isArray(list)) {
+    throw new AppError('backupNotJournal', `Not a trade journal backup: ${key} missing`, { detail: `${key} missing` })
+  }
   const seen = new Set<string>()
   return list.map((item: unknown, i) => {
     const where = `${label} ${i + 1}`
-    if (!isObject(item)) throw new Error(`${where}: not an object`)
+    if (!isObject(item)) damaged(`${where}: not an object`)
     const record = parse(fields(item, where))
-    if (seen.has(record.id)) throw new Error(`${where}: duplicate id "${record.id}"`)
+    if (seen.has(record.id)) damaged(`${where}: duplicate id "${record.id}"`)
     seen.add(record.id)
     return record
   })

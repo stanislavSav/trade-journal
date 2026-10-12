@@ -105,6 +105,7 @@ describe('loadJournal / saveJournal', () => {
       },
     })
     expect(() => saveJournal(journal)).toThrow('Could not save on this device')
+    expect(() => saveJournal(journal)).toThrow(expect.objectContaining({ code: 'storageFull' }))
   })
 })
 
@@ -229,6 +230,10 @@ describe('readBackupFile', () => {
 
   it('rejects files that are not JSON', async () => {
     await expect(readBackupFile(new File(['hello'], 'x.json'))).rejects.toThrow('File is not valid JSON')
+  })
+
+  it('rejects with error codes the UI can translate', async () => {
+    await expect(readBackupFile(new File(['hello'], 'x.json'))).rejects.toMatchObject({ code: 'fileNotJson' })
   })
 
   it('passes validation errors through', async () => {

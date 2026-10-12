@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { Coin } from '../domain'
+import { errorText, useT } from '../i18n'
 import { currentPick, type AssetPick, type AssetValue } from './assetValue'
 import { Field } from './fields'
 import { msgId } from './formValues'
@@ -32,6 +33,7 @@ interface Props {
 }
 
 export function AssetField({ id, value, onChange, coins }: Props) {
+  const t = useT()
   const [suggesting, setSuggesting] = useState(false)
   const query = value.text.trim()
   const symbol = query.toUpperCase()
@@ -119,7 +121,7 @@ export function AssetField({ id, value, onChange, coins }: Props) {
             ))}
           {remoteWanted && remote.loading && <div className="suggest-status">Searching…</div>}
           {remoteWanted && !remote.loading && remote.error && (
-            <div className="suggest-status">Search unavailable ({remote.error}). You can still save.</div>
+            <div className="suggest-status">Search unavailable ({errorText(t, remote.error).text}). You can still save.</div>
           )}
           {remoteWanted && !remote.loading && !remote.error && remote.results.length === 0 && local.length === 0 && (
             <div className="suggest-status">No coins found</div>

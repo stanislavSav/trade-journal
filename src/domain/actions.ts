@@ -1,5 +1,6 @@
 // Pure journal edits. Each returns a new Journal and never mutates its input.
 // `now` is ms since epoch and becomes updatedAt (and createdAt for new trades).
+import { AppError } from './errors'
 import { accountIdFor } from './journal'
 import { summarizeAccount } from './portfolio'
 import type { Bag, Coin, Journal, Side, Synced, Trade } from './types'
@@ -20,13 +21,14 @@ export interface NewTradeInput {
 
 export type TradePatch = Partial<Pick<Trade, 'side' | 'date' | 'qty' | 'total' | 'note'>>
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+/** Month names for default bag names. The UI passes the list of its language (docs/i18n/plan.md D11). */
+export const EN_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 /** Add a trade; creates the Coin and/or Bag when needed. Returns the journal and the new trade id. */
 export function addTrade(journal: Journal, input: NewTradeInput, now: number): { journal: Journal; tradeId: string } {
   const symbol = input.symbol.trim().toUpperCase()
-  if (!symbol) throw new Error('Symbol is required')
-  if (!journal.accounts.some((a) => a.id === input.accountId && !a.deleted)) throw new Error('Account not found')
+  if (!symbol) throw new AppError('symbolRequired', 'Symbol is required')
+  if (!journal.accounts.some((a) => a.id === input.accountId && !a.deleted)) throw new AppError('accountNotFound', 'Account not found')
   checkTradeValues(input)
   const coins = ensureCoin(journal.coins, symbol, input, now)
   let bags = journal.bags
@@ -34,7 +36,7 @@ export function addTrade(journal: Journal, input: NewTradeInput, now: number): {
   if ('bagId' in input.bag) {
     const bag = liveBag(journal, input.bag.bagId)
     if (bag.accountId !== input.accountId || bag.symbol !== symbol) {
-      throw new Error(`Bag "${bag.name}" belongs to another account or coin`)
+      throw new AppError('bagOtherOwner', `Bag "${bag.name}" belongs to another account or coin`, { name: bag.name })
     }
     bagId = bag.id
   } else {
@@ -64,15 +66,15 @@ export function addTrade(journal: Journal, input: NewTradeInput, now: number): {
 
 // Same rules parseJournal enforces, so every saved journal can be restored from a backup.
 function checkTradeValues(t: Pick<Trade, 'side' | 'date' | 'qty' | 'total'>): void {
-  if (t.side !== 'buy' && t.side !== 'sell') throw new Error('Side must be buy or sell')
-  if (t.date !== null && !/^\d{4}-\d{2}-\d{2}$/.test(t.date)) throw new Error('Date must be YYYY-MM-DD')
-  if (!(Number.isFinite(t.qty) && t.qty > 0)) throw new Error('Quantity must be a positive number')
-  if (!(Number.isFinite(t.total) && t.total > 0)) throw new Error('Total must be a positive number')
+  if (t.side !== 'buy' && t.side !== 'sell') throw new AppError('sideInvalid', 'Side must be buy or sell')
+  if (t.date !== null && !/^\d{4}-\d{2}-\d{2}$/.test(t.date)) throw new AppError('dateInvalid', 'Date must be YYYY-MM-DD')
+  if (!(Number.isFinite(t.qty) && t.qty > 0)) throw new AppError('qtyInvalid', 'Quantity must be a positive number')
+  if (!(Number.isFinite(t.total) && t.total > 0)) throw new AppError('totalInvalid', 'Total must be a positive number')
 }
 
 function liveBag(journal: Journal, bagId: string): Bag {
   const bag = journal.bags.find((b) => b.id === bagId && !b.deleted)
-  if (!bag) throw new Error('Bag not found')
+  if (!bag) throw new AppError('bagNotFound', 'Bag not found')
   return bag
 }
 
@@ -114,7 +116,7 @@ export function updateTrade(journal: Journal, tradeId: string, patch: TradePatch
 
 function liveTrade(journal: Journal, tradeId: string): Trade {
   const trade = journal.trades.find((t) => t.id === tradeId && !t.deleted)
-  if (!trade) throw new Error('Trade not found')
+  if (!trade) throw new AppError('tradeNotFound', 'Trade not found')
   return trade
 }
 
@@ -130,7 +132,7 @@ export function deleteTrade(journal: Journal, tradeId: string, now: number): Jou
 
 export function renameBag(journal: Journal, bagId: string, name: string, now: number): Journal {
   const trimmed = name.trim()
-  if (!trimmed) throw new Error('Bag name is required')
+  if (!trimmed) throw new AppError('bagNameRequired', 'Bag name is required')
   const bag = liveBag(journal, bagId)
   return { ...journal, bags: putById(journal.bags, { ...bag, name: trimmed, updatedAt: now }) }
 }
@@ -142,7 +144,7 @@ export function upsertCoin(
   now: number,
 ): Journal {
   const symbol = coin.symbol.trim().toUpperCase()
-  if (!symbol) throw new Error('Symbol is required')
+  if (!symbol) throw new AppError('symbolRequired', 'Symbol is required')
   const next: Coin = {
     id: symbol,
     symbol,
@@ -156,7 +158,7 @@ export function upsertCoin(
 /** Add an account; no-op if a live account with the same id already exists. */
 export function addAccount(journal: Journal, name: string, now: number): Journal {
   const id = accountIdFor(name)
-  if (!id) throw new Error('Account name is required')
+  if (!id) throw new AppError('accountNameRequired', 'Account name is required')
   if (journal.accounts.some((a) => a.id === id && !a.deleted)) return journal
   // A fresh record (no `deleted`) also revives a tombstoned account with this id.
   return { ...journal, accounts: putById(journal.accounts, { id, name: name.trim(), updatedAt: now }) }
@@ -170,11 +172,14 @@ export function openBagsFor(journal: Journal, accountId: string, symbol: string)
     .map((s) => s.bag)
 }
 
-/** Default name for a new bag: month and 2-digit year of `date`, e.g. "Jun 26"; "New" when date is null. */
-export function defaultBagName(date: string | null): string {
+/**
+ * Default name for a new bag: month and 2-digit year of `date`, e.g. "Jun 26"; `newName` ("New") when date is null.
+ * The UI passes the month list and the "New" word of its language (docs/i18n/plan.md D11).
+ */
+export function defaultBagName(date: string | null, months: readonly string[] = EN_MONTHS, newName = 'New'): string {
   const match = /^\d{2}(\d{2})-(\d{2})-\d{2}$/.exec(date ?? '')
-  const month = match && MONTHS[Number(match[2]) - 1]
-  return match && month ? `${month} ${match[1]}` : 'New'
+  const month = match && months[Number(match[2]) - 1]
+  return match && month ? `${month} ${match[1]}` : newName
 }
 
 export function newId(): string {

@@ -1,15 +1,18 @@
 import type { ReactNode } from 'react'
 import {
   formatBagDates,
+  formatDate,
   formatPct,
   formatPrice,
   formatQty,
   formatUsd,
   valuePosition,
   type BagSummary,
+  type BagWarning,
   type Coin,
   type Side,
 } from '../domain'
+import { useT, type Messages } from '../i18n'
 import { BagName } from './BagName'
 import { BackIcon } from './icons'
 import { tone } from './numbers'
@@ -35,7 +38,13 @@ function Stat({ label, children, className = '' }: { label: string; children: Re
   )
 }
 
+function warningText(t: Messages, w: BagWarning): string {
+  const qty = formatQty(w.qty)
+  return w.date === null ? t.bag.oversold({ qty }) : t.bag.oversoldOn({ qty, date: formatDate(w.date) })
+}
+
 export function BagDetail({ summary: s, coin, price, backLabel, onBack, onEditTrade, onTrade, onRename }: Props) {
+  const t = useT()
   const open = s.status === 'open'
   const pos = valuePosition(s, price)
   const priced = open && pos.value !== null
@@ -91,8 +100,8 @@ export function BagDetail({ summary: s, coin, price, backLabel, onBack, onEditTr
         <div className="card warnings" role="note">
           <h2 className="warnings-title">Check these trades</h2>
           <ul>
-            {s.warnings.map((w) => (
-              <li key={w}>{w}</li>
+            {s.warnings.map((w, i) => (
+              <li key={i}>{warningText(t, w)}</li>
             ))}
           </ul>
         </div>

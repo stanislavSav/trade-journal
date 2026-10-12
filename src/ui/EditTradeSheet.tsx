@@ -1,7 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { formatPrice, formatQty, formatUsd, todayIso, type Side, type Trade, type TradePatch } from '../domain'
 import { DateInput, DecimalInput, Field, SideToggle } from './fields'
-import { dateError, readAmount, readAsHint } from './formValues'
+import { useT } from '../i18n'
+import { amountErrorText, dateErrorText, readAmount, readAsText } from './formValues'
 import { NoteField } from './NoteField'
 import { toInputText, toMoneyInputText } from './numbers'
 import { Sheet } from './Sheet'
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export function EditTradeSheet({ trade, symbol, onSave, onDelete, onClose }: Props) {
+  const t = useT()
   const [side, setSide] = useState<Side>(trade.side)
   const [date, setDate] = useState(trade.date ?? '')
   const [qtyText, setQtyText] = useState(() => toInputText(trade.qty))
@@ -33,11 +35,13 @@ export function EditTradeSheet({ trade, symbol, onSave, onDelete, onClose }: Pro
 
   const qty = readAmount(qtyText, 'qty')
   const total = readAmount(totalText, 'money')
-  const dError = dateError(date)
+  const dError = dateErrorText(t, date)
   const price = qty.value !== null && total.value !== null ? total.value / qty.value : null
   const valid = qty.value !== null && total.value !== null && !dError
-  const qtyHint = readAsHint(qtyText, qty.value, formatQty)
-  const totalHint = readAsHint(totalText, total.value, (v) => formatUsd(v))
+  const qtyError = amountErrorText(t, qty.error)
+  const totalError = amountErrorText(t, total.error)
+  const qtyHint = readAsText(t, qtyText, qty.value, formatQty)
+  const totalHint = readAsText(t, totalText, total.value, (v) => formatUsd(v))
 
   const run = (action: () => void) => {
     try {
@@ -79,22 +83,22 @@ export function EditTradeSheet({ trade, symbol, onSave, onDelete, onClose }: Pro
               )}
             </div>
           </Field>
-          <Field id="edit-qty" label="Qty" error={qty.error} hint={qtyHint}>
+          <Field id="edit-qty" label="Qty" error={qtyError} hint={qtyHint}>
             <DecimalInput
               id="edit-qty"
               value={qtyText}
               onChange={setQtyText}
-              invalid={!!qty.error}
-              hasMsg={!!qty.error || !!qtyHint}
+              invalid={!!qtyError}
+              hasMsg={!!qtyError || !!qtyHint}
             />
           </Field>
-          <Field id="edit-total" label="Total $" error={total.error} hint={totalHint}>
+          <Field id="edit-total" label="Total $" error={totalError} hint={totalHint}>
             <DecimalInput
               id="edit-total"
               value={totalText}
               onChange={setTotalText}
-              invalid={!!total.error}
-              hasMsg={!!total.error || !!totalHint}
+              invalid={!!totalError}
+              hasMsg={!!totalError || !!totalHint}
             />
           </Field>
           <div className="field readonly">

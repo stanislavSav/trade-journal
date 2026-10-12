@@ -1,5 +1,4 @@
-import { formatDate, formatQty } from './format'
-import type { AccountSummary, Bag, BagSummary, Journal, PositionValue, Trade } from './types'
+import type { AccountSummary, Bag, BagSummary, BagWarning, Journal, PositionValue, Trade } from './types'
 
 // Remaining qty at or below this fraction of the qty bought counts as zero (float noise from sums).
 const CLOSE_TOLERANCE = 1e-9
@@ -50,7 +49,7 @@ export function summarizeBag(bag: Bag, trades: Trade[]): BagSummary {
   let realized = 0
   let bought = 0
   let hasSell = false
-  const warnings: string[] = []
+  const warnings: BagWarning[] = []
   for (const t of ordered) {
     if (t.side === 'buy') {
       qty += t.qty
@@ -65,7 +64,7 @@ export function summarizeBag(bag: Bag, trades: Trade[]): BagSummary {
     const excess = t.qty - qty
     if (excess > tolerance) {
       realized += t.total - cost
-      warnings.push(`Sold ${formatQty(excess)} more than held${t.date === null ? '' : ` on ${formatDate(t.date)}`}`)
+      warnings.push({ kind: 'oversold', qty: excess, date: t.date })
       qty = 0
       cost = 0
       continue

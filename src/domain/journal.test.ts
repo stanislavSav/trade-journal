@@ -186,6 +186,16 @@ describe('parseJournal', () => {
     )
   })
 
+  it('throws AppErrors: a headline code plus the English detail', () => {
+    expect(() => parseJournal('hello')).toThrow(expect.objectContaining({ code: 'backupNotJournal' }))
+    expect(() => parseJournal({ ...full, version: 2 })).toThrow(
+      expect.objectContaining({ code: 'backupVersion', params: { version: '2' } }),
+    )
+    expect(() => parseJournal(withTrade({ qty: -1 }))).toThrow(
+      expect.objectContaining({ code: 'backupDamaged', params: { detail: 'Trade 1: qty must be a positive number' } }),
+    )
+  })
+
   it('drops unknown fields', () => {
     const parsed = parseJournal(withTrade({ extra: 'x' }))
     expect(parsed.trades[0]).toEqual(tradeOf('t1', 6))

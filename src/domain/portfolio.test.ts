@@ -100,7 +100,7 @@ describe('summarizeBag', () => {
 
   it('clamps to zero and warns when selling more than held', () => {
     const s = summarizeBag(bag, [trade('buy', '2026-07-01', 1, 100), trade('sell', '2026-07-21', 1.5, 300)])
-    expect(s.warnings).toEqual(['Sold 0.5 more than held on 21.07.26'])
+    expect(s.warnings).toEqual([{ kind: 'oversold', qty: 0.5, date: '2026-07-21' }])
     expect(s.qty).toBe(0)
     expect(s.cost).toBe(0)
     expect(s.realized).toBeCloseTo(200, 9)
@@ -123,7 +123,7 @@ describe('summarizeBag', () => {
   it('books the whole total of a sell with nothing held, without a date when unknown', () => {
     const s = summarizeBag(bag, [trade('sell', null, 2, 40)])
     expect(s.realized).toBeCloseTo(40, 9)
-    expect(s.warnings).toEqual(['Sold 2 more than held'])
+    expect(s.warnings).toEqual([{ kind: 'oversold', qty: 2, date: null }])
     expect(s.status).toBe('closed')
   })
 

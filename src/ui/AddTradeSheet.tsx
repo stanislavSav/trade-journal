@@ -17,7 +17,8 @@ import { assetSymbol, currentPick, type AssetValue } from './assetValue'
 import { BagField } from './BagField'
 import { NEW_BAG, bagOptions, exceedsHeld, resolveBagChoice, snapToHeld } from './bagChoice'
 import { DateInput, DecimalInput, Field, SideToggle } from './fields'
-import { dateError, readAmount, readAsHint } from './formValues'
+import { useT } from '../i18n'
+import { amountErrorText, dateErrorText, readAmount, readAsText } from './formValues'
 import { NoteField } from './NoteField'
 import { tone, toInputText } from './numbers'
 import { Sheet } from './Sheet'
@@ -50,6 +51,7 @@ function listWords(words: string[]): string {
 }
 
 export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Props) {
+  const t = useT()
   const coins = useMemo(() => journal.coins.filter((c) => !c.deleted), [journal])
   const [side, setSide] = useState<Side>(preset.side ?? 'buy')
   const [accountId, setAccountId] = useState(preset.accountId)
@@ -74,8 +76,12 @@ export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Pr
   const qty = readAmount(qtyText, 'qty')
   const total = readAmount(totalText, 'money')
   const held = side === 'sell' && selected ? selected.qty : null
-  const qtyError = qty.error ?? (exceedsHeld(qty.value, held) ? `You hold only ${formatQty(held ?? 0)}` : null)
-  const dError = dateError(date)
+  const qtyError =
+    amountErrorText(t, qty.error) ?? (exceedsHeld(qty.value, held) ? `You hold only ${formatQty(held ?? 0)}` : null)
+  const totalError = amountErrorText(t, total.error)
+  const qtyHint = readAsText(t, qtyText, qty.value, formatQty)
+  const totalHint = readAsText(t, totalText, total.value, (v) => formatUsd(v))
+  const dError = dateErrorText(t, date)
   const price = qty.value !== null && total.value !== null ? total.value / qty.value : null
   const sellPl =
     side === 'sell' && selected?.avg != null && qty.value !== null && total.value !== null
@@ -160,14 +166,14 @@ export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Pr
           <Field id="trade-date" label="Date" error={dError} hint={date === '' ? 'Unknown date, shown as ?' : null}>
             <DateInput id="trade-date" value={date} onChange={setDate} />
           </Field>
-          <Field id="trade-qty" label="Qty" error={qtyError} hint={readAsHint(qtyText, qty.value, formatQty)}>
+          <Field id="trade-qty" label="Qty" error={qtyError} hint={qtyHint}>
             <div className="input-with-btn">
               <DecimalInput
                 id="trade-qty"
                 value={qtyText}
                 onChange={setQtyText}
                 invalid={!!qtyError}
-                hasMsg={!!qtyError || !!readAsHint(qtyText, qty.value, formatQty)}
+                hasMsg={!!qtyError || !!qtyHint}
                 placeholder="0"
               />
               {held !== null && held > 0 && (
@@ -177,18 +183,13 @@ export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Pr
               )}
             </div>
           </Field>
-          <Field
-            id="trade-total"
-            label="Total $"
-            error={total.error}
-            hint={readAsHint(totalText, total.value, (v) => formatUsd(v))}
-          >
+          <Field id="trade-total" label="Total $" error={totalError} hint={totalHint}>
             <DecimalInput
               id="trade-total"
               value={totalText}
               onChange={setTotalText}
-              invalid={!!total.error}
-              hasMsg={!!total.error || !!readAsHint(totalText, total.value, (v) => formatUsd(v))}
+              invalid={!!totalError}
+              hasMsg={!!totalError || !!totalHint}
               placeholder={side === 'buy' ? 'paid, fees included' : 'received, after fees'}
             />
           </Field>

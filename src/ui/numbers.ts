@@ -1,3 +1,5 @@
+import { NUMBER_LOCALE } from '../domain/format'
+
 const count = (s: string, ch: string) => s.split(ch).length - 1
 
 /** "1,234,567" -> "1234567"; null when the groups are not thousands groups ("1,2,3"). */
@@ -46,7 +48,7 @@ export function isAmbiguousDecimal(text: string): boolean {
 
 /** A number as plain input text without float noise, e.g. 0.62500000000001 -> "0.625". */
 export function toInputText(n: number): string {
-  return n.toLocaleString('en-US', { useGrouping: false, maximumSignificantDigits: 12 })
+  return n.toLocaleString(NUMBER_LOCALE, { useGrouping: false, maximumSignificantDigits: 12 })
 }
 
 /** Like toInputText, but 1.234 becomes "1.2340" so parseDecimal(…, 'money') does not read it as 1234. */
