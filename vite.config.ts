@@ -44,6 +44,8 @@ export default defineConfig({
         // icons are added by the plugin.
         globPatterns: ['**/*.{js,css,html}', 'assets/*.svg'],
         navigateFallback: 'index.html',
+        // Opening the sample backup in the address bar must give the file, not the app (docs/demo-data/plan.md D16).
+        navigateFallbackDenylist: [/\/sample-backup\.json$/],
         cleanupOutdatedCaches: true,
         runtimeCaching: [
           {

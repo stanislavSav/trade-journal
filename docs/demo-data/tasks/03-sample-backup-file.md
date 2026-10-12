@@ -27,7 +27,8 @@ the app.
 - `src/state/sampleBackup.test.ts`:
   - `const text = JSON.stringify(demoJournal(DEMO_SAMPLE_DATE), null, 2) + '\n'`
   - `await expect(text).toMatchFileSnapshot('../../public/sample-backup.json')`
-  - the file parses with `parseJournal`;
+  - the file parses with `parseJournal` and nothing is dropped (`parseJournal(json)` equals `json`; checked against
+    the file alone, so the test still passes during the `-u` run that rewrites it);
   - **merge safety**: merging the sample into `emptyJournal()` and then merging it again gives
     `countMergedTrades(...)` = `{ added: 0, updated: 0 }` on the second merge, and the result still has the `cs`
     account untouched;
@@ -52,12 +53,12 @@ the app.
 
 ## Acceptance criteria
 
-- [ ] `public/sample-backup.json` is committed and `git check-ignore public/sample-backup.json` prints nothing.
-- [ ] `npm test` fails when the demo data changes without `-u`, and passes after `npm test -- -u`.
-- [ ] `CI=true npm test` does not write the file (check `git status` after a forced mismatch).
-- [ ] The sample file is not in the precache list; the denylist is in `dist/sw.js`.
-- [ ] With the service worker active, the sample URL shows the JSON.
-- [ ] Loading the sample twice in a fresh browser adds the trades once; the second load reports 0 new, 0 updated.
+- [x] `public/sample-backup.json` is committed and `git check-ignore public/sample-backup.json` prints nothing.
+- [x] `npm test` fails when the demo data changes without `-u`, and passes after `npm test -- -u`.
+- [x] `CI=true npm test` does not write the file (check `git status` after a forced mismatch).
+- [x] The sample file is not in the precache list; the denylist is in `dist/sw.js`.
+- [x] With the service worker active, the sample URL shows the JSON.
+- [x] Loading the sample twice in a fresh browser adds the trades once; the second load reports 0 new, 0 updated.
 
 ## Verification
 
@@ -74,8 +75,19 @@ Manual: steps 4 and 5 above.
 
 _(Append a dated entry before you stop, even mid-task: what is done, what is next, surprises.)_
 
+- **2026-10-12** — Done. `src/state/sampleBackup.test.ts` (4 tests) keeps `public/sample-backup.json` (13.6 KB,
+  37 trades) in step with `demoJournal(DEMO_SAMPLE_DATE)`. Checked: a changed number fails `npm test` and
+  `CI=true npm test` (and CI leaves the file unchanged: `git diff` empty); `npm test -- -u` rewrites it.
+  `vite.config.ts` has `navigateFallbackDenylist: [/\/sample-backup\.json$/]`; `dist/sw.js` has the regex and no
+  `sample-backup` precache entry (10 entries, as before). In headless Chrome on `npm run preview` with the service
+  worker in control: `/trade-journal/sample-backup.json` shows the JSON (`application/json`, same bytes as the repo
+  file); other in-scope URLs still get the app. A fresh profile: Load backup → "Merged: 37 new, 0 updated", again →
+  "Merged: 0 new, 0 updated"; tabs CS, Demo, Demo Family, Demo Swing.
+  Surprise: the first draft compared the parsed file with the current demo journal; that would fail during the `-u`
+  run after a data change, so the parse test now checks the file on its own.
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
 | ----------- | ---------- | ---------- | ------------ |
-| Not started | 0%         | 0h         | 0            |
+| Done        | 100%       | 0.5h       | —            |

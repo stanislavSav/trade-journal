@@ -1,0 +1,629 @@
+{
+  "version": 1,
+  "accounts": [
+    {
+      "id": "demo",
+      "name": "Demo",
+      "updatedAt": 1790812800000
+    },
+    {
+      "id": "demo-family",
+      "name": "Demo Family",
+      "updatedAt": 1790812800001
+    },
+    {
+      "id": "demo-swing",
+      "name": "Demo Swing",
+      "updatedAt": 1790812800002
+    }
+  ],
+  "coins": [
+    {
+      "id": "BTC",
+      "symbol": "BTC",
+      "name": "Bitcoin",
+      "geckoId": "bitcoin",
+      "updatedAt": 1790812800000
+    },
+    {
+      "id": "ETH",
+      "symbol": "ETH",
+      "name": "Ethereum",
+      "geckoId": "ethereum",
+      "updatedAt": 1790812800001
+    },
+    {
+      "id": "SOL",
+      "symbol": "SOL",
+      "name": "Solana",
+      "geckoId": "solana",
+      "updatedAt": 1790812800002
+    },
+    {
+      "id": "DOGE",
+      "symbol": "DOGE",
+      "name": "Dogecoin",
+      "geckoId": "dogecoin",
+      "updatedAt": 1790812800003
+    },
+    {
+      "id": "LINK",
+      "symbol": "LINK",
+      "name": "Chainlink",
+      "geckoId": "chainlink",
+      "updatedAt": 1790812800004
+    },
+    {
+      "id": "FAKE",
+      "symbol": "FAKE",
+      "name": "Fake Coin",
+      "geckoId": null,
+      "updatedAt": 1790812800005
+    },
+    {
+      "id": "ADA",
+      "symbol": "ADA",
+      "name": "Cardano",
+      "geckoId": "cardano",
+      "updatedAt": 1790812800006
+    },
+    {
+      "id": "XRP",
+      "symbol": "XRP",
+      "name": "XRP",
+      "geckoId": "ripple",
+      "updatedAt": 1790812800007
+    },
+    {
+      "id": "HYPE",
+      "symbol": "HYPE",
+      "name": "Hyperliquid",
+      "geckoId": "hyperliquid",
+      "updatedAt": 1790812800008
+    },
+    {
+      "id": "PEPE",
+      "symbol": "PEPE",
+      "name": "Pepe",
+      "geckoId": "pepe",
+      "updatedAt": 1790812800009
+    },
+    {
+      "id": "TON",
+      "symbol": "TON",
+      "name": "Toncoin",
+      "geckoId": "the-open-network",
+      "updatedAt": 1790812800010
+    }
+  ],
+  "bags": [
+    {
+      "id": "demo-bag-01",
+      "updatedAt": 1790812800000,
+      "accountId": "demo",
+      "symbol": "BTC",
+      "name": "Long-term",
+      "storageIds": [
+        "ledger"
+      ]
+    },
+    {
+      "id": "demo-bag-02",
+      "updatedAt": 1790812800001,
+      "accountId": "demo",
+      "symbol": "ETH",
+      "name": "Main",
+      "storageIds": [
+        "binance",
+        "ledger"
+      ]
+    },
+    {
+      "id": "demo-bag-03",
+      "updatedAt": 1790812800002,
+      "accountId": "demo",
+      "symbol": "SOL",
+      "name": "Unknown date",
+      "storageIds": []
+    },
+    {
+      "id": "demo-bag-04",
+      "updatedAt": 1790812800003,
+      "accountId": "demo",
+      "symbol": "BTC",
+      "name": "Swing",
+      "storageIds": [
+        "binance"
+      ]
+    },
+    {
+      "id": "demo-bag-05",
+      "updatedAt": 1790812800004,
+      "accountId": "demo",
+      "symbol": "DOGE",
+      "name": "Fun",
+      "storageIds": [
+        "binance"
+      ]
+    },
+    {
+      "id": "demo-bag-06",
+      "updatedAt": 1790812800005,
+      "accountId": "demo",
+      "symbol": "LINK",
+      "name": "Oversold",
+      "storageIds": [
+        "binance"
+      ]
+    },
+    {
+      "id": "demo-bag-07",
+      "updatedAt": 1790812800006,
+      "accountId": "demo",
+      "symbol": "FAKE",
+      "name": "Test coin"
+    },
+    {
+      "id": "demo-bag-08",
+      "updatedAt": 1790812800007,
+      "accountId": "demo-family",
+      "symbol": "BTC",
+      "name": "Kids fund",
+      "storageIds": [
+        "custom-demo-family-safe"
+      ]
+    },
+    {
+      "id": "demo-bag-09",
+      "updatedAt": 1790812800008,
+      "accountId": "demo-family",
+      "symbol": "ETH",
+      "name": "Staking",
+      "storageIds": [
+        "ledger"
+      ]
+    },
+    {
+      "id": "demo-bag-10",
+      "updatedAt": 1790812800009,
+      "accountId": "demo-family",
+      "symbol": "ADA",
+      "name": "DCA",
+      "storageIds": [
+        "binance"
+      ]
+    },
+    {
+      "id": "demo-bag-11",
+      "updatedAt": 1790812800010,
+      "accountId": "demo-family",
+      "symbol": "XRP",
+      "name": "Two sells",
+      "storageIds": [
+        "binance"
+      ]
+    },
+    {
+      "id": "demo-bag-12",
+      "updatedAt": 1790812800011,
+      "accountId": "demo-swing",
+      "symbol": "HYPE",
+      "name": "Breakout",
+      "storageIds": [
+        "rabby"
+      ]
+    },
+    {
+      "id": "demo-bag-13",
+      "updatedAt": 1790812800012,
+      "accountId": "demo-swing",
+      "symbol": "PEPE",
+      "name": "Meme",
+      "storageIds": [
+        "binance"
+      ]
+    },
+    {
+      "id": "demo-bag-14",
+      "updatedAt": 1790812800013,
+      "accountId": "demo-swing",
+      "symbol": "SOL",
+      "name": "Breakout",
+      "storageIds": [
+        "jupiter"
+      ]
+    },
+    {
+      "id": "demo-bag-15",
+      "updatedAt": 1790812800014,
+      "accountId": "demo-swing",
+      "symbol": "TON",
+      "name": "Airdrop",
+      "storageIds": [
+        "keeper"
+      ]
+    }
+  ],
+  "trades": [
+    {
+      "id": "demo-trade-001",
+      "updatedAt": 1754524800000,
+      "bagId": "demo-bag-01",
+      "side": "buy",
+      "date": "2025-08-07",
+      "qty": 0.2,
+      "total": 12400,
+      "createdAt": 1754524800000
+    },
+    {
+      "id": "demo-trade-002",
+      "updatedAt": 1764892800001,
+      "bagId": "demo-bag-01",
+      "side": "buy",
+      "date": "2025-12-05",
+      "qty": 0.15,
+      "total": 10500,
+      "createdAt": 1764892800001
+    },
+    {
+      "id": "demo-trade-003",
+      "updatedAt": 1780444800002,
+      "bagId": "demo-bag-01",
+      "side": "buy",
+      "date": "2026-06-03",
+      "qty": 0.1,
+      "total": 9800,
+      "createdAt": 1780444800002
+    },
+    {
+      "id": "demo-trade-004",
+      "updatedAt": 1759708800003,
+      "bagId": "demo-bag-02",
+      "side": "buy",
+      "date": "2025-10-06",
+      "qty": 5,
+      "total": 15500,
+      "createdAt": 1759708800003
+    },
+    {
+      "id": "demo-trade-005",
+      "updatedAt": 1773532800004,
+      "bagId": "demo-bag-02",
+      "side": "sell",
+      "date": "2026-03-15",
+      "qty": 1.5,
+      "total": 5700,
+      "createdAt": 1773532800004
+    },
+    {
+      "id": "demo-trade-006",
+      "updatedAt": 1788220800005,
+      "bagId": "demo-bag-02",
+      "side": "sell",
+      "date": "2026-09-01",
+      "qty": 1,
+      "total": 4200,
+      "createdAt": 1788220800005
+    },
+    {
+      "id": "demo-trade-007",
+      "updatedAt": 1783036800006,
+      "bagId": "demo-bag-03",
+      "side": "buy",
+      "date": null,
+      "qty": 40,
+      "total": 5600,
+      "createdAt": 1783036800006
+    },
+    {
+      "id": "demo-trade-008",
+      "updatedAt": 1783036800007,
+      "bagId": "demo-bag-03",
+      "side": "buy",
+      "date": "2026-07-03",
+      "qty": 20,
+      "total": 3400,
+      "createdAt": 1783036800007
+    },
+    {
+      "id": "demo-trade-009",
+      "updatedAt": 1777852800008,
+      "bagId": "demo-bag-04",
+      "side": "buy",
+      "date": "2026-05-04",
+      "qty": 0.05,
+      "total": 4600,
+      "createdAt": 1777852800008
+    },
+    {
+      "id": "demo-trade-010",
+      "updatedAt": 1781308800009,
+      "bagId": "demo-bag-04",
+      "side": "sell",
+      "date": "2026-06-13",
+      "qty": 0.05,
+      "total": 5250,
+      "createdAt": 1781308800009
+    },
+    {
+      "id": "demo-trade-011",
+      "updatedAt": 1769212800010,
+      "bagId": "demo-bag-05",
+      "side": "buy",
+      "date": "2026-01-24",
+      "qty": 10000,
+      "total": 3200,
+      "createdAt": 1769212800010
+    },
+    {
+      "id": "demo-trade-012",
+      "updatedAt": 1775260800011,
+      "bagId": "demo-bag-05",
+      "side": "sell",
+      "date": "2026-04-04",
+      "qty": 10000,
+      "total": 2100,
+      "createdAt": 1775260800011
+    },
+    {
+      "id": "demo-trade-013",
+      "updatedAt": 1782172800012,
+      "bagId": "demo-bag-06",
+      "side": "buy",
+      "date": "2026-06-23",
+      "qty": 50,
+      "total": 900,
+      "createdAt": 1782172800012
+    },
+    {
+      "id": "demo-trade-014",
+      "updatedAt": 1785628800013,
+      "bagId": "demo-bag-06",
+      "side": "sell",
+      "date": "2026-08-02",
+      "qty": 60,
+      "total": 1260,
+      "createdAt": 1785628800013
+    },
+    {
+      "id": "demo-trade-015",
+      "updatedAt": 1787356800014,
+      "bagId": "demo-bag-07",
+      "side": "buy",
+      "date": "2026-08-22",
+      "qty": 1000,
+      "total": 500,
+      "note": "Demo data, not a real trade",
+      "createdAt": 1787356800014
+    },
+    {
+      "id": "demo-trade-016",
+      "updatedAt": 1775260800015,
+      "bagId": "demo-bag-08",
+      "side": "buy",
+      "date": "2026-04-04",
+      "qty": 0.00588,
+      "total": 500,
+      "createdAt": 1775260800015
+    },
+    {
+      "id": "demo-trade-017",
+      "updatedAt": 1777852800016,
+      "bagId": "demo-bag-08",
+      "side": "buy",
+      "date": "2026-05-04",
+      "qty": 0.00568,
+      "total": 500,
+      "createdAt": 1777852800016
+    },
+    {
+      "id": "demo-trade-018",
+      "updatedAt": 1780444800017,
+      "bagId": "demo-bag-08",
+      "side": "buy",
+      "date": "2026-06-03",
+      "qty": 0.00526,
+      "total": 500,
+      "createdAt": 1780444800017
+    },
+    {
+      "id": "demo-trade-019",
+      "updatedAt": 1783036800018,
+      "bagId": "demo-bag-08",
+      "side": "buy",
+      "date": "2026-07-03",
+      "qty": 0.0049,
+      "total": 500,
+      "createdAt": 1783036800018
+    },
+    {
+      "id": "demo-trade-020",
+      "updatedAt": 1785628800019,
+      "bagId": "demo-bag-08",
+      "side": "buy",
+      "date": "2026-08-02",
+      "qty": 0.00463,
+      "total": 500,
+      "createdAt": 1785628800019
+    },
+    {
+      "id": "demo-trade-021",
+      "updatedAt": 1788220800020,
+      "bagId": "demo-bag-08",
+      "side": "buy",
+      "date": "2026-09-01",
+      "qty": 0.00446,
+      "total": 500,
+      "createdAt": 1788220800020
+    },
+    {
+      "id": "demo-trade-022",
+      "updatedAt": 1764892800021,
+      "bagId": "demo-bag-09",
+      "side": "buy",
+      "date": "2025-12-05",
+      "qty": 2,
+      "total": 6400,
+      "createdAt": 1764892800021
+    },
+    {
+      "id": "demo-trade-023",
+      "updatedAt": 1777852800022,
+      "bagId": "demo-bag-10",
+      "side": "buy",
+      "date": "2026-05-04",
+      "qty": 300,
+      "total": 114,
+      "createdAt": 1777852800022
+    },
+    {
+      "id": "demo-trade-024",
+      "updatedAt": 1780876800023,
+      "bagId": "demo-bag-10",
+      "side": "buy",
+      "date": "2026-06-08",
+      "qty": 300,
+      "total": 126,
+      "createdAt": 1780876800023
+    },
+    {
+      "id": "demo-trade-025",
+      "updatedAt": 1783900800024,
+      "bagId": "demo-bag-10",
+      "side": "buy",
+      "date": "2026-07-13",
+      "qty": 300,
+      "total": 135,
+      "createdAt": 1783900800024
+    },
+    {
+      "id": "demo-trade-026",
+      "updatedAt": 1786924800025,
+      "bagId": "demo-bag-10",
+      "side": "buy",
+      "date": "2026-08-17",
+      "qty": 300,
+      "total": 120,
+      "createdAt": 1786924800025
+    },
+    {
+      "id": "demo-trade-027",
+      "updatedAt": 1789948800026,
+      "bagId": "demo-bag-10",
+      "side": "buy",
+      "date": "2026-09-21",
+      "qty": 300,
+      "total": 108,
+      "createdAt": 1789948800026
+    },
+    {
+      "id": "demo-trade-028",
+      "updatedAt": 1766620800027,
+      "bagId": "demo-bag-11",
+      "side": "buy",
+      "date": "2025-12-25",
+      "qty": 1000,
+      "total": 2100,
+      "createdAt": 1766620800027
+    },
+    {
+      "id": "demo-trade-029",
+      "updatedAt": 1773532800028,
+      "bagId": "demo-bag-11",
+      "side": "sell",
+      "date": "2026-03-15",
+      "qty": 400,
+      "total": 1040,
+      "createdAt": 1773532800028
+    },
+    {
+      "id": "demo-trade-030",
+      "updatedAt": 1778716800029,
+      "bagId": "demo-bag-11",
+      "side": "sell",
+      "date": "2026-05-14",
+      "qty": 600,
+      "total": 1740,
+      "createdAt": 1778716800029
+    },
+    {
+      "id": "demo-trade-031",
+      "updatedAt": 1786924800030,
+      "bagId": "demo-bag-12",
+      "side": "buy",
+      "date": "2026-08-17",
+      "qty": 50,
+      "total": 1900,
+      "createdAt": 1786924800030
+    },
+    {
+      "id": "demo-trade-032",
+      "updatedAt": 1789084800031,
+      "bagId": "demo-bag-12",
+      "side": "buy",
+      "date": "2026-09-11",
+      "qty": 30,
+      "total": 1320,
+      "createdAt": 1789084800031
+    },
+    {
+      "id": "demo-trade-033",
+      "updatedAt": 1784332800032,
+      "bagId": "demo-bag-13",
+      "side": "buy",
+      "date": "2026-07-18",
+      "qty": 100000000,
+      "total": 1234,
+      "createdAt": 1784332800032
+    },
+    {
+      "id": "demo-trade-034",
+      "updatedAt": 1779580800033,
+      "bagId": "demo-bag-14",
+      "side": "buy",
+      "date": "2026-05-24",
+      "qty": 15,
+      "total": 2850,
+      "createdAt": 1779580800033
+    },
+    {
+      "id": "demo-trade-035",
+      "updatedAt": 1780012800034,
+      "bagId": "demo-bag-14",
+      "side": "sell",
+      "date": "2026-05-29",
+      "qty": 15,
+      "total": 2475,
+      "createdAt": 1780012800034
+    },
+    {
+      "id": "demo-trade-036",
+      "updatedAt": 1787788800035,
+      "bagId": "demo-bag-15",
+      "side": "buy",
+      "date": "2026-08-27",
+      "qty": 400,
+      "total": 960,
+      "createdAt": 1787788800035
+    },
+    {
+      "id": "demo-trade-037",
+      "updatedAt": 1787788800036,
+      "bagId": "demo-bag-15",
+      "side": "sell",
+      "date": null,
+      "qty": 200,
+      "total": 560,
+      "createdAt": 1787788800036
+    }
+  ],
+  "storages": [
+    {
+      "id": "custom-demo-family-safe",
+      "name": "Family safe",
+      "kind": "other",
+      "colour": "#1a7f37",
+      "updatedAt": 1790812800000
+    }
+  ]
+}
