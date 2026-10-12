@@ -15,6 +15,7 @@ import { errorText, useT } from '../i18n'
 import { usePrices } from '../prices/usePrices'
 import { useJournal } from '../state/useJournal'
 import { useStoredString } from '../state/useStoredString'
+import { bagStorages, storageLookup } from '../storage-tags/resolve'
 import { AddAccountSheet } from './AddAccountSheet'
 import { AddTradeSheet, type AddPreset } from './AddTradeSheet'
 import { BackupSheet } from './BackupSheet'
@@ -29,11 +30,14 @@ import { coinMap, findBagSummary, geckoIdsFor, liveAccounts, openPositions, open
 import { useBagRoute } from './route'
 import { SettingsSheet } from './SettingsSheet'
 import { SummaryCard } from './SummaryCard'
+import { StoragePickerSheet } from './StoragePickerSheet'
+import { applyBagStorages, customStorageHandlers } from './storageHandlers'
 import { accountTabId } from './tabKeys'
 import { Toast, type ToastMessage } from './Toast'
 
 type SheetState =
   | { kind: 'add'; preset: AddPreset }
+  | { kind: 'storages'; bagId: string } // storage picker over the bag screen
   | { kind: 'edit'; tradeId: string }
   | { kind: 'backup' }
   | { kind: 'account' }
@@ -75,6 +79,8 @@ export function JournalApp() {
   const notify = (text: string) => setToast({ id: Date.now(), text })
 
   const detail = useMemo(() => (bagId ? findBagSummary(journal, bagId) : null), [journal, bagId])
+  const lookup = useMemo(() => storageLookup(journal), [journal])
+  const storageEdits = customStorageHandlers(apply)
   const showingDetail = detail !== null
 
   // The list stays in place under the bag screen; only the bag screen scrolls meanwhile.
@@ -175,6 +181,8 @@ export function JournalApp() {
               })
             }
             onRename={(name) => apply((j, now) => renameBag(j, detail.bag.id, name, now))}
+            storages={bagStorages(detail.bag, lookup)}
+            onEditStorages={() => setSheet({ kind: 'storages', bagId: detail.bag.id })}
           />
         </DetailLayer>
       )}
@@ -184,6 +192,7 @@ export function JournalApp() {
           journal={journal}
           accounts={accounts}
           preset={sheet.preset}
+          storageEdits={storageEdits}
           onSave={saveTrade}
           onClose={() => setSheet(null)}
         />
@@ -215,6 +224,20 @@ export function JournalApp() {
         <AddAccountSheet accounts={accounts} onAdd={createAccount} onClose={() => setSheet(null)} />
       )}
       {sheet?.kind === 'settings' && <SettingsSheet onClose={() => setSheet(null)} />}
+
+      {sheet?.kind === 'storages' && detail?.bag.id === sheet.bagId && (
+        <StoragePickerSheet
+          journal={journal}
+          title={t.storage.storedAt}
+          initial={detail.bag.storageIds ?? []}
+          onSave={(ids) => {
+            setSheet(null)
+            if (applyBagStorages(apply, sheet.bagId, ids)) notify(t.storage.updated)
+          }}
+          onClose={() => setSheet(null)}
+          {...storageEdits}
+        />
+      )}
 
       <Toast message={toast} onDone={() => setToast(null)} />
     </>

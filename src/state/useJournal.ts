@@ -18,6 +18,7 @@ export interface JournalApi {
   /**
    * Compute the next journal from the latest one, persist it and render it; returns it.
    * Throws what `fn` throws (nothing changes then). A failed save keeps the change in memory and sets saveError.
+   * When `fn` returns the same journal (a no-op edit), nothing is saved.
    */
   apply: (fn: (j: Journal, now: number) => Journal) => Journal
   backup: BackupState
@@ -61,6 +62,8 @@ export function useJournal(): JournalApi {
     (fn: (j: Journal, now: number) => Journal) => {
       const now = Math.max(Date.now(), lastNow.current + 1)
       const next = fn(current.current, now)
+      // An edit that changed nothing (it returned the same journal) is not saved, so the backup state stays clean.
+      if (next === current.current) return next
       lastNow.current = now
       return commit(next)
     },

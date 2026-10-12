@@ -39,8 +39,10 @@ export function pickerGroups(
     byKey.get(key)?.push(info)
   }
   const collator = new Intl.Collator(locale, { sensitivity: 'base', numeric: true })
-  return GROUP_ORDER.map((key) => ({ key, items: byKey.get(key)!.sort((a, b) => collator.compare(a.name, b.name)) }))
-    .filter((group) => group.items.length > 0)
+  return GROUP_ORDER.map((key) => ({
+    key,
+    items: byKey.get(key)!.sort((a, b) => collator.compare(a.name, b.name)),
+  })).filter((group) => group.items.length > 0)
 }
 
 /**

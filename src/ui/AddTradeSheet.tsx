@@ -19,10 +19,14 @@ import { BagField } from './BagField'
 import { NEW_BAG, bagOptions, exceedsHeld, resolveBagChoice, snapToHeld } from './bagChoice'
 import { DateInput, DecimalInput, Field, FormError, SideToggle } from './fields'
 import { joinList, useLang, useT } from '../i18n'
+import { storageLookup, type StorageInfo } from '../storage-tags/resolve'
 import { amountErrorText, dateErrorText, readAmount, readAsText } from './formValues'
 import { NoteField } from './NoteField'
 import { tone, toInputText } from './numbers'
 import { Sheet } from './Sheet'
+import { StoragePickerSheet } from './StoragePickerSheet'
+import type { CustomStorageHandlers } from './storageHandlers'
+import { StorageChips } from './StorageTags'
 
 export interface AddPreset {
   accountId: string
@@ -35,6 +39,10 @@ interface Props {
   journal: Journal
   accounts: Account[]
   preset: AddPreset
+  /** Stored at, prefilled for a new bag (task 05 passes the active single-storage filter). */
+  presetStorageIds?: readonly string[]
+  /** The picker's custom-storage callbacks (storageHandlers.ts). */
+  storageEdits: CustomStorageHandlers
   /** May throw; the error is shown in the form. */
   onSave: (input: NewTradeInput) => void
   onClose: () => void
@@ -46,7 +54,7 @@ function initialAsset(symbol: string | undefined, coins: Coin[]): AssetValue {
   return { text: symbol ?? '', pick: null }
 }
 
-export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Props) {
+export function AddTradeSheet({ journal, accounts, preset, presetStorageIds, storageEdits, onSave, onClose }: Props) {
   const t = useT()
   const { lang } = useLang()
   const coins = useMemo(() => journal.coins.filter((c) => !c.deleted), [journal])
@@ -60,6 +68,8 @@ export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Pr
   const [totalText, setTotalText] = useState('')
   const [note, setNote] = useState('')
   const [saveError, setSaveError] = useState<Error | null>(null)
+  const [storageIds, setStorageIds] = useState<string[]>(() => [...(presetStorageIds ?? [])])
+  const [pickingStorage, setPickingStorage] = useState(false)
 
   const symbol = assetSymbol(asset)
   const account = useMemo(() => summarizeAccount(journal, accountId), [journal, accountId])
@@ -69,6 +79,10 @@ export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Pr
   )
   const choice = resolveBagChoice(bagChoice, options, side)
   const selected = options.find((s) => s.bag.id === choice) ?? null
+  // Stored at is asked only when the trade starts a new bag (docs/storage-tags/plan.md §5.5).
+  const startsNewBag = side === 'buy' && (choice === NEW_BAG || options.length === 0)
+  const lookup = useMemo(() => storageLookup(journal), [journal])
+  const chosenStorages = storageIds.map(lookup).filter((s): s is StorageInfo => s !== null)
 
   const qty = readAmount(qtyText, 'qty')
   const total = readAmount(totalText, 'money')
@@ -113,7 +127,10 @@ export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Pr
       coinName: pick?.name,
       // Unknown coin typed without picking a search result: saved without a live price.
       geckoId: pick ? pick.geckoId : known ? undefined : null,
-      bag: choice && choice !== NEW_BAG ? { bagId: choice } : { newBagName: newBagName.trim() || autoBagName },
+      bag:
+        choice && choice !== NEW_BAG
+          ? { bagId: choice }
+          : { newBagName: newBagName.trim() || autoBagName, ...(startsNewBag ? { storageIds } : {}) },
       side,
       date: date === '' ? null : date,
       qty: side === 'sell' ? snapToHeld(qty.value, held) : qty.value,
@@ -160,6 +177,24 @@ export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Pr
             onNewName={setNewBagName}
             newNamePlaceholder={autoBagName}
           />
+          {startsNewBag && (
+            <div className="field storage-field">
+              <span className="field-label" id="trade-storage-label">
+                {t.storage.storedAt}
+              </span>
+              <div className="field-control storage-field-control">
+                <StorageChips storages={chosenStorages} labelledBy="trade-storage-label" />
+                <button
+                  type="button"
+                  className="chip-btn"
+                  aria-describedby="trade-storage-label"
+                  onClick={() => setPickingStorage(true)}
+                >
+                  {t.storage.choose}
+                </button>
+              </div>
+            </div>
+          )}
           <Field id="trade-date" label={t.trade.date} error={dError} hint={date === '' ? t.trade.unknownDate : null}>
             <DateInput id="trade-date" value={date} onChange={setDate} />
           </Field>
@@ -217,6 +252,21 @@ export function AddTradeSheet({ journal, accounts, preset, onSave, onClose }: Pr
           <p className="form-hint">{t.trade.enter({ fields: joinList(lang, missing) })}</p>
         )}
       </form>
+      {/* A second sheet over this one (portal). Outside the form, so React events from the picker's own form
+          never reach this form's onSubmit. */}
+      {pickingStorage && (
+        <StoragePickerSheet
+          journal={journal}
+          title={t.storage.storedAt}
+          initial={storageIds}
+          onSave={(ids) => {
+            setStorageIds(ids)
+            setPickingStorage(false)
+          }}
+          onClose={() => setPickingStorage(false)}
+          {...storageEdits}
+        />
+      )}
     </Sheet>
   )
 }

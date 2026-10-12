@@ -344,6 +344,9 @@ export function bagsUsingStorage(journal, id): number
 // src/ui/StoragePickerSheet.tsx + CustomStorageForm.tsx (task 03); styles in src/ui/storage-tags.css.
 // src/ui/storageHandlers.ts: customStorageHandlers(apply) gives the picker's three custom-storage callbacks,
 // so JournalApp only opens the picker. src/ui/storageText.ts: kindLabel(t, kind), groupLabel(t, key).
+// Task 04: src/ui/StorageTags.tsx (StorageTags block + StorageChips, also used by the Add trade row);
+// applyBagStorages(apply, bagId, ids) in storageHandlers.ts returns false when nothing changed; useJournal's apply
+// does not save a journal that an edit returned unchanged, so a no-op Save leaves the backup state alone.
 
 // src/storage-tags/StorageIcon.tsx (+ storage-icon.css; the only .tsx in this folder)
 export function StorageIcon(props: { info: StorageInfo; size: number }): JSX.Element // aria-hidden

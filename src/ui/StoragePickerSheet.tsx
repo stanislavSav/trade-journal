@@ -4,9 +4,10 @@ import { useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { bagsUsingStorage, pickerGroups, usedStorageIds } from '../storage-tags/picker'
 import { storageList, storageLookup, type StorageInfo } from '../storage-tags/resolve'
 import { StorageIcon } from '../storage-tags/StorageIcon'
-import { MAX_STORAGE_TAGS, type CustomStorageInput, type Journal } from '../domain'
+import { asError, MAX_STORAGE_TAGS, type CustomStorageInput, type Journal } from '../domain'
 import { useLang, useT } from '../i18n'
 import { CustomStorageForm } from './CustomStorageForm'
+import { FormError } from './fields'
 import { PlusIcon } from './icons'
 import { Sheet } from './Sheet'
 import { groupLabel, kindLabel } from './storageText'
@@ -16,6 +17,7 @@ interface Props {
   journal: Journal
   title: string
   initial: readonly string[]
+  /** May throw; the error is shown above Save. */
   onSave: (ids: string[]) => void
   onClose: () => void
   /** The three custom-storage callbacks may throw; the message is shown in the form. */
@@ -44,6 +46,7 @@ export function StoragePickerSheet({
   const [query, setQuery] = useState('')
   const [view, setView] = useState<View>({ kind: 'list' })
   const [limitHit, setLimitHit] = useState(false)
+  const [saveError, setSaveError] = useState<Error | null>(null)
   const root = useRef<HTMLDivElement>(null)
   // Where focus and scroll go back to when the form view closes.
   const returnTo = useRef<{ focus: HTMLElement | null; scroll: number } | null>(null)
@@ -80,6 +83,14 @@ export function StoragePickerSheet({
       setLimitHit(true)
     } else {
       setDraft([...draft, id])
+    }
+  }
+
+  const save = () => {
+    try {
+      onSave(draft)
+    } catch (err) {
+      setSaveError(asError(err))
     }
   }
 
@@ -230,7 +241,8 @@ export function StoragePickerSheet({
         )}
 
         <div className="storage-save">
-          <button type="button" className="btn primary block" onClick={() => onSave(draft)}>
+          {saveError && <FormError error={saveError} />}
+          <button type="button" className="btn primary block" onClick={save}>
             {t.common.save}
           </button>
         </div>
@@ -241,7 +253,16 @@ export function StoragePickerSheet({
 
 function CheckIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M5 12.5l4.5 4.5L19 7" />
     </svg>
   )

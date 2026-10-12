@@ -214,6 +214,10 @@
   background: var(--sheet-bg);
 }
 
+.storage-save .form-error {
+  margin-bottom: 8px;
+}
+
 @media (min-width: 640px) {
   .storage-save {
     bottom: -20px;
@@ -310,4 +314,62 @@
   color: var(--muted);
   font-size: 15px;
   text-align: center;
+}
+
+/* Bag screen: "Stored at" under the coin line (plan §5.2). */
+.storage-tags {
+  margin-top: 4px;
+}
+
+.storage-tags-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+}
+
+.storage-tags-label {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.storage-tags-head .text-btn {
+  margin-right: -8px;
+}
+
+.storage-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.storage-tags .storage-chip {
+  background: var(--card);
+}
+
+.storage-not-set {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+/* Add trade: the Stored at row (plan §5.5). Chips wrap; Choose… stays at the end. */
+.storage-field-control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  padding: 6px 0;
+}
+
+.storage-field-control .storage-tag-list {
+  flex: 1 1 auto;
+}
+
+.storage-field-control .chip-btn {
+  margin-left: auto;
 }

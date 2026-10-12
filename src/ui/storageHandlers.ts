@@ -1,8 +1,9 @@
-// The custom-storage callbacks of StoragePickerSheet, bound to the journal (docs/storage-tags/plan.md §6).
+// The storage edits the UI makes, bound to the journal (docs/storage-tags/plan.md §6).
 // Kept out of JournalApp so that file only opens the picker. Each handler throws what the action throws.
 import {
   addCustomStorage,
   deleteCustomStorage,
+  setBagStorages,
   updateCustomStorage,
   type CustomStorageInput,
   type Journal,
@@ -30,4 +31,15 @@ export function customStorageHandlers(apply: Apply): CustomStorageHandlers {
     onUpdateCustom: (id, patch) => apply((j, now) => updateCustomStorage(j, id, patch, now)),
     onDeleteCustom: (id) => apply((j, now) => deleteCustomStorage(j, id, now)),
   }
+}
+
+/** Save the storage tags of a bag. Returns false when the list did not change (then nothing is written). */
+export function applyBagStorages(apply: Apply, bagId: string, ids: string[]): boolean {
+  let changed = false
+  apply((j, now) => {
+    const next = setBagStorages(j, bagId, ids, now)
+    changed = next !== j
+    return next
+  })
+  return changed
 }

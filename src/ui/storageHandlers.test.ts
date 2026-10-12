@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { emptyJournal, type Journal } from '../domain'
-import { customStorageHandlers } from './storageHandlers'
+import { addTrade, emptyJournal, type Journal } from '../domain'
+import { applyBagStorages, customStorageHandlers } from './storageHandlers'
 
 // The same contract as useJournal().apply: run fn on the latest journal; nothing changes when it throws.
 function fakeApply() {
@@ -32,5 +32,24 @@ describe('customStorageHandlers', () => {
       expect.objectContaining({ code: 'storageNameTaken' }),
     )
     expect(current()).toBe(before)
+  })
+})
+
+describe('applyBagStorages', () => {
+  it('saves a changed list and reports whether anything changed', () => {
+    const { apply, current } = fakeApply()
+    apply(
+      (j, now) =>
+        addTrade(j, { accountId: 'cs', symbol: 'BTC', bag: {}, side: 'buy', date: null, qty: 1, total: 10 }, now)
+          .journal,
+    )
+    const bagId = current().bags[0]!.id
+    expect(applyBagStorages(apply, bagId, ['binance'])).toBe(true)
+    expect(current().bags[0]!.storageIds).toEqual(['binance'])
+    const before = current()
+    expect(applyBagStorages(apply, bagId, ['binance'])).toBe(false)
+    expect(current()).toBe(before)
+    expect(applyBagStorages(apply, bagId, [])).toBe(true)
+    expect(current().bags[0]!.storageIds).toEqual([])
   })
 })
