@@ -13,11 +13,12 @@ import {
   type NewTradeInput,
   type TradePatch,
 } from '../domain'
-import { errorText, useT } from '../i18n'
+import { errorText, useLang, useT } from '../i18n'
 import { usePrices } from '../prices/usePrices'
 import { deviceKey, isDemo } from '../state/demo'
 import { useJournal } from '../state/useJournal'
 import { useStoredString } from '../state/useStoredString'
+import { activeFilter, filterChips, filterKey, matchesFilter } from '../storage-tags/filter'
 import { bagStorages, storageLookup } from '../storage-tags/resolve'
 import { AddAccountSheet } from './AddAccountSheet'
 import { AddTradeSheet, type AddPreset } from './AddTradeSheet'
@@ -30,14 +31,25 @@ import { DetailLayer } from './DetailLayer'
 import { EditTradeSheet } from './EditTradeSheet'
 import { Header } from './Header'
 import { PlusIcon } from './icons'
-import { coinMap, findBagSummary, geckoIdsFor, liveAccounts, openPositions, openTotals, priceFor } from './portfolioView'
+import {
+  coinMap,
+  findBagSummary,
+  geckoIdsFor,
+  liveAccounts,
+  openPositions,
+  openTotals,
+  priceFor,
+  realizedOf,
+} from './portfolioView'
 import { RemoveAccountSheet } from './RemoveAccountSheet'
 import { useBagRoute } from './route'
 import { SettingsSheet } from './SettingsSheet'
 import { SortSheet } from './SortSheet'
 import { SummaryCard } from './SummaryCard'
+import { StorageFilterBar } from './StorageFilterBar'
 import { StoragePickerSheet } from './StoragePickerSheet'
 import { applyBagStorages, customStorageHandlers } from './storageHandlers'
+import { filterCaption } from './storageText'
 import { accountTabId } from './tabKeys'
 import { Toast, type ToastMessage } from './Toast'
 import { useBagSort } from './useBagSort'
@@ -55,6 +67,7 @@ type SheetState =
 
 export function JournalApp() {
   const t = useT()
+  const { lang } = useLang()
   const api = useJournal()
   const { journal, apply } = api
 
@@ -68,18 +81,39 @@ export function JournalApp() {
   const idsKey = summary ? geckoIdsFor(summary.open, coins).join(',') : ''
   const geckoIds = useMemo(() => (idsKey === '' ? [] : idsKey.split(',')), [idsKey])
   const prices = usePrices(geckoIds)
+
+  // Storage filter (docs/storage-tags/plan.md §6.1): filter first, then sort, then totals. One device preference for
+  // every account; a chip the account does not have shows All and keeps the stored value (D3).
+  const lookup = useMemo(() => storageLookup(journal), [journal])
+  const [storedFilter, rememberFilter] = useStoredString(deviceKey('storage-filter'))
+  const chips = useMemo(
+    () => (summary ? filterChips([...summary.open, ...summary.closed], lookup, lang) : []),
+    [summary, lookup, lang],
+  )
+  const filter = useMemo(() => activeFilter(storedFilter, chips), [storedFilter, chips])
+  const filtered = useMemo(() => {
+    if (!summary) return null
+    if (filter.kind === 'all') return summary
+    const keep = (s: (typeof summary.open)[number]) => matchesFilter(s.bag, filter, lookup)
+    const open = summary.open.filter(keep)
+    const closed = summary.closed.filter(keep)
+    return { ...summary, open, closed, realized: realizedOf([...open, ...closed]) }
+  }, [summary, filter, lookup])
+
   const positions = useMemo(
-    () => (summary ? openPositions(summary.open, coins, prices.snapshot.prices) : []),
-    [summary, coins, prices.snapshot.prices],
+    () => (filtered ? openPositions(filtered.open, coins, prices.snapshot.prices) : []),
+    [filtered, coins, prices.snapshot.prices],
   )
   const totals = useMemo(() => openTotals(positions), [positions])
   // List order comes only from sortBags, with the sort saved on this device (docs/list-sorting/plan.md).
   const { sorts, pick } = useBagSort()
   const openRows = useMemo(() => sortBags(positions, sorts.open), [positions, sorts.open])
   const closedRows = useMemo(() => {
-    const rows = summary ? summary.closed.map((s) => ({ summary: s })) : []
+    const rows = filtered ? filtered.closed.map((s) => ({ summary: s })) : []
     return sortBags(rows, sorts.closed).map((r) => r.summary)
-  }, [summary, sorts.closed])
+  }, [filtered, sorts.closed])
+  // A trade started from a single-storage chip is tagged with it, so the new bag stays in the list.
+  const presetStorageIds = filter.kind === 'storage' ? [filter.id] : undefined
 
   const [listTab, setListTab] = useState<ListTab>('open')
   const [sheet, setSheet] = useState<SheetState>(null)
@@ -89,7 +123,6 @@ export function JournalApp() {
   const notify = (text: string) => setToast({ id: Date.now(), text })
 
   const detail = useMemo(() => (bagId ? findBagSummary(journal, bagId) : null), [journal, bagId])
-  const lookup = useMemo(() => storageLookup(journal), [journal])
   const storageEdits = customStorageHandlers(apply)
   const showingDetail = detail !== null
 
@@ -168,7 +201,21 @@ export function JournalApp() {
         )}
         {summary && accountId ? (
           <main id="account-panel" role="tabpanel" aria-labelledby={accountTabId(accountId)}>
-            <SummaryCard totals={totals} realized={summary.realized} prices={prices} />
+            {chips.length > 0 && (
+              <StorageFilterBar
+                key={accountId}
+                chips={chips}
+                active={filter}
+                lookup={lookup}
+                onPick={(f) => rememberFilter(filterKey(f))}
+              />
+            )}
+            <SummaryCard
+              totals={totals}
+              realized={filtered?.realized ?? summary.realized}
+              prices={prices}
+              caption={filterCaption(t, filter, lookup)}
+            />
             <BagList
               tab={listTab}
               onTab={setListTab}
@@ -177,6 +224,8 @@ export function JournalApp() {
               onOpen={openBag}
               sort={sorts[listTab]}
               onSortClick={() => setSheet({ kind: 'sort', tab: listTab })}
+              filter={filter}
+              lookup={lookup}
             />
           </main>
         ) : (
@@ -226,6 +275,7 @@ export function JournalApp() {
           journal={journal}
           accounts={accounts}
           preset={sheet.preset}
+          presetStorageIds={presetStorageIds}
           storageEdits={storageEdits}
           onSave={saveTrade}
           onClose={() => setSheet(null)}

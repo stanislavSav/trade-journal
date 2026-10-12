@@ -20,7 +20,9 @@ The app is in English and Ukrainian. The Ukrainian word for each term is in the 
 | **Invested**     | For an open bag in the list: cost of the coins still held. For a closed bag: total of all buys.            |
 | **Latest action**| The date of the newest buy or sell in a bag.                                                               |
 | **Storage**      | A place where coins are kept: a centralised exchange (CEX), a decentralised exchange (DEX), a hot wallet or a cold wallet. Predefined ones ship with the app; the user can add custom ones. |
+| **Custom storage** | A storage the user adds (name, kind, colour), shown with a letter badge. It is part of the journal, so it travels in backups. Deleting it leaves a tombstone. |
 | **Storage tag**  | A storage attached to a bag. A bag can have several. With exactly one tag, its icon shows before the coin symbol. |
+| **Storage filter** | The chip row above the summary card: All, each storage that is the only tag of a bag in this account, Mixed (2+ tags), No tag. The list, the Open / Closed counts and the summary totals follow it. A device preference. |
 | **Backup**       | The `trades.json` file. *Save backup* writes it; *Load backup* merges it into the device's journal.       |
 | **Tombstone**    | A record marked `deleted: true` instead of being removed, so the deletion survives a merge.                |
 | **Settings**     | The sheet behind the gear button in the header: Language, Accounts (remove an account) and About. Ukrainian UI: «Налаштування». |

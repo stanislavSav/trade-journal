@@ -308,6 +308,20 @@ export const en = {
     usedBy: pluralEn({ one: (n) => `Used by ${n} bag`, other: (n) => `Used by ${n} bags` }),
     notUsed: 'Not used by any bag',
     deleteStorage: 'Delete storage',
+    // Filter chips on the overview (docs/storage-tags/plan.md §5.1).
+    filterLabel: 'Filter by storage',
+    filterAll: 'All',
+    filterMixed: 'Mixed',
+    filterNone: 'No tag',
+    onlyStorage: (p: { name: string }) => `Only ${p.name}`,
+    onlyMixed: 'Only mixed storage',
+    onlyNone: 'Only bags without a tag',
+    emptyOpenIn: (p: { name: string }) => `No open bags in ${p.name}.`,
+    emptyClosedIn: (p: { name: string }) => `No closed bags in ${p.name}.`,
+    emptyOpenMixed: 'No open bags with mixed storage.',
+    emptyClosedMixed: 'No closed bags with mixed storage.',
+    emptyOpenNone: 'No open bags without a tag.',
+    emptyClosedNone: 'No closed bags without a tag.',
   },
 }
 

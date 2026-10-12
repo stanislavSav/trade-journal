@@ -79,3 +79,10 @@ export function openTotals(positions: OpenPosition[]): OpenTotals {
   const pl = value - cost
   return { value, pl, plPct: cost > 0 ? (pl / cost) * 100 : null, unpriced: count - priced, count }
 }
+
+/** Realized P/L over some bags, e.g. the open and closed bags that a storage filter keeps. */
+export function realizedOf(summaries: readonly BagSummary[]): number {
+  let sum = 0
+  for (const s of summaries) sum += s.realized
+  return sum
+}

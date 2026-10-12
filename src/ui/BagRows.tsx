@@ -1,13 +1,20 @@
 import { formatBagDates, formatPct, formatPrice, formatQty, formatUsd, type BagSummary } from '../domain'
 import { useT } from '../i18n'
+import { bagStorages, type StorageLookup } from '../storage-tags/resolve'
+import { StorageIcon } from '../storage-tags/StorageIcon'
 import { tone } from './numbers'
 import type { OpenPosition } from './portfolioView'
 
-function Title({ summary }: { summary: BagSummary }) {
+function Title({ summary, lookup }: { summary: BagSummary; lookup: StorageLookup }) {
   const t = useT()
+  // Exactly one known tag: its icon before the symbol (docs/storage-tags/plan.md D5).
+  const tags = bagStorages(summary.bag, lookup)
+  const only = tags.length === 1 ? tags[0] : undefined
   return (
     <span className="row-title">
+      {only && <StorageIcon info={only} size={18} />}
       {summary.bag.symbol}
+      {only && <span className="sr-only">, {only.name}</span>}
       {summary.warnings.length > 0 && (
         <span className="warn-dot" title={t.list.hasWarnings}>
           <span className="sr-only">{t.list.hasWarningsSr}</span>
@@ -17,13 +24,18 @@ function Title({ summary }: { summary: BagSummary }) {
   )
 }
 
-export function OpenRow({ position, onOpen }: { position: OpenPosition; onOpen: (bagId: string) => void }) {
+interface RowProps {
+  onOpen: (bagId: string) => void
+  lookup: StorageLookup
+}
+
+export function OpenRow({ position, onOpen, lookup }: RowProps & { position: OpenPosition }) {
   const t = useT()
   const { summary: s, pos } = position
   return (
     <button type="button" className="row" onClick={() => onOpen(s.bag.id)}>
       <span className="row-main">
-        <Title summary={s} />
+        <Title summary={s} lookup={lookup} />
         <span className="row-sub">{s.bag.name}</span>
         <span className="row-meta num">
           {t.list.qtyAvg({ qty: formatQty(s.qty), avg: formatPrice(s.avg) })}
@@ -44,11 +56,11 @@ export function OpenRow({ position, onOpen }: { position: OpenPosition; onOpen: 
   )
 }
 
-export function ClosedRow({ summary: s, onOpen }: { summary: BagSummary; onOpen: (bagId: string) => void }) {
+export function ClosedRow({ summary: s, onOpen, lookup }: RowProps & { summary: BagSummary }) {
   return (
     <button type="button" className="row" onClick={() => onOpen(s.bag.id)}>
       <span className="row-main">
-        <Title summary={s} />
+        <Title summary={s} lookup={lookup} />
         <span className="row-sub">{s.bag.name}</span>
         <span className="row-meta row-meta-wrap num">
           <span>{formatBagDates(s.trades)}</span>

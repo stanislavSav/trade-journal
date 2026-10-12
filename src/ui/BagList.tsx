@@ -1,9 +1,12 @@
 import type { BagSummary } from '../domain'
 import { useT } from '../i18n'
+import type { StorageFilter } from '../storage-tags/filter'
+import type { StorageLookup } from '../storage-tags/resolve'
 import type { BagSort } from './bagSort'
 import { ClosedRow, OpenRow } from './BagRows'
 import type { OpenPosition } from './portfolioView'
 import { sortAriaLabel, sortLabel } from './sortLabels'
+import { filterEmptyText } from './storageText'
 import { onTabKeys } from './tabKeys'
 
 export type ListTab = 'open' | 'closed'
@@ -17,15 +20,19 @@ interface Props {
   /** The sort of the shown tab; its button opens the sort sheet. */
   sort: BagSort
   onSortClick: () => void
+  /** The active storage filter: the lists are already filtered; it only changes the empty text. */
+  filter: StorageFilter
+  lookup: StorageLookup
 }
 
-export function BagList({ tab, onTab, open, closed, onOpen, sort, onSortClick }: Props) {
+export function BagList({ tab, onTab, open, closed, onOpen, sort, onSortClick, filter, lookup }: Props) {
   const t = useT()
   const tabs: { id: ListTab; label: string; count: number }[] = [
     { id: 'open', label: t.list.open, count: open.length },
     { id: 'closed', label: t.list.closed, count: closed.length },
   ]
   const shownCount = tab === 'open' ? open.length : closed.length
+  const emptyText = filterEmptyText(t, filter, lookup, tab) ?? (tab === 'open' ? t.list.emptyOpen : t.list.emptyClosed)
 
   return (
     <section className="bag-list">
@@ -47,7 +54,7 @@ export function BagList({ tab, onTab, open, closed, onOpen, sort, onSortClick }:
         ))}
       </div>
       <div id="bags-panel" role="tabpanel" aria-labelledby={`bags-tab-${tab}`}>
-        {/* The left side stays free for the storage filter chips of feature 5 (docs/list-sorting/plan.md §5.1). */}
+        {/* The storage filter chips sit above the summary card, not here (docs/storage-tags/plan.md §5.1). */}
         {shownCount > 0 && (
           <div className="list-tools">
             <button
@@ -65,20 +72,20 @@ export function BagList({ tab, onTab, open, closed, onOpen, sort, onSortClick }:
           open.length > 0 ? (
             <div className="card list">
               {open.map((p) => (
-                <OpenRow key={p.summary.bag.id} position={p} onOpen={onOpen} />
+                <OpenRow key={p.summary.bag.id} position={p} onOpen={onOpen} lookup={lookup} />
               ))}
             </div>
           ) : (
-            <p className="empty">{t.list.emptyOpen}</p>
+            <p className="empty">{emptyText}</p>
           )
         ) : closed.length > 0 ? (
           <div className="card list">
             {closed.map((s) => (
-              <ClosedRow key={s.bag.id} summary={s} onOpen={onOpen} />
+              <ClosedRow key={s.bag.id} summary={s} onOpen={onOpen} lookup={lookup} />
             ))}
           </div>
         ) : (
-          <p className="empty">{t.list.emptyClosed}</p>
+          <p className="empty">{emptyText}</p>
         )}
       </div>
     </section>

@@ -11,6 +11,8 @@ interface Props {
   totals: OpenTotals
   realized: number
   prices: UsePrices
+  /** "Only Binance" under Value while a storage filter is on (docs/storage-tags/plan.md §5.1). */
+  caption?: string | null
 }
 
 /** "Rate limited — showing prices from 14:02": the problem, then how old the prices on screen are. */
@@ -21,7 +23,7 @@ function priceProblemText(t: Messages, problem: PriceProblem, fetchedAt: number 
   return `${what} — ${age}`
 }
 
-export function SummaryCard({ totals, realized, prices }: Props) {
+export function SummaryCard({ totals, realized, prices, caption }: Props) {
   const t = useT()
   const { snapshot, refreshing, refresh } = prices
   const value = totals.count === 0 ? 0 : totals.value
@@ -33,8 +35,15 @@ export function SummaryCard({ totals, realized, prices }: Props) {
         <span className="summary-label">{t.summary.value}</span>
         <span className="summary-value num">{formatUsd(value)}</span>
       </div>
-      {totals.unpriced > 0 && (
-        <div className="summary-note">{t.summary.withoutPrice({ unpriced: totals.unpriced, count: totals.count })}</div>
+      {(caption || totals.unpriced > 0) && (
+        <div className="summary-sub">
+          {caption && <span className="summary-caption">{caption}</span>}
+          {totals.unpriced > 0 && (
+            <span className="summary-note">
+              {t.summary.withoutPrice({ unpriced: totals.unpriced, count: totals.count })}
+            </span>
+          )}
+        </div>
       )}
       <div className="summary-row">
         <span className="summary-label">{t.summary.openPl}</span>

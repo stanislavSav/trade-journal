@@ -55,7 +55,7 @@ the bags of one storage, and the summary card totals follow that filter. A catal
 | --- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | D1  | What carries the tag?                        | Each **bag**. Every list row is a bag, and two BTC bags can be kept in different places. A bag can have several tags.                                                                                                                                                                                                                                                       |
 | D2  | How does the overview filter?                | A horizontally scrolling row of **filter chips**: **All** · each storage that is the *only* tag of at least one bag in this account · **Mixed** (bags with 2 or more tags) · **No tag**. A tap shows only those bags. The **summary card totals follow the filter**. The row is hidden when no bag of the account has a tag.                                                 |
-| D3  | Is the chosen filter remembered?             | Yes, as a **device preference** (G5): `localStorage` key `trade-journal:ui:storage-filter`, not in backups. When the remembered chip does not exist in the current account, the app shows **All** (and keeps the stored value, so it comes back on the account that has it).                                                                                                  |
+| D3  | Is the chosen filter remembered?             | Yes, as a **device preference** (G5): `localStorage` key `trade-journal:ui:storage-filter` (built with `deviceKey('storage-filter')` from `src/state/demo.ts`, so the demo keeps its own `trade-journal:demo:ui:storage-filter`), not in backups. When the remembered chip does not exist in the current account, the app shows **All** (and keeps the stored value, so it comes back on the account that has it).                                                                                                  |
 | D4  | Which icons?                                 | **Real logos, bundled in the app.** They work offline and nothing is fetched from a third party (G7). A logo is used only to name the service; the app does not suggest any partnership.                                                                                                                                                                                    |
 | D5  | Where does the icon show?                    | With **exactly one** tag, the storage icon shows **before the coin symbol** in the list row and in the bag screen header. With 0 or 2+ tags there is no icon before the symbol.                                                                                                                                                                                             |
 | D6  | How does the filter work with sorting (#4)?  | **Filter first, then sort.** The sort from feature #4 runs on the filtered list.                                                                                                                                                                                                                                                                                              |
@@ -355,9 +355,17 @@ export function StorageIcon(props: { info: StorageInfo; size: number }): JSX.Ele
 export type StorageFilter = { kind: 'all' } | { kind: 'mixed' } | { kind: 'none' } | { kind: 'storage'; id: string }
 export function filterKey(f: StorageFilter): string // 'all' | 'mixed' | 'none' | 'storage:<id>'
 export function parseFilterKey(raw: string | null): StorageFilter // anything unknown → all
-export function filterChips(bags: BagSummary[], lookup): StorageFilter[] // [] when no bag has a known tag
+export function filterChips(bags: BagSummary[], lookup, locale?): StorageFilter[] // [] when no bag has a known tag
 export function matchesFilter(bag: Bag, f: StorageFilter, lookup): boolean
+export function activeFilter(raw: string | null, chips): StorageFilter // stored one if it is a chip, else all (D3)
+
+// Task 05: src/ui/StorageFilterBar.tsx (chip row; styles in src/ui/storage-tags.css). Chip, caption and empty-list
+// texts come from filterChipLabel / filterCaption / filterEmptyText in src/ui/storageText.ts. The filtered realized
+// sum is realizedOf(summaries) in src/ui/portfolioView.ts.
 ```
+
+Note (task 05): `filterChips` takes the UI language as a third argument, so storage names sort like the picker
+(`Intl.Collator`). `activeFilter` was added so the D3 fallback is a tested pure step.
 
 The folder is `src/storage-tags/`, not `src/storage/`: `src/storage/` already holds the `localStorage` persistence
 (`src/storage/index.ts:1`).
@@ -492,12 +500,14 @@ scripts/storage-icons.mjs   (dev-only; run with `npm run icons`; output is commi
 
 - `Sheet` for the picker (`src/ui/Sheet.tsx:13-60`); the layer stack in `src/ui/modal.ts:31-44` already handles a sheet
   opened from inside the bag screen.
-- `useStoredString` for the filter preference (`src/state/useStoredString.ts:4-26`), like the account preference
-  (`src/ui/JournalApp.tsx:44`).
+- `useStoredString(deviceKey('storage-filter'))` for the filter preference (`src/state/useStoredString.ts`), like
+  the account preference in `src/ui/JournalApp.tsx`. A raw `trade-journal:ui:` string in `src/` fails the guard test
+  `src/state/demo.test.ts`.
 - `putById` for all new writes (`src/domain/actions.ts:90-93`). `renameBag` and `deleteTrade` spread the old bag
   (`src/domain/actions.ts:127`, `:135`), so they keep `storageIds` without a change.
-- The `chip-btn` style (`src/ui/styles.css:738-757`) and the scroll style of `.account-tabs`
-  (`src/ui/styles.css:167-178`) for the chip row.
+- The scroll style of `.account-tabs` (`src/ui/styles.css`) for the chip row. The chips have their own pill style
+  (`.storage-filter-chip` in `src/ui/storage-tags.css`): `.chip-btn` is an accent-coloured action button and has no
+  selected state.
 - The two-tap delete pattern from `EditTradeSheet` (`src/ui/EditTradeSheet.tsx`, "Tap again to delete").
 
 ## 7. Libraries

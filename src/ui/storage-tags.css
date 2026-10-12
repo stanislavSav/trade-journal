@@ -373,3 +373,51 @@
 .storage-field-control .chip-btn {
   margin-left: auto;
 }
+
+/* Filter chips on the overview (StorageFilterBar), under the account tabs. The row scrolls sideways like the
+   account tabs; the page itself does not. Selected chip = filled. */
+.storage-filter {
+  position: relative; /* offsetParent for scrolling the remembered chip into view */
+  display: flex;
+  gap: 8px;
+  margin: -4px calc(-1 * var(--gutter)) 12px;
+  padding: 4px var(--gutter);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.storage-filter::-webkit-scrollbar {
+  display: none;
+}
+
+.storage-filter-chip {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 17px;
+  background: var(--fill);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.storage-filter-chip:has(.storage-icon) {
+  padding-left: 9px;
+}
+
+.storage-filter-chip[aria-pressed='true'] {
+  background: var(--accent-fill);
+  color: var(--on-accent);
+}
+
+/* Grows the hit area to 44 px without making the chip look big. */
+.storage-filter-chip::after {
+  content: '';
+  position: absolute;
+  inset: -5px -4px;
+}

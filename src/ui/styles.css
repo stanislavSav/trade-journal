@@ -299,10 +299,24 @@ button:disabled {
   margin-left: 8px;
 }
 
-.summary-note {
+/* Under Value: the storage filter caption on the left, "2 of 5 without price" on the right. */
+.summary-sub {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 12px;
   margin: -4px 0 4px;
   color: var(--muted);
   font-size: 13px;
+}
+
+.summary-caption {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.summary-note {
+  margin-left: auto;
   text-align: right;
 }
 
