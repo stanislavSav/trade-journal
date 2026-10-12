@@ -1443,6 +1443,109 @@ textarea.input {
   }
 }
 
+/* Build line in Settings → About links to the commit; keep the accent colour after a visit. */
+.about-head .help a {
+  color: var(--accent);
+}
+
+/* New-version card (docs/update-prompt/plan.md D5, D6) */
+
+.update-region {
+  position: fixed;
+  z-index: 210;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom) + 16px);
+  left: 0;
+  display: flex;
+  justify-content: center;
+  padding: 0 max(var(--gutter), env(safe-area-inset-right)) 0 max(var(--gutter), env(safe-area-inset-left));
+  pointer-events: none;
+}
+
+.update-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  align-items: center;
+  width: 100%;
+  max-width: 528px;
+  padding: 14px 14px 12px 16px;
+  border: var(--hairline) solid var(--sep);
+  border-radius: 18px;
+  background: var(--card-elevated);
+  box-shadow: var(--shadow);
+  pointer-events: auto;
+  animation: update-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+}
+
+.update-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--accent-fill);
+  color: var(--on-accent);
+  animation: update-spin 0.9s 0.25s ease-out both;
+}
+
+.update-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.update-text strong {
+  font-size: 16px;
+}
+
+.update-text span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.update-actions {
+  display: flex;
+  grid-column: 1 / -1;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.update-actions .btn.small {
+  min-height: 40px;
+}
+
+.update-later {
+  background: transparent;
+}
+
+@media (min-width: 420px) {
+  .update-card {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .update-actions {
+    grid-column: auto;
+    margin-top: 0;
+  }
+}
+
+@keyframes update-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(100% + 24px)) scale(0.96);
+  }
+}
+
+@keyframes update-spin {
+  from {
+    transform: rotate(-200deg) scale(0.6);
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -1,4 +1,5 @@
 /// <reference types="vitest/config" />
+import { execSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
@@ -10,10 +11,24 @@ const base = '/trade-journal/'
 // Shown in Settings → About (docs/i18n/plan.md §3 defaults). Read at build time, no runtime fetch.
 const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { version: string }
 
+// Which build is running, shown in Settings → About with a link to the commit (docs/update-prompt/plan.md D7).
+function commitSha(): string {
+  if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA
+  try {
+    return execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim()
+  } catch {
+    return ''
+  }
+}
+const commit = commitSha()
+const build = `${new Date().toISOString().slice(0, 10)} · ${commit ? commit.slice(0, 7) : 'local'}`
+
 export default defineConfig({
   base,
   define: {
     __APP_VERSION__: JSON.stringify(version),
+    __APP_BUILD__: JSON.stringify(build),
+    __APP_COMMIT__: JSON.stringify(commit),
   },
   plugins: [
     react(),
@@ -40,6 +55,11 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // A new worker takes over at once. vite-plugin-pwa sets these only with injectRegister 'auto'; we register in
+        // main.tsx, so without them a new version waited until every window was closed, which iOS rarely does
+        // (docs/update-prompt/plan.md D1). The client then shows the "new version" card instead of reloading.
+        skipWaiting: true,
+        clientsClaim: true,
         // App shell (js/css/html) and the storage logos (src/storage-tags/icons); includeAssets, the manifest and its
         // icons are added by the plugin.
         globPatterns: ['**/*.{js,css,html}', 'assets/*.svg'],

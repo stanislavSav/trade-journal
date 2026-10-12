@@ -313,6 +313,7 @@ export function JournalApp() {
           accounts={accounts}
           journal={journal}
           onRemoveAccount={(id) => setSheet({ kind: 'removeAccount', accountId: id })}
+          onNotify={notify}
           onClose={() => setSheet(null)}
         />
       )}

@@ -227,6 +227,20 @@ export const en = {
   },
   // One entry per ErrorCode (src/domain/errors.ts). The English texts match AppError.message, except the three
   // backup headlines (plan D13), which show the technical detail under them.
+  // New-version card and Settings → About checks (docs/update-prompt/plan.md).
+  update: {
+    title: 'New version available',
+    text: 'Refresh to load it.',
+    refresh: 'Refresh',
+    later: 'Later',
+    build: (p: { build: string }) => `Build ${p.build}`,
+    check: 'Check for updates',
+    checking: 'Checking…',
+    latest: 'You have the latest version',
+    downloading: 'Downloading the new version…',
+    offline: 'No connection. Try again later.',
+    unsupported: 'Updates are not available in this browser',
+  },
   errors: {
     symbolRequired: 'Symbol is required',
     accountNotFound: 'Account not found',

@@ -1,9 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { registerSW } from 'virtual:pwa-register'
+import { startUpdateChecks } from './pwa/updates'
 import { App } from './ui/App'
 
-registerSW({ immediate: true })
+startUpdateChecks()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
