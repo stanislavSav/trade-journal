@@ -205,7 +205,7 @@ export function countAccountData(journal: Journal, accountId: string): { bags: n
  */
 export function removeAccount(journal: Journal, accountId: string, now: number): Journal {
   const account = journal.accounts.find((a) => a.id === accountId && !a.deleted)
-  if (!account) throw new Error('Account not found')
+  if (!account) throw new AppError('accountNotFound', 'Account not found')
   const bagIds = accountBagIds(journal, accountId)
   return {
     ...journal,

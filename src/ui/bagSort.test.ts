@@ -200,6 +200,7 @@ describe('sortBags: defaults keep the order from before sorting existed', () => 
   it('DEFAULT_SORT.closed matches summarizeAccount(...).closed, unknown dates last', () => {
     const journal: Journal = {
       version: 1,
+    storages: [],
       accounts: [{ id: 'cs', name: 'CS', updatedAt: 1 }],
       coins: [],
       bags: [bag('c-june'), bag('c-undated'), bag('c-aug'), bag('c-jan')],

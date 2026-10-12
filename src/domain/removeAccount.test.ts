@@ -23,6 +23,7 @@ function trade(id: string, bagId: string, extra: Partial<Trade> = {}): Trade {
 function sample(): Journal {
   return {
     version: 1,
+    storages: [],
     accounts: [
       { id: 'cs', name: 'CS', updatedAt: OLD },
       { id: 'family', name: 'Family', updatedAt: OLD },
