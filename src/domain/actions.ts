@@ -2,6 +2,7 @@
 // `now` is ms since epoch and becomes updatedAt (and createdAt for new trades).
 import { AppError } from './errors'
 import { accountIdFor } from './journal'
+import { normaliseStorageIds } from './storages'
 import { summarizeAccount } from './portfolio'
 import type { Bag, Coin, Journal, Side, Synced, Trade } from './types'
 
@@ -10,8 +11,8 @@ export interface NewTradeInput {
   symbol: string // any case, stored upper case
   coinName?: string // used when the coin is new
   geckoId?: string | null // used when the coin is new or has no geckoId yet
-  /** Add to an existing bag, or start a new one (name defaults to defaultBagName). */
-  bag: { bagId: string } | { newBagName?: string }
+  /** Add to an existing bag, or start a new one (name defaults to defaultBagName; storageIds are its tags). */
+  bag: { bagId: string } | { newBagName?: string; storageIds?: string[] }
   side: Side
   date: string | null
   qty: number
@@ -30,6 +31,7 @@ export function addTrade(journal: Journal, input: NewTradeInput, now: number): {
   if (!symbol) throw new AppError('symbolRequired', 'Symbol is required')
   if (!journal.accounts.some((a) => a.id === input.accountId && !a.deleted)) throw new AppError('accountNotFound', 'Account not found')
   checkTradeValues(input)
+  const storageIds = 'bagId' in input.bag ? [] : normaliseStorageIds(input.bag.storageIds ?? [])
   const coins = ensureCoin(journal.coins, symbol, input, now)
   let bags = journal.bags
   let bagId: string
@@ -45,6 +47,7 @@ export function addTrade(journal: Journal, input: NewTradeInput, now: number): {
       accountId: input.accountId,
       symbol,
       name: input.bag.newBagName?.trim() || defaultBagName(input.date),
+      ...(storageIds.length > 0 ? { storageIds } : {}),
       updatedAt: now,
     }
     bags = [...bags, bag]

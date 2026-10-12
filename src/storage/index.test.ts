@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Journal } from '../domain'
 
-const EMPTY: Journal = { version: 1, accounts: [], coins: [], bags: [], trades: [] }
+const EMPTY: Journal = { version: 1, accounts: [], coins: [], bags: [], trades: [], storages: [] }
 
 vi.mock('../domain', () => ({
   emptyJournal: () => structuredClone(EMPTY),
@@ -46,6 +46,7 @@ const journal: Journal = {
   coins: [],
   bags: [],
   trades: [],
+  storages: [],
 }
 
 let storage: Storage

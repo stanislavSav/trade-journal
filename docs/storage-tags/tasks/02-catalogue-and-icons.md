@@ -52,13 +52,13 @@ offline.
 - `src/storage-tags/resolve.ts`: `StorageInfo`, `storageLookup(journal)` (catalogue + live custom storages; tombstoned
   custom → `null`), `bagStorages(bag, lookup)`, `storageSearch(query, infos)` (case- and accent-insensitive match on
   name, id and aliases).
-- `src/ui/StorageIcon.tsx`: `<StorageIcon info size />`. Logo → `<img src alt="" width height decoding="async">`;
-  `paper-backup` and `other-hardware` → a generic stroke icon (two new icons in `src/ui/icons.tsx`: a sheet with a key,
-  and a small device); no logo → letter badge (`<span>` with the first letter of the name, upper case, white or black by contrast on
+- `src/storage-tags/StorageIcon.tsx` (moved from `src/ui/`, see hand-off log): `<StorageIcon info size />`. Logo →
+  `<img src alt="" width height decoding="async">`; `paper-backup` and `other-hardware` → a generic stroke icon (two
+  icons in the same file, in the style of `src/ui/icons.tsx`: a sheet with a key, and a small device); no logo → letter badge (`<span>` with the first letter of the name, upper case, white or black by contrast on
   `info.colour`). Both are square with `border-radius: 22%` and an inset `1px var(--sep)` ring. `aria-hidden`; the
   caller provides the text.
 - `vite.config.ts`: `globPatterns: ['**/*.{js,css,html}', 'assets/*.svg']`.
-- `.storage-icon` styles in `src/ui/styles.css`.
+- `.storage-icon` styles in `src/storage-tags/storage-icon.css`, imported by `StorageIcon.tsx`.
 - Tests: `src/storage-tags/catalogue.test.ts`, `src/storage-tags/resolve.test.ts`.
 
 **Out:** where icons appear in the UI (tasks 03–05). Picking the 8 custom colours (task 01).
@@ -78,27 +78,30 @@ offline.
 
 ## Acceptance criteria
 
-- [ ] `catalogue.ts` has exactly the live rows of catalogue.md (same ids, names, kinds, colours). Test: ids are unique,
+- [x] `catalogue.ts` has exactly the live rows of catalogue.md (same ids, names, kinds, colours). Test: ids are unique,
       match `^[a-z0-9]+(-[a-z0-9]+)*$`, never start with `custom-`; colours match `^#[0-9a-f]{6}$`; every kind is one of
       `cex`, `dex`, `hot`, `cold`.
-- [ ] Test: every file in `src/storage-tags/icons/*.svg` is named after a catalogue id; each is ≤ 6 KB; the total is
+- [x] Test: every file in `src/storage-tags/icons/*.svg` is named after a catalogue id; each is ≤ 6 KB; the total is
       ≤ 200 KB; no file contains `<script`, `on[a-z]+=` or `href="http`.
-- [ ] `npm run icons` is repeatable: running it twice gives no git diff.
-- [ ] `NOTICE.md` lists every icon file with its source and licence and contains the Web3 Icons MIT notice.
-- [ ] A tile exists for every catalogue row whose icon source is `SI`, `W3I`, `KIT` or `REPO`, including Ledger, Trezor
+- [x] `npm run icons` is repeatable: running it twice gives no git diff.
+- [x] `NOTICE.md` lists every icon file with its source and licence and contains the Web3 Icons MIT notice.
+- [x] A tile exists for every catalogue row whose icon source is `SI`, `W3I`, `KIT` or `REPO`, including Ledger, Trezor
       and the other brands named in plan D8 (test compares the files with the source table of the script).
-- [ ] The "Icon licensing summary" table in catalogue.md matches the files that were really produced.
-- [ ] `storageLookup` returns `null` for an unknown id and for a tombstoned custom storage; `bagStorages` drops unknown
+- [x] The "Icon licensing summary" table in catalogue.md matches the files that were really produced.
+- [x] `storageLookup` returns `null` for an unknown id and for a tombstoned custom storage; `bagStorages` drops unknown
       ids and keeps order (tests).
-- [ ] `storageSearch('huobi')` finds HTX; `storageSearch('LEDG')` finds Ledger; an empty query returns everything
+- [x] `storageSearch('huobi')` finds HTX; `storageSearch('LEDG')` finds Ledger; an empty query returns everything
       (tests; use the actual aliases from catalogue.md).
-- [ ] `npm run build`: the main JS chunk grows by less than 25 KB (the catalogue data), not by the logos. Note the
+- [x] `npm run build`: the main JS chunk grows by less than 25 KB (the catalogue data), not by the logos. Note the
       before/after sizes in the hand-off log.
-- [ ] `dist/sw.js` precache manifest contains the logo files (`grep -c 'assets/.*\.svg' dist/sw.js` ≥ number of icon
-      files).
-- [ ] Manual: a scratch page (not committed) or the dev tools shows every tile at 18 px and 28 px, light and dark; dark
-      tiles (OKX, Trezor) have a visible edge.
-- [ ] `npm test`, `npm run typecheck` and `npm run build` pass.
+- [x] `dist/sw.js` precache manifest contains the logo files (`grep -c 'assets/.*\.svg' dist/sw.js` ≥ number of icon
+      files). Checked with a temporary import (no screen uses the icons before task 03): 95 entries for 97 files,
+      because two pairs have the same content and Vite emits one file each (Binance / Binance Wallet,
+      Uniswap / Uniswap Wallet).
+- [x] Manual: a scratch page (not committed) or the dev tools shows every tile at 18 px and 28 px, light and dark; dark
+      tiles (OKX, Trezor) have a visible edge. Done for the 97 logo tiles (headless Chrome screenshot). Letter badges
+      and the two generic icons are drawn by React and are seen for the first time in task 03.
+- [x] `npm test`, `npm run typecheck` and `npm run build` pass.
 
 ## Verification
 
@@ -118,8 +121,35 @@ logos still show (after task 05 they are visible in the list; before that, check
 
 _(Append a dated entry before you stop, even mid-task: what is done, what is next, surprises.)_
 
+- **2026-10-12** — Done, on a branch built in parallel with features #2–#4 (so no edits in `src/ui/`).
+  - **97 logo tiles** (plan expected 101): Simple Icons 11, Web3 Icons 45, brand kits 37 (including official site
+    files where no kit is online), project repositories 4. 35 letter badges, 2 generic icons. 134,412 bytes in total;
+    the largest file is `curve.svg` (6,100 bytes). catalogue.md has the per-row details and a "Changes made in task 02"
+    list; its summary table matches the files.
+  - Every kit and repository file was downloaded by hand into `scripts/storage-icons/official/` (the source table in
+    the script records each URL). Four rows fell back to `LETTER` (Sparrow, SeedSigner, COLDCARD, Bitstamp) and the
+    placeholder colours were replaced (parking lot
+    [02-letter-badge-fallbacks](../parking-lot/02-letter-badge-fallbacks.md)). Kit rules that a small tile cannot
+    meet: [02-kit-rules-at-small-size](../parking-lot/02-kit-rules-at-small-size.md).
+  - Script options beyond the plan: `background` (swap a W3I tile colour where only the colour changed: Kraken,
+    Gemini), `viewBox` (show only the symbol of a symbol + wordmark file), `scale`, `places` (decimals; Curve uses 1 to
+    fit 6 KB), `bg: null` (the file already is a full tile). `<style>` rules become attributes; `@media` rules are
+    dropped (Nexo's icon turns light in dark mode, which a tile with its own background must not do). `xlink:href`
+    becomes `href`. Every tile passes `xmllint`.
+  - `?no-inline` works with `import.meta.glob` in Vite 8 (checked with ctx7); no `assetsInlineLimit` callback needed.
+  - **Moved out of `src/ui/`:** `StorageIcon.tsx`, its CSS (`storage-icon.css`) and the two generic icons live in
+    `src/storage-tags/`, so this branch does not touch files the i18n work rewrites. `textColour` and `badgeLetter`
+    are in `resolve.ts` (pure, tested). `StorageInfo` has an `aliases` field and there is a `storageList(journal)`
+    helper for the picker. Plan §6 and task 03 updated.
+  - Main JS chunk: 277.27 kB before, 294.43 kB with a temporary import of `storageList` and `StorageIcon` (+17.2 kB,
+    the catalogue data). The logos stay separate files. Without that import, nothing uses the new code yet, so the
+    build is unchanged until task 03.
+  - README: the trademark sentence and a link to `NOTICE.md` under "Licence".
+  - Tests: 205 → 221 (`catalogue.test.ts` reads catalogue.md and the script's source table; `resolve.test.ts`).
+  - Next: task 03. It must import `StorageIcon` from `src/storage-tags/StorageIcon.tsx`.
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
 | ----------- | ---------- | ---------- | ------------ |
-| Not started | 0%         | 0h         | 0            |
+| Done        | 100%       | 3h         | —            |

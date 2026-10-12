@@ -40,8 +40,9 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // App shell (js/css/html); includeAssets, the manifest and its icons are added by the plugin.
-        globPatterns: ['**/*.{js,css,html}'],
+        // App shell (js/css/html) and the storage logos (src/storage-tags/icons); includeAssets, the manifest and its
+        // icons are added by the plugin.
+        globPatterns: ['**/*.{js,css,html}', 'assets/*.svg'],
         navigateFallback: 'index.html',
         cleanupOutdatedCaches: true,
         runtimeCaching: [

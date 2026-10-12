@@ -34,6 +34,8 @@ export interface Bag extends Synced {
   accountId: string
   symbol: string // Coin.symbol
   name: string // e.g. "Long-term", "Jun 26"
+  /** Storage ids (catalogue id or CustomStorage.id). Absent = never set (or dropped by an old app); [] = no tags. */
+  storageIds?: string[]
 }
 
 export interface Trade extends Synced {
@@ -54,6 +56,18 @@ export interface Journal {
   coins: Coin[]
   bags: Bag[]
   trades: Trade[]
+  storages: CustomStorage[]
+}
+
+/** Where a bag is kept. Predefined storages use the first four; `other` is for custom ones. */
+export type StorageKind = 'cex' | 'dex' | 'hot' | 'cold' | 'other'
+export const STORAGE_KINDS: readonly StorageKind[] = ['cex', 'dex', 'hot', 'cold', 'other']
+
+/** A storage the user added (the predefined ones live in src/storage-tags/catalogue.ts). `id` is `custom-<uuid>`. */
+export interface CustomStorage extends Synced {
+  name: string // 1–30 characters, trimmed
+  kind: StorageKind
+  colour: string // '#rrggbb', one of CUSTOM_COLOURS
 }
 
 export type BagStatus = 'open' | 'closed'

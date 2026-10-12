@@ -3,7 +3,7 @@ import { accountIdFor, emptyJournal, mergeJournals, parseJournal } from './journ
 import type { Account, Bag, Coin, Journal, Trade } from './types'
 
 function journalOf(parts: Partial<Omit<Journal, 'version'>>): Journal {
-  return { version: 1, accounts: [], coins: [], bags: [], trades: [], ...parts }
+  return { version: 1, accounts: [], coins: [], bags: [], trades: [], storages: [], ...parts }
 }
 
 const account = (id: string, updatedAt: number, name = id.toUpperCase()): Account => ({ id, name, updatedAt })
@@ -114,6 +114,7 @@ describe('emptyJournal', () => {
       coins: [],
       bags: [],
       trades: [],
+      storages: [],
     })
   })
 

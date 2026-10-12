@@ -15,7 +15,7 @@ glance and to ask "what do I hold on Binance, and how is it doing?".
 When this ships, each bag can carry one or more **storage tags** (Binance, Ledger, a custom "Safe deposit box", …). A bag
 with exactly one tag shows the storage logo before the coin symbol. A row of **filter chips** above the list shows only
 the bags of one storage, and the summary card totals follow that filter. A catalogue of 134 predefined storages
-(101 with a bundled logo) makes tagging fast. The user can add their own storages too.
+(97 with a bundled logo) makes tagging fast. The user can add their own storages too.
 
 ## 2. Scope
 
@@ -265,16 +265,16 @@ flowchart LR
   subgraph domain [src/domain — pure, tested]
     T[types.ts<br/>Bag.storageIds · CustomStorage · Journal.storages]
     J[journal.ts<br/>parseJournal · mergeJournals]
-    A[actions.ts<br/>addTrade · setBagStorages<br/>add/update/deleteCustomStorage]
+    A[actions.ts · storageActions.ts<br/>addTrade · setBagStorages<br/>add/update/deleteCustomStorage]
   end
   subgraph tags [src/storage-tags — pure + assets]
     CAT[catalogue.ts<br/>134 predefined storages]
     IC[icons.ts + icons/*.svg<br/>id → bundled URL]
     RES[resolve.ts<br/>lookup · bagStorages]
     FIL[filter.ts<br/>chip options · matches · key]
+    SI[StorageIcon.tsx<br/>logo or letter badge]
   end
   subgraph ui [src/ui]
-    SI[StorageIcon.tsx<br/>logo or letter badge]
     FB[StorageFilterBar.tsx]
     PK[StoragePickerSheet.tsx<br/>+ CustomStorageForm.tsx]
     ST[StorageTags.tsx<br/>bag screen block]
@@ -310,21 +310,29 @@ export interface CustomStorage extends Synced {
 }
 export interface Journal { version: 1; accounts; coins; bags; trades; storages: CustomStorage[] }
 
-// src/domain/actions.ts (new functions; each returns a new Journal)
+// src/domain/storageActions.ts (new functions, exported from src/domain/index.ts; each returns a new Journal)
+// Shared rules (MAX_STORAGE_TAGS, CUSTOM_COLOURS, normaliseStorageIds, contrastRatio) are in src/domain/storages.ts.
 setBagStorages(journal, bagId, storageIds: string[], now): Journal
 addCustomStorage(journal, { name, kind, colour }, now): { journal: Journal; id: string }
 updateCustomStorage(journal, id, { name?, kind?, colour? }, now): Journal
 deleteCustomStorage(journal, id, now): Journal // tombstone
-// NewTradeInput.bag gains: { newBagName?: string; storageIds?: string[] }
+// src/domain/actions.ts: NewTradeInput.bag gains { newBagName?: string; storageIds?: string[] }
 
 // src/storage-tags/catalogue.ts
-export interface PredefinedStorage { id: string; name: string; kind: Exclude<StorageKind, 'other'>; colour: string; aliases?: string[] }
+export interface PredefinedStorage { id: string; name: string; kind: Exclude<StorageKind, 'other'>; colour: string; aliases?: readonly string[] }
 export const CATALOGUE: readonly PredefinedStorage[]
 
 // src/storage-tags/resolve.ts
-export interface StorageInfo { id: string; name: string; kind: StorageKind; colour: string; iconUrl: string | null; custom: boolean }
+export interface StorageInfo { id: string; name: string; kind: StorageKind; colour: string; iconUrl: string | null; custom: boolean; aliases: readonly string[] }
+export function storageList(journal: Journal): StorageInfo[] // catalogue order, then live custom storages
 export function storageLookup(journal: Journal): (id: string) => StorageInfo | null
 export function bagStorages(bag: Bag, lookup): StorageInfo[] // known ids only, deduped, in stored order
+export function storageSearch(query: string, infos: readonly StorageInfo[]): StorageInfo[] // name, id, aliases
+export function textColour(background: string): '#ffffff' | '#000000' // letter badge and generic icon colour
+export function badgeLetter(name: string): string
+
+// src/storage-tags/StorageIcon.tsx (+ storage-icon.css; the only .tsx in this folder)
+export function StorageIcon(props: { info: StorageInfo; size: number }): JSX.Element // aria-hidden
 
 // src/storage-tags/filter.ts
 export type StorageFilter = { kind: 'all' } | { kind: 'mixed' } | { kind: 'none' } | { kind: 'storage'; id: string }
@@ -432,20 +440,24 @@ scripts/storage-icons.mjs   (dev-only; run with `npm run icons`; output is commi
   official brand hex. The script builds a tile: a `<rect>` in the brand hex, the glyph scaled to 70 % in the centre,
   in white or black, whichever has the higher contrast on the brand colour.
 - **Web3 Icons** (`@web3icons/core`, MIT, version 4.0.58 checked on 2026-10-12): its `background` variant is already a
-  24×24 tile with the brand background. The script copies it and makes the `clipPath` ids unique per file.
+  24×24 tile with the brand background. The script copies it and makes the `clipPath` ids unique per file. Where only
+  the brand colour changed since the drawing (Kraken, Gemini), the script swaps the tile colour (`background` option).
 - **Official brand kits**: the developer downloads the SVG mark from the kit URL in [catalogue.md](catalogue.md), puts it
   in `scripts/storage-icons/official/<id>.svg`, and the script places it on a tile in an allowed colour combination
   from the kit. The logo is not changed, and the kit rules on colour and shape are followed. Terms that ask for
-  permission first do not stop a logo (D8).
-- **Project repositories**: a few open-source wallets (Electrum, Sparrow, Phoenix, Cake Wallet, Wasabi, SeedSigner)
-  keep their logo in the code repository under MIT or Apache-2.0. Handled like the kit files. The code licence covers
+  permission first do not stop a logo (D8). When a kit has only a "symbol + wordmark" file, the `viewBox` option shows
+  only the symbol (the drawing stays as it is). When a brand has no kit online, the SVG logo or icon on its own site is
+  used. The source table in the script records the download URL of each file.
+- **Project repositories**: a few open-source wallets (Electrum, Phoenix, Cake Wallet, Wasabi) keep their logo in the
+  code repository under MIT or Apache-2.0 (Sparrow's and SeedSigner's files were not usable, see catalogue.md). Handled like the kit files. The code licence covers
   the file, not the trademark.
 - **Letter badge** for every storage without a logo source (the `LETTER` rows of the catalogue) and for custom
   storages, drawn at runtime by `StorageIcon` (no file): the first letter of the name in white or black on the brand
   colour (custom storages: the chosen colour).
-- **Generic icons** for `paper-backup` and `other-hardware`: two stroke icons in `src/ui/icons.tsx` style, drawn on the
-  tile by `StorageIcon`.
-- Every file is minified (the script strips metadata, comments and `class` attributes). **Budget:** each file ≤ 6 KB,
+- **Generic icons** for `paper-backup` and `other-hardware`: two stroke icons in `src/ui/icons.tsx` style, defined in
+  `src/storage-tags/StorageIcon.tsx` and drawn on the tile.
+- Every file is minified (the script strips metadata, comments, editor attributes, `<style>` (rules become
+  attributes) and `class`, and keeps 3 decimals; `places` lowers that for a file over budget). **Budget:** each file ≤ 6 KB,
   all files together ≤ 200 KB. A unit test checks the budget and that every file name is a catalogue id.
 - `src/storage-tags/icons.ts` maps ids to URLs:
   `import.meta.glob('./icons/*.svg', { eager: true, query: '?no-inline', import: 'default' })`. `?no-inline` keeps each
