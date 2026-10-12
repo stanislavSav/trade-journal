@@ -1,7 +1,9 @@
 import type { BagSummary } from '../domain'
 import { useT } from '../i18n'
+import type { BagSort } from './bagSort'
 import { ClosedRow, OpenRow } from './BagRows'
 import type { OpenPosition } from './portfolioView'
+import { sortAriaLabel, sortLabel } from './sortLabels'
 import { onTabKeys } from './tabKeys'
 
 export type ListTab = 'open' | 'closed'
@@ -12,14 +14,18 @@ interface Props {
   open: OpenPosition[]
   closed: BagSummary[]
   onOpen: (bagId: string) => void
+  /** The sort of the shown tab; its button opens the sort sheet. */
+  sort: BagSort
+  onSortClick: () => void
 }
 
-export function BagList({ tab, onTab, open, closed, onOpen }: Props) {
+export function BagList({ tab, onTab, open, closed, onOpen, sort, onSortClick }: Props) {
   const t = useT()
   const tabs: { id: ListTab; label: string; count: number }[] = [
     { id: 'open', label: t.list.open, count: open.length },
     { id: 'closed', label: t.list.closed, count: closed.length },
   ]
+  const shownCount = tab === 'open' ? open.length : closed.length
 
   return (
     <section className="bag-list">
@@ -41,6 +47,20 @@ export function BagList({ tab, onTab, open, closed, onOpen }: Props) {
         ))}
       </div>
       <div id="bags-panel" role="tabpanel" aria-labelledby={`bags-tab-${tab}`}>
+        {/* The left side stays free for the storage filter chips of feature 5 (docs/list-sorting/plan.md §5.1). */}
+        {shownCount > 0 && (
+          <div className="list-tools">
+            <button
+              type="button"
+              className="sort-btn"
+              aria-haspopup="dialog"
+              aria-label={sortAriaLabel(t, sort)}
+              onClick={onSortClick}
+            >
+              {sortLabel(t, sort)}
+            </button>
+          </div>
+        )}
         {tab === 'open' ? (
           open.length > 0 ? (
             <div className="card list">

@@ -60,21 +60,21 @@ Ukrainian.
 
 ## Acceptance criteria
 
-- [ ] Under Open / Closed there is a small button showing the current sort ("Value ↓" on Open and "Latest action ↓"
+- [x] Under Open / Closed there is a small button showing the current sort ("Value ↓" on Open and "Latest action ↓"
       on Closed by default).
-- [ ] The Open sort sheet lists Value, Gain %, Invested, Latest action, Name; the Closed sort sheet lists Gain %,
+- [x] The Open sort sheet lists Value, Gain %, Invested, Latest action, Name; the Closed sort sheet lists Gain %,
       Invested, Latest action, Name (no Value). The active one is marked and shows its direction.
-- [ ] Tapping another option sorts by it in its first direction; tapping the active option reverses it; the sheet
+- [x] Tapping another option sorts by it in its first direction; tapping the active option reverses it; the sheet
       closes after each tap.
-- [ ] Open and Closed keep separate choices; switching account keeps them; a reload keeps them
+- [x] Open and Closed keep separate choices; switching account keeps them; a reload keeps them
       (`localStorage` keys `trade-journal:ui:sort:open` / `:closed`, values like `gain:desc`).
-- [ ] A garbage value in either key shows the default and does not crash.
-- [ ] Rows without a price (Value, Gain %) or without any dated trade (Latest action) stay at the end in both
+- [x] A garbage value in either key shows the default and does not crash.
+- [x] Rows without a price (Value, Gain %) or without any dated trade (Latest action) stay at the end in both
       directions.
-- [ ] In Ukrainian, every text of the button and the sheet is Ukrainian (symbols and bag names stay as typed).
-- [ ] The button has an `aria-label` with the full meaning; options are announced as radio buttons with checked state.
-- [ ] The button row is hidden when the shown list is empty.
-- [ ] `npm test`, `npm run typecheck`, `npm run build` pass.
+- [x] In Ukrainian, every text of the button and the sheet is Ukrainian (symbols and bag names stay as typed).
+- [x] The button has an `aria-label` with the full meaning; options are announced as radio buttons with checked state.
+- [x] The button row is hidden when the shown list is empty.
+- [x] `npm test`, `npm run typecheck`, `npm run build` pass.
 
 ## Verification
 
@@ -102,8 +102,27 @@ Manual (dev, `?demo`, account "Demo"):
 
 _(Append a dated entry before you stop, even mid-task: what is done, what is next, surprises.)_
 
+- **2026-10-12** — Done.
+  - New: `src/ui/useBagSort.ts` (`useBagSort`, `SORT_STORAGE_KEYS`), `src/ui/SortSheet.tsx`, `src/ui/sortLabels.ts`
+    (short label, direction words, `aria-label`) with `src/ui/sortLabels.test.ts`.
+  - `BagList` takes `sort` and `onSortClick`; the button row sits at the top of the list panel, right-aligned, and is
+    hidden when the shown list is empty. The `closed` prop stays `BagSummary[]` (see task 01's note).
+  - `JournalApp` sorts with `sorts.open` / `sorts.closed` and has the `sort` sheet kind.
+  - Strings: one new group `sort` in `en.ts` / `uk.ts` (`sort.button`, `.buttonLabel`, `.titleOpen`, `.titleClosed`,
+    `.keys.*`, `.desc`, `.asc`, `.nameAsc`, `.nameDesc`, `.largest` … `.oldest`, `.nameAscLong`, `.nameDescLong`,
+    `.hint*`). Name also has spoken words ("A to Z") for the `aria-label`, because "A–Z" reads badly.
+  - **Changes from the plan wireframe (plan updated):** the active option shows its direction on a second line under
+    the name ("newest first ↓"), with ✓ on the right; on one line the Ukrainian text wrapped badly at 320 px. The
+    Ukrainian sheet titles are «Сортувати відкриті» / «Сортувати закриті»: «… позиції» was cut off at 320 px.
+  - Manual checks with headless Chrome driven over the DevTools protocol (dev server, `?demo`): steps 1–7 pass in
+    English and Ukrainian (430 px light, 320 px dark). Open default = Value ↓ in the old order, FAKE last in every
+    Value and Gain % order; SOL (no dated trade) last in both Latest action orders; Closed default DOGE then BTC
+    Swing; separate choices per list; kept after reload and in account "Test"; `nonsense` and `value:desc` fall back
+    to the defaults.
+  - Not checked: step 8 (iPhone, after the deploy).
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
 | ----------- | ---------- | ---------- | ------------ |
-| Not started | 0%         | 0h         | 0            |
+| Done        | 100%       | 1h         | —            |

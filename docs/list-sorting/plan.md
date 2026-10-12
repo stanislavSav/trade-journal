@@ -1,6 +1,6 @@
 # List sorting — plan
 
-> **Status:** In progress · **Owner:** @stanislavSav · **Decided:** 2026-10-12
+> **Status:** Shipped (2026-10-12) · **Owner:** @stanislavSav · **Decided:** 2026-10-12
 > **Vocabulary:** [docs/CONTEXT.md](../CONTEXT.md) (Invested, Latest action, Device preference) · **Decisions:**
 > [docs/README.md](../README.md) G4, G5 · **Depends on:** feature 2 ([docs/i18n/plan.md](../i18n/plan.md): `useT()`)
 > · **Next:** feature 5 ([docs/storage-tags/plan.md](../storage-tags/plan.md)) filters before this sort ·
@@ -145,9 +145,18 @@ storage filter chips of feature 5.
 The Closed sheet ("Sort closed bags") has four rows and no Value: Gain %, Invested, Latest action, Name. Its default
 is Latest action, newest first.
 
+**As shipped:** the active row shows its direction on a second line under the option name ("newest first ↓", for
+Name "A–Z"), with ✓ on the right. On one line, the Ukrainian direction text wrapped badly at 320 px.
+
 ### 5.3 Strings (EN + UK)
 
-Use the key style that feature 2 set up in `src/i18n/en.ts` / `src/i18n/uk.ts`; the keys are suggestions. The Ukrainian
+Use the key style that feature 2 set up in `src/i18n/en.ts` / `src/i18n/uk.ts`; the keys are suggestions.
+**As shipped:** one group `sort` (`sort.button`, `.buttonLabel`, `.titleOpen`, `.titleClosed`, `.keys.value` …
+`.keys.name`, `.desc`, `.asc`, `.nameAsc`, `.nameDesc`, `.largest`, `.smallest`, `.newest`, `.oldest`, `.hintFlip`,
+`.hintInvestedOpen`, `.hintInvestedClosed`, `.hintUnknown`), plus `.nameAscLong` / `.nameDescLong` ("A to Z" /
+"від A до Z") for the spoken label. The Ukrainian sheet titles are «Сортувати відкриті» / «Сортувати закриті»
+(«… позиції» did not fit at 320 px), and the flip hint reads «Торкніться вибраного варіанта ще раз, щоб змінити
+порядок на зворотний.» The Ukrainian
 word for *bag* is «позиція» (owner decision 2026-10-12, feature 2 plan D18), and the texts use the polite Ви form (D17).
 
 | Key (suggested)             | English                                                  | Ukrainian (draft, owner to check)                            |

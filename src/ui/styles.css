@@ -346,6 +346,52 @@ button:disabled {
   font-weight: 500;
 }
 
+/* Sort button under Open / Closed and the sort sheet (docs/list-sorting/plan.md §5) */
+
+.list-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: -10px 0 -2px;
+}
+
+.sort-btn {
+  flex: none;
+  min-height: 44px;
+  padding: 0 4px 0 8px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.sort-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* .row.sort-option: wins over .row, which comes later in this file. */
+.row.sort-option {
+  align-items: center;
+  min-height: 48px;
+  font-size: 17px;
+}
+
+.sort-check {
+  flex: none;
+  color: var(--accent);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.sort-hints {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 16px;
+}
+
 .list {
   overflow: hidden;
 }
