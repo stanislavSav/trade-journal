@@ -199,6 +199,7 @@ describe('summarizeAccount', () => {
       trade('buy', '2026-06-01', 1, 10000, { bagId: 'gone' }),
       trade('buy', '2026-06-01', 1, 5000, { bagId: 'family-bag' }),
     ],
+    storages: [],
   }
 
   it('sorts open bags by cost and closed bags by last date, unknown dates last', () => {

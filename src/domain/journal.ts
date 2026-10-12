@@ -1,4 +1,5 @@
-import type { Journal, Side, Synced } from './types'
+import { carryStorageIds, isHexColour, normaliseStorageIds } from './storages'
+import { STORAGE_KINDS, type Journal, type Side, type StorageKind, type Synced } from './types'
 
 /** Lower-case slug used as the Account id, e.g. "CS" -> "cs", "My Fund" -> "my-fund". */
 export function accountIdFor(name: string): string {
@@ -11,7 +12,14 @@ export function accountIdFor(name: string): string {
 
 /** A fresh journal with one account "CS" (id "cs", updatedAt 0 so any backup overrides it). */
 export function emptyJournal(): Journal {
-  return { version: 1, accounts: [{ id: 'cs', name: 'CS', updatedAt: 0 }], coins: [], bags: [], trades: [] }
+  return {
+    version: 1,
+    accounts: [{ id: 'cs', name: 'CS', updatedAt: 0 }],
+    coins: [],
+    bags: [],
+    trades: [],
+    storages: [],
+  }
 }
 
 /**
@@ -30,12 +38,16 @@ export function parseJournal(json: unknown): Journal {
       name: f.string('name'),
       geckoId: f.stringOrNull('geckoId'),
     })),
-    bags: parseList(json, 'bags', 'Bag', (f) => ({
-      ...f.synced(),
-      accountId: f.id('accountId'),
-      symbol: f.id('symbol'),
-      name: f.string('name'),
-    })),
+    bags: parseList(json, 'bags', 'Bag', (f) => {
+      const storageIds = f.optionalWith('storageIds', normaliseStorageIds)
+      return {
+        ...f.synced(),
+        accountId: f.id('accountId'),
+        symbol: f.id('symbol'),
+        name: f.string('name'),
+        ...(storageIds === undefined ? {} : { storageIds }),
+      }
+    }),
     trades: parseList(json, 'trades', 'Trade', (f) => {
       const note = f.optionalString('note')
       return {
@@ -49,6 +61,13 @@ export function parseJournal(json: unknown): Journal {
         createdAt: f.number('createdAt'),
       }
     }),
+    // Added with storage tags: older backups have no list, so a missing one reads as empty.
+    storages: parseList({ storages: [], ...json }, 'storages', 'Storage', (f) => ({
+      ...f.synced(),
+      name: f.id('name'),
+      kind: f.storageKind(),
+      colour: f.colour(),
+    })),
   }
 }
 
@@ -100,6 +119,25 @@ function fields(record: Obj, where: string) {
       const v = record.date
       return v === null || (typeof v === 'string' && ISO_DATE.test(v)) ? v : fail('date must be YYYY-MM-DD or null')
     },
+    /** Absent → undefined; else `parse(value)`, whose error message becomes the problem. */
+    optionalWith: <T>(key: string, parse: (value: unknown) => T): T | undefined => {
+      const v = record[key]
+      if (v === undefined) return undefined
+      try {
+        return parse(v)
+      } catch (err) {
+        return fail(err instanceof Error ? err.message : `${key} is not valid`)
+      }
+    },
+    storageKind: (): StorageKind => {
+      const v = record.kind
+      const kind = STORAGE_KINDS.find((k) => k === v)
+      return kind ?? fail(`kind must be one of ${STORAGE_KINDS.join(', ')}`)
+    },
+    colour: (): string => {
+      const v = record.colour
+      return isHexColour(v) ? v : fail('colour must be #rrggbb')
+    },
     synced: (): Synced => {
       const base = { id: id('id'), updatedAt: number('updatedAt') }
       const deleted = record.deleted
@@ -126,7 +164,7 @@ function parseList<T extends Synced>(json: Obj, key: string, label: string, pars
 }
 
 /**
- * Combine two journals. Records are matched by id per collection (accounts, coins, bags, trades);
+ * Combine two journals. Records are matched by id per collection (accounts, coins, bags, trades, storages);
  * the copy with the higher updatedAt wins (tombstones included). On a tie, keep `a`.
  * Result collections are sorted by id so merging is deterministic.
  */
@@ -135,8 +173,9 @@ export function mergeJournals(a: Journal, b: Journal): Journal {
     version: 1,
     accounts: mergeById(a.accounts, b.accounts),
     coins: mergeById(a.coins, b.coins),
-    bags: mergeById(a.bags, b.bags),
+    bags: carryStorageIds(mergeById(a.bags, b.bags), a.bags, b.bags),
     trades: mergeById(a.trades, b.trades),
+    storages: mergeById(a.storages, b.storages),
   }
 }
 

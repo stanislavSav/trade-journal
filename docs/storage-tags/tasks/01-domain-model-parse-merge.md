@@ -70,26 +70,26 @@ any UI.
 
 ## Acceptance criteria
 
-- [ ] An old backup (no `storageIds`, no `storages`) parses to the same journal as before, plus `storages: []`. Test
+- [x] An old backup (no `storageIds`, no `storages`) parses to the same journal as before, plus `storages: []`. Test
       uses a literal copy of today's backup shape.
-- [ ] `parseJournal(JSON.parse(JSON.stringify(j)))` equals `j` for a journal with tagged bags, a bag with
+- [x] `parseJournal(JSON.parse(JSON.stringify(j)))` equals `j` for a journal with tagged bags, a bag with
       `storageIds: []`, live and tombstoned custom storages.
-- [ ] Parse rejects with a readable message: `storageIds` not an array, an empty-string id, more than 10 ids, a custom
+- [x] Parse rejects with a readable message: `storageIds` not an array, an empty-string id, more than 10 ids, a custom
       storage with a bad `kind`, a bad `colour`, a duplicate custom id. Duplicate tag ids are removed, not rejected.
-- [ ] `bags` missing still throws `Not a trade journal backup: bags missing`; `storages` missing does not throw.
-- [ ] Merge: a newer bag copy **without** `storageIds` takes the older copy's `storageIds` — tested with the newer copy
+- [x] `bags` missing still throws `Not a trade journal backup: bags missing`; `storages` missing does not throw.
+- [x] Merge: a newer bag copy **without** `storageIds` takes the older copy's `storageIds` — tested with the newer copy
       as `a` and as `b`. A newer copy with `storageIds: []` wins over an older `['binance']`.
-- [ ] Merge: custom storages merge by id and `updatedAt`; a newer tombstone wins.
-- [ ] `setBagStorages` writes `[]` explicitly, bumps `updatedAt`, rejects a deleted bag, and returns the same object
+- [x] Merge: custom storages merge by id and `updatedAt`; a newer tombstone wins.
+- [x] `setBagStorages` writes `[]` explicitly, bumps `updatedAt`, rejects a deleted bag, and returns the same object
       when nothing changed.
-- [ ] `addTrade` with a new bag and `storageIds: ['binance', 'binance', 'ledger']` stores `['binance', 'ledger']`;
+- [x] `addTrade` with a new bag and `storageIds: ['binance', 'binance', 'ledger']` stores `['binance', 'ledger']`;
       with no `storageIds` the bag has no field.
-- [ ] `renameBag` and `deleteTrade` keep `storageIds` (test).
-- [ ] Custom storage actions: empty name, 31-character name, duplicate live name (any case), unknown kind and a colour
+- [x] `renameBag` and `deleteTrade` keep `storageIds` (test).
+- [x] Custom storage actions: empty name, 31-character name, duplicate live name (any case), unknown kind and a colour
       outside `CUSTOM_COLOURS` throw; renaming to the same name with other casing of **itself** is allowed; a name of
       a tombstoned storage can be reused.
-- [ ] Every `CUSTOM_COLOURS` entry has contrast ≥ 4.5 against `#ffffff` (test).
-- [ ] `npm test`, `npm run typecheck` and `npm run build` pass.
+- [x] Every `CUSTOM_COLOURS` entry has contrast ≥ 4.5 against `#ffffff` (test).
+- [x] `npm test`, `npm run typecheck` and `npm run build` pass.
 
 ## Verification
 
@@ -106,8 +106,33 @@ nothing in the UI changes.
 
 _(Append a dated entry before you stop, even mid-task: what is done, what is next, surprises.)_
 
+- **2026-10-12** — Done. Built on a branch in parallel with features #2 (i18n), #3 (account removal) and #4 (sorting),
+  so edits to shared files are kept small:
+  - Types in `src/domain/types.ts` (`StorageKind`, `STORAGE_KINDS`, `Bag.storageIds`, `CustomStorage`,
+    `Journal.storages`).
+  - Shared rules in `src/domain/storages.ts` (constants, `normaliseStorageIds`, `isHexColour`, `contrastRatio`, and
+    `carryStorageIds`, the bag merge step).
+  - **The four new actions live in `src/domain/storageActions.ts`**, not in `actions.ts` (plan §6 updated). Reason:
+    fewer merge conflicts with the error-code and account-removal work in `actions.ts`. It has its own copy of
+    `putById` (3 lines) because `actions.ts` does not export it. `actions.ts` only got `NewTradeInput.bag.storageIds`
+    and the new-bag branch of `addTrade`.
+  - `parseJournal` reads `storages` with `parseList({ storages: [], ...json }, …)`, so `parseList` itself is unchanged
+    and a missing list reads as empty. A new field reader `optionalWith` passes the message of
+    `normaliseStorageIds` through (`Bag 1: storageIds must be a list of ids`).
+  - The parser accepts any `#rrggbb` colour and any non-empty name for a custom storage; the actions are stricter
+    (palette colour, 1–30 characters, unique live name). `updateCustomStorage` keeps a stored colour that is not in
+    the palette when the patch does not change it.
+  - Tests: `src/domain/storages.test.ts` (parse, merge, rules) and `src/domain/storageActions.test.ts`. 168 → 205.
+  - **For the merge with feature #2:** the new actions throw plain `Error`s with English text (`Bag not found`,
+    `Storage name is required`, `A storage called "…" already exists`, `Unknown storage kind`, `Pick one of the
+    storage colours`, `Storage not found`, `storageIds …`). Once `src/domain/errors.ts` (`AppError`) is on `main`, turn
+    them into error codes; task 03 shows them.
+  - The manual check (load a real `trades.json` in `npm run dev`) was not done on this branch; the old-backup parse
+    test covers it. Task 06 repeats it on the owner's devices.
+  - Next: task 02.
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
 | ----------- | ---------- | ---------- | ------------ |
-| Not started | 0%         | 0h         | 0            |
+| Done        | 100%       | 1h         | —            |

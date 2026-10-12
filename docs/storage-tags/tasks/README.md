@@ -10,7 +10,7 @@ truth.** Update both in the same change.
 
 | #   | Task                                                                          | Depends on | Status      | Progress |
 | --- | ----------------------------------------------------------------------------- | ---------- | ----------- | -------- |
-| 01  | [Domain model, parse and merge](01-domain-model-parse-merge.md)                | —          | Not started | 0%       |
+| 01  | [Domain model, parse and merge](01-domain-model-parse-merge.md)                | —          | Done        | 100%     |
 | 02  | [Catalogue module and logo pipeline](02-catalogue-and-icons.md)               | 01         | Not started | 0%       |
 | 03  | [Storage picker and custom storages](03-picker-and-custom-storages.md)       | 02         | Not started | 0%       |
 | 04  | [Bag screen tags and Stored at in Add trade](04-bag-screen-and-add-trade.md)  | 03         | Not started | 0%       |

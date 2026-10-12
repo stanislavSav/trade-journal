@@ -265,7 +265,7 @@ flowchart LR
   subgraph domain [src/domain — pure, tested]
     T[types.ts<br/>Bag.storageIds · CustomStorage · Journal.storages]
     J[journal.ts<br/>parseJournal · mergeJournals]
-    A[actions.ts<br/>addTrade · setBagStorages<br/>add/update/deleteCustomStorage]
+    A[actions.ts · storageActions.ts<br/>addTrade · setBagStorages<br/>add/update/deleteCustomStorage]
   end
   subgraph tags [src/storage-tags — pure + assets]
     CAT[catalogue.ts<br/>134 predefined storages]
@@ -310,12 +310,13 @@ export interface CustomStorage extends Synced {
 }
 export interface Journal { version: 1; accounts; coins; bags; trades; storages: CustomStorage[] }
 
-// src/domain/actions.ts (new functions; each returns a new Journal)
+// src/domain/storageActions.ts (new functions, exported from src/domain/index.ts; each returns a new Journal)
+// Shared rules (MAX_STORAGE_TAGS, CUSTOM_COLOURS, normaliseStorageIds, contrastRatio) are in src/domain/storages.ts.
 setBagStorages(journal, bagId, storageIds: string[], now): Journal
 addCustomStorage(journal, { name, kind, colour }, now): { journal: Journal; id: string }
 updateCustomStorage(journal, id, { name?, kind?, colour? }, now): Journal
 deleteCustomStorage(journal, id, now): Journal // tombstone
-// NewTradeInput.bag gains: { newBagName?: string; storageIds?: string[] }
+// src/domain/actions.ts: NewTradeInput.bag gains { newBagName?: string; storageIds?: string[] }
 
 // src/storage-tags/catalogue.ts
 export interface PredefinedStorage { id: string; name: string; kind: Exclude<StorageKind, 'other'>; colour: string; aliases?: string[] }

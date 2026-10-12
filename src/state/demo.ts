@@ -21,7 +21,7 @@ const rows: Row[] = [
 ]
 
 export function demoJournal(): Journal {
-  let journal: Journal = { version: 1, accounts: [], coins: [], bags: [], trades: [] }
+  let journal: Journal = { version: 1, accounts: [], coins: [], bags: [], trades: [], storages: [] }
   let now = Date.UTC(2026, 0, 1)
   journal = addAccount(journal, 'Demo', now++)
   journal = addAccount(journal, 'Test', now++)
