@@ -1,6 +1,7 @@
 // Storage tags: shared rules for Bag.storageIds and custom storages.
 // Used by the parser (journal.ts) and by the actions (storageActions.ts), so both accept the same data.
 // Spec: docs/storage-tags/plan.md §6.3.
+import { AppError } from './errors'
 import type { Bag } from './types'
 
 /** At most this many tags per bag. */
@@ -30,14 +31,16 @@ export function isHexColour(value: unknown): value is string {
 
 /**
  * The one rule for a list of storage ids: an array of non-empty strings, at most MAX_STORAGE_TAGS
- * after duplicates are removed (first one kept, order kept). Throws otherwise.
+ * after duplicates are removed (first one kept, order kept). Throws an AppError otherwise.
  */
 export function normaliseStorageIds(ids: unknown): string[] {
   if (!Array.isArray(ids) || !ids.every((id) => typeof id === 'string' && id !== '')) {
-    throw new Error('storageIds must be a list of ids')
+    throw new AppError('storageIdsInvalid', 'storageIds must be a list of ids')
   }
   const unique = [...new Set(ids as string[])]
-  if (unique.length > MAX_STORAGE_TAGS) throw new Error(`storageIds can have at most ${MAX_STORAGE_TAGS} ids`)
+  if (unique.length > MAX_STORAGE_TAGS) {
+    throw new AppError('storageTooMany', `storageIds can have at most ${MAX_STORAGE_TAGS} ids`, { max: MAX_STORAGE_TAGS })
+  }
   return unique
 }
 

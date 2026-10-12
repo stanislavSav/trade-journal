@@ -61,19 +61,19 @@ rename and delete their own custom storages. The sheet returns the chosen ids; t
 
 ## Acceptance criteria
 
-- [ ] With `initial = ['binance', 'ledger']` both rows are checked and both chips show; Close returns nothing; Save
+- [x] With `initial = ['binance', 'ledger']` both rows are checked and both chips show; Close returns nothing; Save
       returns the edited list in the order the user selected.
-- [ ] Typing "led" shows only matching rows across all groups; an alias from the catalogue (for example "huobi")
+- [x] Typing "led" shows only matching rows across all groups; an alias from the catalogue (for example "huobi")
       finds the renamed storage.
-- [ ] "Used in this journal" lists exactly the known storages on live bags; unknown or deleted ids do not appear.
-- [ ] Add custom: empty name and a predefined name ("binance", any case) are refused with the message; a valid one is
+- [x] "Used in this journal" lists exactly the known storages on live bags; unknown or deleted ids do not appear.
+- [x] Add custom: empty name and a predefined name ("binance", any case) are refused with the message; a valid one is
       created, selected, and appears under Custom with its letter badge in the chosen colour.
-- [ ] Edit custom: rename shows at once in the list; delete needs two taps, shows the bag count before, and removes the
+- [x] Edit custom: rename shows at once in the list; delete needs two taps, shows the bag count before, and removes the
       row and the selection.
-- [ ] Escape closes only the picker when it is opened over another sheet (the layer stack works).
-- [ ] Keyboard: Tab reaches the search, each row, the ⋯ buttons and Save; Space toggles a row.
-- [ ] Every new string exists in `en.ts` and `uk.ts` (the typed dictionary makes a missing key a type error).
-- [ ] `npm test`, `npm run typecheck` and `npm run build` pass.
+- [x] Escape closes only the picker when it is opened over another sheet (the layer stack works).
+- [x] Keyboard: Tab reaches the search, each row, the ⋯ buttons and Save; Space toggles a row.
+- [x] Every new string exists in `en.ts` and `uk.ts` (the typed dictionary makes a missing key a type error).
+- [x] `npm test`, `npm run typecheck` and `npm run build` pass.
 
 ## Verification
 
@@ -90,8 +90,43 @@ in Ukrainian; the sheet scrolls with the on-screen keyboard open (`useVisualView
 
 _(Append a dated entry before you stop, even mid-task: what is done, what is next, surprises.)_
 
+- **2026-10-12** — Done, on a branch built in parallel with feature #3 (account removal) and #4 task 02 (sort sheet), so
+  `JournalApp.tsx`, `styles.css`, `BagList.tsx` and the Settings sheet are not touched here.
+  - **Error codes first.** Feature #2 shipped `AppError` before this task, so the plain `Error`s of task 01 became
+    codes (`src/domain/errors.ts`): `storageIdsInvalid`, `storageTooMany { max }`, `storageNameRequired`,
+    `storageNameTooLong { max }`, `storageNameTaken { name }`, `storageKindInvalid`, `storageColourInvalid`,
+    `storageNotFound`; `setBagStorages` uses the existing `bagNotFound`. The English `message` did not change, so the
+    old tests still pass; a new test checks the codes. Texts in the `errors` group of both dictionaries use the words
+    of the form ("Enter a name", "This name is already in the list"), not the message.
+  - **Strings** are in a new `storage` group at the end of `en.ts` / `uk.ts` (also the task 04 words). Ukrainian:
+    Сховище, Біржа / DEX / Гарячий гаманець / Холодний гаманець / Власне, group «Власні», «Уже є в журналі».
+    "Used by N bags" uses `pluralEn` / `pluralUk` («Використовується в 1 позиції / 3 позиціях / 5 позиціях»), and
+    "Not used by any bag" for 0.
+  - **Pure parts in `src/storage-tags/picker.ts`** (tested): `usedStorageIds`, `pickerGroups` (fixed order, used not
+    repeated, custom storages of any kind under Custom, `Intl.Collator` in the UI language), `storageNameTaken`
+    (predefined + live custom names, any case), `bagsUsingStorage`.
+  - **Handlers in `src/ui/storageHandlers.ts`**, not in `JournalApp.tsx`: `customStorageHandlers(apply)` returns the
+    three callbacks (tested with a fake `apply`). Task 04 spreads them into the picker, so `JournalApp` gets only the
+    lines that open the picker. Plan §6 updated.
+  - `StoragePickerSheet`: one `Sheet` for both views (the title changes; "‹ Back" is the first line of the body,
+    because `Sheet` has no back slot and is shared). Search and selected chips are sticky at the top; Save is sticky
+    at the bottom; the sheet keeps a minimum height so it does not jump while typing. "Used in this journal" is
+    computed once when the sheet opens, so rows do not jump between groups. Unknown ids in `initial` stay in the
+    draft and are saved back unchanged (plan "Unknown ids"). An 11th tag is refused with the `storageTooMany` text.
+    After the form closes, focus and scroll go back to where they were. Kind labels move under the name when both
+    do not fit (Ukrainian at 320 px).
+  - `CustomStorageForm`: kind is a row of pill radios, colour 8 round radios with colour names for screen readers
+    (`storage.colourNames`). A new storage starts with the first colour no custom storage uses yet.
+  - Styles in `src/ui/storage-tags.css` (imported by the two components).
+  - Manual check with a temporary dev entry (removed before the commit) in headless Chrome at 430 px and 320 px,
+    English and Ukrainian, light and dark: all criteria above, plus Escape with the picker over the Settings sheet
+    (first Escape closes only the picker, the page stays locked; the second closes Settings). Keyboard order: Close,
+    search, chips, rows, ⋯, Add custom storage, Save; Space toggles a row.
+  - Tests: 287 → 297.
+  - Next: task 04.
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
 | ----------- | ---------- | ---------- | ------------ |
-| Not started | 0%         | 0h         | 0            |
+| Done        | 100%       | 2h         | —            |

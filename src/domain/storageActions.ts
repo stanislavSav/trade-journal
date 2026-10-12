@@ -2,6 +2,7 @@
 // They accept exactly what parseJournal accepts, so every saved journal can be restored from a backup.
 // Spec: docs/storage-tags/plan.md §6 (seams) and §6.3.
 import { newId } from './actions'
+import { AppError } from './errors'
 import { CUSTOM_COLOURS, CUSTOM_ID_PREFIX, CUSTOM_NAME_MAX, normaliseStorageIds } from './storages'
 import { STORAGE_KINDS, type CustomStorage, type Journal, type StorageKind, type Synced } from './types'
 
@@ -17,7 +18,7 @@ export interface CustomStorageInput {
  */
 export function setBagStorages(journal: Journal, bagId: string, storageIds: string[], now: number): Journal {
   const bag = journal.bags.find((b) => b.id === bagId && !b.deleted)
-  if (!bag) throw new Error('Bag not found')
+  if (!bag) throw new AppError('bagNotFound', 'Bag not found')
   const ids = normaliseStorageIds(storageIds)
   if (bag.storageIds && sameList(bag.storageIds, ids)) return journal
   return { ...journal, bags: putById(journal.bags, { ...bag, storageIds: ids, updatedAt: now }) }
@@ -60,22 +61,26 @@ function checkCustomStorage(
   keptColour?: string,
 ): CustomStorageInput {
   const name = input.name.trim()
-  if (!name) throw new Error('Storage name is required')
-  if ([...name].length > CUSTOM_NAME_MAX) throw new Error(`Storage name can have at most ${CUSTOM_NAME_MAX} characters`)
+  if (!name) throw new AppError('storageNameRequired', 'Storage name is required')
+  if ([...name].length > CUSTOM_NAME_MAX) {
+    throw new AppError('storageNameTooLong', `Storage name can have at most ${CUSTOM_NAME_MAX} characters`, {
+      max: CUSTOM_NAME_MAX,
+    })
+  }
   const key = name.toLowerCase()
   if (journal.storages.some((s) => !s.deleted && s.id !== selfId && s.name.trim().toLowerCase() === key)) {
-    throw new Error(`A storage called "${name}" already exists`)
+    throw new AppError('storageNameTaken', `A storage called "${name}" already exists`, { name })
   }
-  if (!STORAGE_KINDS.includes(input.kind)) throw new Error('Unknown storage kind')
+  if (!STORAGE_KINDS.includes(input.kind)) throw new AppError('storageKindInvalid', 'Unknown storage kind')
   if (input.colour !== keptColour && !CUSTOM_COLOURS.includes(input.colour)) {
-    throw new Error('Pick one of the storage colours')
+    throw new AppError('storageColourInvalid', 'Pick one of the storage colours')
   }
   return { name, kind: input.kind, colour: input.colour }
 }
 
 function liveStorage(journal: Journal, id: string): CustomStorage {
   const storage = journal.storages.find((s) => s.id === id && !s.deleted)
-  if (!storage) throw new Error('Storage not found')
+  if (!storage) throw new AppError('storageNotFound', 'Storage not found')
   return storage
 }
 

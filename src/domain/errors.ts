@@ -29,6 +29,15 @@ export type ErrorCode =
   | 'searchHttp' // { status }
   | 'searchFailed'
   | 'deviceOffline'
+  // storage tags (storages.ts, storageActions.ts)
+  | 'storageIdsInvalid'
+  | 'storageTooMany' // { max }
+  | 'storageNameRequired'
+  | 'storageNameTooLong' // { max }
+  | 'storageNameTaken' // { name }
+  | 'storageKindInvalid'
+  | 'storageColourInvalid'
+  | 'storageNotFound'
 
 export type ErrorParams = Record<string, string | number>
 

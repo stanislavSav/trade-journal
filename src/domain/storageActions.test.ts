@@ -131,6 +131,28 @@ describe('custom storages', () => {
     expect(updateCustomStorage(journal, 'custom-1', { name: 'Vault' }, NOW).storages[0]!.colour).toBe('#123456')
   })
 
+  it('throws AppErrors with codes the UI can translate', () => {
+    const code = (c: string, params?: object) => expect.objectContaining({ code: c, ...(params && { params }) })
+    const { journal, id } = addCustomStorage(emptyJournal(), safeBox, NOW)
+    expect(() => addCustomStorage(journal, { ...safeBox, name: ' ' }, NOW)).toThrow(code('storageNameRequired'))
+    expect(() => addCustomStorage(journal, { ...safeBox, name: 'x'.repeat(31) }, NOW)).toThrow(
+      code('storageNameTooLong', { max: 30 }),
+    )
+    expect(() => addCustomStorage(journal, { ...safeBox, name: 'SAFE BOX' }, NOW)).toThrow(
+      code('storageNameTaken', { name: 'SAFE BOX' }),
+    )
+    expect(() => addCustomStorage(journal, { ...safeBox, name: 'B', kind: 'x' as never }, NOW)).toThrow(
+      code('storageKindInvalid'),
+    )
+    expect(() => updateCustomStorage(journal, id, { colour: '#000000' }, NOW)).toThrow(code('storageColourInvalid'))
+    expect(() => deleteCustomStorage(journal, 'custom-x', NOW)).toThrow(code('storageNotFound'))
+    const bag = oneBag()
+    expect(() => setBagStorages(bag.journal, 'missing', [], NOW)).toThrow(code('bagNotFound'))
+    expect(() => setBagStorages(bag.journal, bag.bagId, [''], NOW)).toThrow(code('storageIdsInvalid'))
+    const eleven = Array.from({ length: 11 }, (_, i) => `s${i}`)
+    expect(() => setBagStorages(bag.journal, bag.bagId, eleven, NOW)).toThrow(code('storageTooMany', { max: 10 }))
+  })
+
   it('deletes with a tombstone and leaves bags unchanged', () => {
     const added = addCustomStorage(emptyJournal(), safeBox, NOW)
     const { journal } = addTrade(added.journal, { ...btcBuy, bag: { storageIds: [added.id] } }, NOW)

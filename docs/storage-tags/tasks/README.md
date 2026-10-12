@@ -12,7 +12,7 @@ truth.** Update both in the same change.
 | --- | ----------------------------------------------------------------------------- | ---------- | ----------- | -------- |
 | 01  | [Domain model, parse and merge](01-domain-model-parse-merge.md)                | —          | Done        | 100%     |
 | 02  | [Catalogue module and logo pipeline](02-catalogue-and-icons.md)               | 01         | Done        | 100%     |
-| 03  | [Storage picker and custom storages](03-picker-and-custom-storages.md)       | 02         | Not started | 0%       |
+| 03  | [Storage picker and custom storages](03-picker-and-custom-storages.md)       | 02         | Done        | 100%     |
 | 04  | [Bag screen tags and Stored at in Add trade](04-bag-screen-and-add-trade.md)  | 03         | Not started | 0%       |
 | 05  | [List icon, filter chips and filtered totals](05-list-icon-and-filter.md)     | 04         | Not started | 0%       |
 | 06  | [QA and hardening](06-qa.md)                                                  | 05         | Not started | 0%       |
