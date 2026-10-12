@@ -216,6 +216,15 @@ export const en = {
     reload: 'Reload',
     backupSaved: 'Backup saved',
   },
+  // Demo mode, the app opened with ?demo (docs/demo-data/plan.md §5).
+  demo: {
+    banner: 'Demo — nothing is saved',
+    exit: 'Exit demo',
+    chip: 'Demo',
+    backupNote: 'This is the demo. There is nothing to back up. Exit the demo to back up your own data.',
+    loadHelp: 'In the demo, loading merges the file into the demo only. Nothing is saved.',
+    crashNote: 'This was the demo. Your own data was not touched.',
+  },
   // One entry per ErrorCode (src/domain/errors.ts). The English texts match AppError.message, except the three
   // backup headlines (plan D13), which show the technical detail under them.
   errors: {

@@ -8,6 +8,8 @@ import { Sheet } from './Sheet'
 import { formatStamp } from './time'
 
 interface Props {
+  /** Demo mode: Save is disabled with a note; Load merges into the demo only (docs/demo-data/plan.md §5.3). */
+  demo?: boolean
   backup: BackupState
   unsaved: boolean
   onExport: () => Promise<'shared' | 'downloaded' | 'cancelled'>
@@ -16,7 +18,7 @@ interface Props {
   onClose: () => void
 }
 
-export function BackupSheet({ backup, unsaved, onExport, onMerge, onMerged, onClose }: Props) {
+export function BackupSheet({ demo = false, backup, unsaved, onExport, onMerge, onMerged, onClose }: Props) {
   const t = useT()
   const fileInput = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState<'save' | 'load' | null>(null)
@@ -54,20 +56,24 @@ export function BackupSheet({ backup, unsaved, onExport, onMerge, onMerged, onCl
     <Sheet title={t.backup.title} onClose={onClose}>
       <div className="backup">
         <section className="card backup-card">
-          <p className="backup-status">
-            {backup.lastBackupAt ? (
-              <>
-                {t.backup.lastBackup} <span className="num">{formatStamp(backup.lastBackupAt)}</span>
-              </>
-            ) : (
-              t.backup.none
-            )}
-            {unsaved && <span className="backup-unsaved"> · {t.backup.changesSince}</span>}
-          </p>
-          <button type="button" className="btn primary block" onClick={save} disabled={busy !== null}>
+          {demo ? (
+            <p className="backup-status">{t.demo.backupNote}</p>
+          ) : (
+            <p className="backup-status">
+              {backup.lastBackupAt ? (
+                <>
+                  {t.backup.lastBackup} <span className="num">{formatStamp(backup.lastBackupAt)}</span>
+                </>
+              ) : (
+                t.backup.none
+              )}
+              {unsaved && <span className="backup-unsaved"> · {t.backup.changesSince}</span>}
+            </p>
+          )}
+          <button type="button" className="btn primary block" onClick={save} disabled={demo || busy !== null}>
             {busy === 'save' ? t.backup.saving : t.backup.save}
           </button>
-          <p className="help">{t.backup.iphoneHelp}</p>
+          {!demo && <p className="help">{t.backup.iphoneHelp}</p>}
           {status && (
             <p className="help ok" role="status">
               {status === 'saved' ? t.backup.saved : t.backup.downloaded}
@@ -94,7 +100,7 @@ export function BackupSheet({ backup, unsaved, onExport, onMerge, onMerged, onCl
           >
             {busy === 'load' ? t.backup.loading : t.backup.load}
           </button>
-          <p className="help">{t.backup.loadHelp}</p>
+          <p className="help">{demo ? t.demo.loadHelp : t.backup.loadHelp}</p>
           {loadError && <FormError error={loadError} />}
         </section>
       </div>

@@ -65,7 +65,9 @@ describe('demoJournal', () => {
     // unknown dates
     expect(j.trades.filter((t) => t.date === null).length).toBeGreaterThanOrEqual(1)
     // partial sells while still open
-    const partial = summaries.filter((s) => s.status === 'open' && s.trades.filter((t) => t.side === 'sell').length >= 2)
+    const partial = summaries.filter(
+      (s) => s.status === 'open' && s.trades.filter((t) => t.side === 'sell').length >= 2,
+    )
     expect(partial.map((s) => s.bag.id)).toContain('demo-bag-02')
     // storage tags: one, two, none, custom
     const tagCounts = j.bags.map((b) => b.storageIds?.length ?? 0)

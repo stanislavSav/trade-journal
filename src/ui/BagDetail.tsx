@@ -13,6 +13,7 @@ import {
   type Side,
 } from '../domain'
 import { useT, type Messages } from '../i18n'
+import { isDemo } from '../state/demo'
 import { BagName } from './BagName'
 import { BackIcon } from './icons'
 import { tone } from './numbers'
@@ -56,6 +57,7 @@ export function BagDetail({ summary: s, coin, price, backLabel, onBack, onEditTr
           <BackIcon />
           {backLabel}
         </button>
+        {isDemo && <span className="badge demo-chip">{t.demo.chip}</span>}
       </div>
 
       <div className="detail-head">

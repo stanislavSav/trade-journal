@@ -141,17 +141,21 @@ export function demoJournal(today: string): Journal {
   return {
     version: 1,
     accounts: ACCOUNTS.map(([id, name], i) => ({ id, name, updatedAt: stamp(i) })),
-    coins: COINS.map(([symbol, name, geckoId], i): Coin => ({ id: symbol, symbol, name, geckoId, updatedAt: stamp(i) })),
-    bags: BAGS.map(
-      ([no, accountId, symbol, name, storageIds], i): Bag => ({
-        id: bagId(no),
-        updatedAt: stamp(i),
-        accountId,
-        symbol,
-        name,
-        ...(storageIds === undefined ? {} : { storageIds }),
-      }),
-    ),
+    coins: COINS.map(([symbol, name, geckoId], i): Coin => ({
+      id: symbol,
+      symbol,
+      name,
+      geckoId,
+      updatedAt: stamp(i),
+    })),
+    bags: BAGS.map(([no, accountId, symbol, name, storageIds], i): Bag => ({
+      id: bagId(no),
+      updatedAt: stamp(i),
+      accountId,
+      symbol,
+      name,
+      ...(storageIds === undefined ? {} : { storageIds }),
+    })),
     trades,
     storages: STORAGES.map((s, i) => ({ ...s, updatedAt: stamp(i) })),
   }

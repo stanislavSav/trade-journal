@@ -234,6 +234,36 @@ button:disabled {
   font-size: 15px;
 }
 
+/* Demo mode (docs/demo-data/plan.md §5.1): neutral colours, not the red .banner. */
+.demo-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 8px;
+  margin: 0 0 8px;
+  padding: 2px 6px 2px 14px;
+  border-radius: 12px;
+  background: var(--fill);
+  font-size: 15px;
+}
+
+.demo-banner p {
+  margin: 0;
+  padding: 8px 0;
+}
+
+.demo-banner .text-btn {
+  margin-left: auto;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.badge.demo-chip {
+  margin: 0 6px 0 auto;
+  background: var(--fill);
+  color: var(--muted);
+}
+
 /* Summary */
 
 .summary {

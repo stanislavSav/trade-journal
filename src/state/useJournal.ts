@@ -69,6 +69,8 @@ export function useJournal(): JournalApi {
   )
 
   const exportNow = useCallback(async () => {
+    // Demo: there is nothing to back up, and exportBackup would write the real lastBackupAt (docs/demo-data/plan.md D7).
+    if (isDemo) return 'cancelled' as const
     const result = await exportBackup(current.current)
     setBackup(readBackupState())
     return result
@@ -86,6 +88,7 @@ export function useJournal(): JournalApi {
   )
 
   useEffect(() => {
+    if (isDemo) return // nothing is stored in the demo (plan D3)
     requestPersistence().catch(() => {})
   }, [])
 

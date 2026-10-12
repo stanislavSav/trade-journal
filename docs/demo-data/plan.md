@@ -55,7 +55,7 @@ Load backup, for example in a private window, to test backups and merging. Both 
 | D5  | What does **Exit demo** do?                        | `location.replace(import.meta.env.BASE_URL)`: loads the real app without `?demo`, and the demo page is not left in history. The tester's real data appears untouched. |
 | D6  | Device preferences in demo                         | One helper `deviceKey(name)` returns `trade-journal:ui:<name>` normally and `trade-journal:demo:ui:<name>` in demo. Used for `account` (`src/ui/JournalApp.tsx:44`), the sort order (feature 4) and `storage-filter` (feature 5, `docs/storage-tags/plan.md` D3). **Exception: language** keeps the real key `trade-journal:ui:lang`, because it belongs to the person, not to the portfolio; a tester who switches to Українська in the demo expects the real app in Українська too. Owner to confirm: [parking lot](parking-lot/02-language-shared-in-demo.md). |
 | D7  | Backup sheet in demo                               | **Save backup is disabled**, with the note "This is the demo. There is nothing to back up. Exit the demo to back up your own data." This also fixes a real bug: today `exportNow` in demo calls `exportBackup`, which writes the **real** `lastBackupAt` (`src/storage/index.ts:138`, `src/state/useJournal.ts:70-74`) and can hide the "not backed up" dot of the tester's real data. **Load backup works** and merges the file into the demo journal in memory, so a tester can try loading without risk; the help text says so. |
-| D8  | Settings sheet in demo                             | Same as normal: language switch and About work. Account removal (feature 3) works on the in-memory demo journal. No extra demo section. |
+| D8  | Settings sheet in demo                             | Same as normal: language switch and About work. Account removal (feature 3) works on the in-memory demo journal. No extra demo section. The remove-account sheet hides its "Save backup now" block in demo (added while building, 2026-10-12: it would have done nothing, see D7). |
 | D9  | Crash screen in demo                               | The crash screen (`src/ui/ErrorBoundary.tsx:22-52`) hides "Save backup" (it would export the real journal, not what the tester saw) and shows **Reload** and **Exit demo**. |
 | D10 | Dates: relative or fixed?                          | **Both, from one function.** `demoJournal(today: string)` places every trade "N days before `today`" (or on an unknown date). The live demo passes `todayIso()`, so it never looks stale. The sample file and the tests pass the fixed `DEMO_SAMPLE_DATE` (`'2026-10-01'`), so they are deterministic. No trade is ever after `today`. |
 | D11 | Ids and timestamps                                 | Fixed, readable ids: `demo-family` style account ids, `demo-bag-01` … `demo-bag-15`, `demo-trade-001` …, custom storage `custom-demo-family-safe`. `createdAt` / `updatedAt` are computed from the reference date and the row order. So: (1) the sample file is byte-stable for the drift test; (2) loading the sample file twice adds nothing (same ids, same `updatedAt`, G6); (3) a tester's later edits to sample trades win the merge (newer `updatedAt`). When the demo data changes, **move `DEMO_SAMPLE_DATE` forward**, so the new sample's records win over an older loaded copy. |
@@ -194,7 +194,11 @@ flowchart LR
 - `isDemo: boolean` (module constant).
 - `deviceKey(name: string): string` — **every** device preference key goes through it, except `lang`. Tasks of
   features 4 and 5 that already shipped use `trade-journal:ui:` literals; task 02 replaces them
-  (`grep -rn "trade-journal:ui:" src`).
+  (`grep -rn "trade-journal:ui:" src`). A test (`src/state/demo.test.ts`) fails when a `trade-journal:ui:` literal
+  appears anywhere else in `src/`.
+  _Note (2026-10-12):_ the storage-tags UI (feature 5, task 05) was still being built in parallel when task 02 shipped.
+  Its filter key must be `deviceKey('storage-filter')`, not the literal `'trade-journal:ui:storage-filter'`; the test
+  above fails until it is.
 - `exitDemo(): void` — `location.replace(import.meta.env.BASE_URL)`.
 - `demoJournal(today: string): Journal` — pure, deterministic for a given `today`, passes `parseJournal`.
 - `DEMO_SAMPLE_DATE = '2026-10-01'`.

@@ -8,7 +8,8 @@ import { Sheet } from './Sheet'
 interface Props {
   account: Account
   counts: { bags: number; trades: number }
-  onExport: () => Promise<'shared' | 'downloaded' | 'cancelled'>
+  /** Absent in the demo: there is nothing to back up there (docs/demo-data/plan.md D7). */
+  onExport?: () => Promise<'shared' | 'downloaded' | 'cancelled'>
   onConfirm: () => void
   /** Back to Settings; nothing is deleted. */
   onClose: () => void
@@ -25,6 +26,7 @@ export function RemoveAccountSheet({ account, counts, onExport, onConfirm, onClo
 
   // No await before onExport(): the share sheet only opens during the user's tap.
   const save = () => {
+    if (!onExport) return
     setError(null)
     setSaved(false)
     setBusy(true)
@@ -47,18 +49,20 @@ export function RemoveAccountSheet({ account, counts, onExport, onConfirm, onClo
           <p>{t.accounts.final}</p>
         </div>
 
-        <div className="remove-backup">
-          <p className="help">{t.accounts.backupHint}</p>
-          <button type="button" className="btn small" onClick={save} disabled={busy}>
-            {t.accounts.saveBackup}
-          </button>
-          {saved && (
-            <p className="help ok" role="status">
-              {t.accounts.backupSaved}
-            </p>
-          )}
-          {error && <FormError error={error} />}
-        </div>
+        {onExport && (
+          <div className="remove-backup">
+            <p className="help">{t.accounts.backupHint}</p>
+            <button type="button" className="btn small" onClick={save} disabled={busy}>
+              {t.accounts.saveBackup}
+            </button>
+            {saved && (
+              <p className="help ok" role="status">
+                {t.accounts.backupSaved}
+              </p>
+            )}
+            {error && <FormError error={error} />}
+          </div>
+        )}
 
         <div className="remove-confirm">
           <label htmlFor="remove-account-name" className="remove-label">

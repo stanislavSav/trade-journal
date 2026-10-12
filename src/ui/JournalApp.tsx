@@ -15,6 +15,7 @@ import {
 } from '../domain'
 import { errorText, useT } from '../i18n'
 import { usePrices } from '../prices/usePrices'
+import { deviceKey, isDemo } from '../state/demo'
 import { useJournal } from '../state/useJournal'
 import { useStoredString } from '../state/useStoredString'
 import { AddAccountSheet } from './AddAccountSheet'
@@ -23,6 +24,7 @@ import { BackupSheet } from './BackupSheet'
 import { BagDetail } from './BagDetail'
 import { BagList, type ListTab } from './BagList'
 import { sortBags } from './bagSort'
+import { DemoBanner } from './DemoBanner'
 import { DetailLayer } from './DetailLayer'
 import { EditTradeSheet } from './EditTradeSheet'
 import { Header } from './Header'
@@ -53,7 +55,7 @@ export function JournalApp() {
   const { journal, apply } = api
 
   const accounts = useMemo(() => liveAccounts(journal), [journal])
-  const [storedAccount, rememberAccount] = useStoredString('trade-journal:ui:account')
+  const [storedAccount, rememberAccount] = useStoredString(deviceKey('account'))
   const account = accounts.find((a) => a.id === storedAccount) ?? accounts[0] ?? null
   const accountId = account?.id ?? null
 
@@ -143,6 +145,7 @@ export function JournalApp() {
   return (
     <>
       <div className="app" inert={showingDetail}>
+        {isDemo && <DemoBanner />}
         <Header
           accounts={accounts}
           activeId={accountId}
@@ -231,6 +234,7 @@ export function JournalApp() {
       )}
       {sheet?.kind === 'backup' && (
         <BackupSheet
+          demo={isDemo}
           backup={api.backup}
           unsaved={api.unsaved}
           onExport={api.exportNow}
@@ -266,7 +270,7 @@ export function JournalApp() {
           key={removing.id}
           account={removing}
           counts={countAccountData(journal, removing.id)}
-          onExport={api.exportNow}
+          onExport={isDemo ? undefined : api.exportNow}
           onConfirm={() => dropAccount(removing.id)}
           onClose={() => setSheet({ kind: 'settings' })}
         />
