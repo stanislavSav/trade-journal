@@ -15,7 +15,7 @@ rename and delete their own custom storages. The sheet returns the chosen ids; t
 - `src/ui/EditTradeSheet.tsx:24-32` and `:118-124`: the two-tap delete pattern.
 - `src/ui/fields.tsx` (`Field`) and `src/ui/AddAccountSheet.tsx` for a small form inside a sheet.
 - `src/ui/styles.css`: `.chip-btn` (738-757), `.list` / `.row` (347-445), `.form-card`.
-- Task 02: `src/storage-tags/resolve.ts` (`storageLookup`, `storageSearch`), `src/ui/StorageIcon.tsx`.
+- Task 02: `src/storage-tags/resolve.ts` (`storageLookup`, `storageSearch`), `src/storage-tags/StorageIcon.tsx`.
 - Task 01: `addCustomStorage`, `updateCustomStorage`, `deleteCustomStorage`, `CUSTOM_COLOURS`, `CUSTOM_NAME_MAX`.
 - The i18n dictionaries `src/i18n/en.ts`, `src/i18n/uk.ts` and `useT()` (feature #2) for how keys are named.
 

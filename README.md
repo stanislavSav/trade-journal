@@ -65,3 +65,7 @@ Actions**.
 ## Licence
 
 MIT, see [LICENSE](LICENSE).
+
+The storage logos in `src/storage-tags/icons/` are not covered by the MIT licence. Their sources and licences are in
+[NOTICE.md](src/storage-tags/icons/NOTICE.md). Logos are trademarks of their owners. They are used only to name the
+service where the user keeps coins. No endorsement is implied.

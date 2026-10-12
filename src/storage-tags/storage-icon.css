@@ -1,0 +1,22 @@
+/* Storage icon (src/storage-tags/StorageIcon.tsx): a square tile with rounded corners.
+   The ring keeps dark tiles (OKX, Trezor) visible on a dark screen. An outline is drawn over the image;
+   an inset box-shadow would be hidden behind it. */
+.storage-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 22%;
+  outline: 1px solid var(--sep);
+  outline-offset: -1px;
+  overflow: hidden;
+  vertical-align: middle;
+  object-fit: cover;
+}
+
+.storage-icon-letter {
+  font-weight: 600;
+  line-height: 1;
+  font-family: var(--font);
+  user-select: none;
+}
