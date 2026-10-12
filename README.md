@@ -77,6 +77,33 @@ https://stanislavsav.github.io/trade-journal/. For a fork, the address is `https
 One-time setup for a fork: in the repository settings, set **Pages → Build and deployment → Source** to **GitHub
 Actions**.
 
+## Updates and your own copy
+
+The app looks for a new version in the background. When one is ready, a card says **New version available**. Tap
+**What changed** to see every code change on GitHub, **Later** to keep the version you have for now, or **Refresh** to
+load the new one. **Settings → About** shows which build runs (date and commit, linked to GitHub).
+
+The installed app cannot stay on an old version forever: the browser always installs the newest version of the site.
+If you want to decide yourself which code runs, run your own copy:
+
+1. Read the code, or ask someone you trust to check it. Note the commit you checked.
+2. On GitHub, tap **Fork**. Keep the name `trade-journal` (the app is built for the `/trade-journal/` path).
+3. To pin the checked version, reset your fork to that commit:
+
+   ```sh
+   git clone https://github.com/<your-user>/trade-journal.git && cd trade-journal
+   git reset --hard <checked-commit>
+   git push --force origin main
+   ```
+
+4. In your fork: **Settings → Pages → Build and deployment → Source → GitHub Actions**. Your copy opens at
+   `https://<your-user>.github.io/trade-journal/`. Nobody else can change it.
+5. To update later, open the compare page (`https://github.com/<your-user>/trade-journal/compare/main...stanislavSav:trade-journal:main`),
+   read the changes, then use **Sync fork** on GitHub.
+
+Your copy has its own data, because the data belongs to the web address. Move it with **Backup → Save backup** in the
+old app and **Load backup** in your copy.
+
 ## Licence
 
 MIT, see [LICENSE](LICENSE).

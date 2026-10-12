@@ -248,6 +248,7 @@ export const uk: Messages = {
     text: 'Оновіть, щоб завантажити її.',
     refresh: 'Оновити',
     later: 'Пізніше',
+    whatChanged: 'Що змінилося',
     build: (p) => `Збірка ${p.build}`,
     check: 'Перевірити оновлення',
     checking: 'Перевіряємо…',

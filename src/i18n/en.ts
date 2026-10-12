@@ -233,6 +233,7 @@ export const en = {
     text: 'Refresh to load it.',
     refresh: 'Refresh',
     later: 'Later',
+    whatChanged: 'What changed',
     build: (p: { build: string }) => `Build ${p.build}`,
     check: 'Check for updates',
     checking: 'Checking…',

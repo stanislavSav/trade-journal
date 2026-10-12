@@ -1,11 +1,11 @@
 import { useId, useState } from 'react'
 import type { Account, Journal } from '../domain'
 import { LANG_NAMES, LANGS, useLang, useT } from '../i18n'
+import { changesUrl, REPO_URL } from '../pwa/changes'
 import { checkForUpdates } from '../pwa/updates'
 import { AccountsSection } from './AccountsSection'
 import { Sheet } from './Sheet'
 
-const REPO_URL = 'https://github.com/stanislavSav/trade-journal'
 const LICENCE_URL = `${REPO_URL}/blob/main/LICENSE`
 
 interface Props {
@@ -87,6 +87,15 @@ export function SettingsSheet({ accounts, journal, onRemoveAccount, onNotify, on
                 )}
               </p>
             </div>
+            <a className="row link-row" href={changesUrl(__APP_COMMIT__)} target="_blank" rel="noopener noreferrer">
+              <span>
+                {t.update.whatChanged}
+                <span className="sr-only"> {t.settings.opensInNewTab}</span>
+              </span>
+              <span className="link-arrow" aria-hidden="true">
+                ↗
+              </span>
+            </a>
             <button type="button" className="row link-row" onClick={check} disabled={checking}>
               <span>{checking ? t.update.checking : t.update.check}</span>
               <span className="link-arrow" aria-hidden="true">

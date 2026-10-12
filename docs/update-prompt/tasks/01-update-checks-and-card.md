@@ -63,6 +63,11 @@ waiting worker from an older build was replaced by the next build after a "visib
 light/dark, over the Settings sheet); Refresh loaded the new build id; Check for updates showed "latest". Owner check
 left: the iPhone after the deploy.
 
+**2026-10-12 — owner follow-up (plan D8).** Added the **What changed** link (card and Settings → About; GitHub compare
+from the running commit to `main`, `src/pwa/changes.ts` + test) and the README section "Updates and your own copy"
+(fork at a checked commit, own GitHub Pages, Sync fork after reading the compare page). Checked in headless Chrome: the
+card with the link over Settings in dark mode; the Settings link points to `compare/<commit>...main`.
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |

@@ -38,6 +38,7 @@ new version is ready, a card slides up: "New version available" with a **Refresh
 | D5  | Where is the card | Bottom of the screen above the + button, outside `#root` (like the toast), so it shows over sheets. Not modal; it does not take focus. `role="status"` region so screen readers announce it. |
 | D6  | Transition | Slide up + fade in with a slight overshoot (≈0.45 s); the global `prefers-reduced-motion` rule in `styles.css` turns it off. |
 | D7  | Build id | `__APP_BUILD__` = short commit id (`GITHUB_SHA` in CI, else `git rev-parse`) + build date, set by `define` in `vite.config.ts`. Shown in Settings → About. |
+| D8  | Can a user refuse an update or keep an old version? (owner, 2026-10-12) | **Later** refuses for the session. Keeping an old version forever inside the same installed app is not possible: the browser always installs the newest worker of the site. Owner chose: (C) a **What changed** link on the card and in Settings → About that opens GitHub's compare view from the running commit to `main`, so people can read the changes before Refresh; (B) a README section **Run your own copy** (fork at a checked commit, own GitHub Pages, update only by choice). Fixed version links per release (option A) were not chosen. |
 
 **Defaults decided without a question** (reversible): 30-minute interval; card texts "New version available" /
 "Refresh to load it." (UK «Доступна нова версія» / «Оновіть, щоб завантажити її.»); Check for updates shows a toast

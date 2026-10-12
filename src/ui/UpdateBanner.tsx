@@ -1,6 +1,7 @@
 import { useState, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 import { useT } from '../i18n'
+import { changesUrl } from '../pwa/changes'
 import { isUpdateReady, subscribeUpdateReady } from '../pwa/updates'
 
 /**
@@ -26,6 +27,10 @@ export function UpdateBanner() {
           <div className="update-text">
             <strong>{t.update.title}</strong>
             <span>{t.update.text}</span>
+            <a className="update-changes" href={changesUrl(__APP_COMMIT__)} target="_blank" rel="noopener noreferrer">
+              {t.update.whatChanged}
+              <span className="sr-only"> {t.settings.opensInNewTab}</span>
+            </a>
           </div>
           <div className="update-actions">
             <button type="button" className="btn small update-later" onClick={() => setLater(true)}>

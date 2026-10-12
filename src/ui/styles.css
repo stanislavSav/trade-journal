@@ -1505,6 +1505,15 @@ textarea.input {
   font-size: 14px;
 }
 
+.update-changes {
+  align-self: flex-start;
+  text-decoration: none;
+  margin-top: 2px;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+}
+
 .update-actions {
   display: flex;
   grid-column: 1 / -1;
