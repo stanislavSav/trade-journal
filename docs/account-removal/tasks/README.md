@@ -11,7 +11,7 @@ truth.** Update both in the same change.
 
 | #   | Task                                                                        | Depends on      | Status      | Progress |
 | --- | --------------------------------------------------------------------------- | --------------- | ----------- | -------- |
-| 01  | [`removeAccount` and `countAccountData` in the domain](01-remove-account-domain.md) | —               | Not started | 0%       |
+| 01  | [`removeAccount` and `countAccountData` in the domain](01-remove-account-domain.md) | —               | Done        | 100%     |
 | 02  | [Accounts section in Settings and the confirmation sheet](02-settings-accounts-ui.md) | 01, feature 2   | Not started | 0%       |
 
 ## How to pick up a task (also for a new agent session)
