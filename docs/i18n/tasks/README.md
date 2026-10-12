@@ -10,7 +10,7 @@ truth.** Update both in the same change.
 
 | #   | Task                                                                      | Depends on | Status      | Progress |
 | --- | ------------------------------------------------------------------------- | ---------- | ----------- | -------- |
-| 01  | [i18n core: catalogs, plurals, detection, `useT`](01-i18n-core.md)        | —          | Not started | 0%       |
+| 01  | [i18n core: catalogs, plurals, detection, `useT`](01-i18n-core.md)        | —          | Done        | 100%     |
 | 02  | [Settings sheet: gear button, Language, About](02-settings-sheet.md)      | 01         | Not started | 0%       |
 | 03  | [Domain messages as data (error codes, warnings, price problems)](03-domain-messages-as-data.md) | 01 | Not started | 0% |
 | 04  | [Translate every screen](04-translate-every-screen.md)                    | 02, 03     | Not started | 0%       |

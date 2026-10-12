@@ -60,14 +60,14 @@ comes from the stored choice or the device, and `<html lang>` follows it. No vis
 
 ## Acceptance criteria
 
-- [ ] `src/i18n/` exists with the files above; `useT()` returns `en` or `uk`.
-- [ ] Removing any key from `uk.ts` makes `npm run typecheck` fail (try it once, then restore).
-- [ ] `catalog.test.ts` fails if a value in `uk.ts` is `''` (try it once, then restore).
-- [ ] Plural tests pass for the Ukrainian one / few / many cases listed in step 1.
-- [ ] Detection tests pass for the cases in step 2.
-- [ ] With an empty `localStorage` and a Ukrainian device language, `document.documentElement.lang` is `uk`; with
+- [x] `src/i18n/` exists with the files above; `useT()` returns `en` or `uk`.
+- [x] Removing any key from `uk.ts` makes `npm run typecheck` fail (try it once, then restore).
+- [x] `catalog.test.ts` fails if a value in `uk.ts` is `''` (try it once, then restore).
+- [x] Plural tests pass for the Ukrainian one / few / many cases listed in step 1.
+- [x] Detection tests pass for the cases in step 2.
+- [x] With an empty `localStorage` and a Ukrainian device language, `document.documentElement.lang` is `uk`; with
       `trade-journal:ui:lang = "en"` it is `en`.
-- [ ] Nothing is written to `trade-journal:ui:lang` until `setLang` is called.
+- [x] Nothing is written to `trade-journal:ui:lang` until `setLang` is called.
 
 ## Verification
 
@@ -85,8 +85,24 @@ Languages, move Ukrainian to the top), reload, check `lang="uk"` again.
 
 _(Append a dated entry before you stop, even mid-task: what is done, what is next, surprises.)_
 
+- **2026-10-12** — Done. `src/i18n/` has `types.ts`, `plural.ts`, `detect.ts`, `en.ts`, `uk.ts`, `I18nProvider.tsx`,
+  `index.ts` and three tests (`plural`, `detect`, `catalog`). `App.tsx` wraps `ErrorBoundary` in `I18nProvider`.
+  - Plural style: every form is a function of the count (`one: (n) => ${n} нова` as a template literal), so a message decides where the
+    number goes. The catalogs start with `common.close` and `backup.merged` (the plural example; task 04 uses it for
+    the merge toast).
+  - `detect.ts` also has `resolveLang(stored, languages)` → `{ lang, chosen }`, so the provider logic is tested in
+    Node without a DOM.
+  - `<html lang>` is set in a layout effect (before paint, on every change). Nothing is written to
+    `trade-journal:ui:lang` until `setLang`.
+  - The catalog test calls every function with a stand-in parameter (a Proxy that reads as 1, 2 or 5), so it needs no
+    per-key sample map. Keep catalog functions to template strings and plurals; a function that calls a string
+    method on a parameter would break the test.
+  - Checked: deleting a key in `uk.ts` fails `tsc`; `''` fails the catalog test. Headless Chrome with device language
+    `uk-UA` and empty storage gives `lang="uk"`; with the key set to `en` it gives `lang="en"`.
+  - Next: task 02 (Settings sheet).
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
 | ----------- | ---------- | ---------- | ------------ |
-| Not started | 0%         | 0h         | 0            |
+| Done        | 100%       | 1h         | —            |
