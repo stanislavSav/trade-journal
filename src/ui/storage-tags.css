@@ -1,0 +1,375 @@
+/* Storage tags UI: picker sheet, custom storage form, bag screen block and the Add trade row.
+   Spec: docs/storage-tags/plan.md §5. Colour tokens come from styles.css. */
+
+/* Picker. It keeps its height while the search narrows the list, so the sheet does not jump while typing. */
+.storage-picker {
+  display: flex;
+  flex-direction: column;
+  min-height: min(640px, 70dvh);
+}
+
+/* Search and the selected chips stay on top while the list scrolls. */
+.storage-picker-top {
+  position: sticky;
+  top: -8px;
+  z-index: 2;
+  margin: -8px -16px 0;
+  padding: 8px 16px 6px;
+  background: var(--sheet-bg);
+}
+
+.storage-search {
+  -webkit-appearance: none;
+  appearance: none;
+  padding: 0 12px;
+  border-radius: 10px;
+  background: var(--fill);
+}
+
+.storage-chips {
+  display: flex;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 4px 0;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.storage-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.storage-chips > li {
+  flex: none;
+}
+
+/* A tag: 16 px icon and the name. Used in the picker (removable) and on the bag screen (static). */
+.storage-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  max-width: 100%;
+  padding: 0 10px 0 8px;
+  border-radius: 16px;
+  background: var(--fill);
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.storage-chip-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.storage-chip.removable::after {
+  content: '';
+  position: absolute;
+  inset: -6px -2px;
+}
+
+.storage-chip-x {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.storage-limit {
+  margin: 0;
+  color: var(--neg);
+  font-size: 13px;
+}
+
+.storage-limit:not(:empty) {
+  padding: 6px 16px 0;
+}
+
+.storage-group-title {
+  margin: 18px 16px 6px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.storage-list {
+  overflow: hidden;
+}
+
+.storage-row {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.storage-row + .storage-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 56px;
+  border-top: var(--hairline) solid var(--sep);
+}
+
+.storage-pick {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 52px;
+  padding: 8px 12px 8px 16px;
+  text-align: left;
+}
+
+.storage-pick:active,
+.storage-more:active {
+  background: var(--pressed);
+}
+
+@media (hover: hover) {
+  .storage-pick:hover,
+  .storage-more:hover {
+    background: var(--hover);
+  }
+}
+
+.storage-text {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  column-gap: 10px;
+  min-width: 0;
+}
+
+.storage-name {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 17px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Shown in "Used" and "Custom"; moves under the name when both do not fit on one line. */
+.storage-kind {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.storage-check {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 22px;
+  color: var(--accent);
+}
+
+.storage-more {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 48px;
+  color: var(--accent);
+}
+
+.storage-nomatch {
+  margin-bottom: 14px;
+}
+
+.storage-nomatch p {
+  margin: 24px 16px 12px;
+  color: var(--muted);
+  font-size: 15px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.storage-nomatch .btn,
+.storage-add-custom {
+  gap: 6px;
+}
+
+.storage-add-custom {
+  margin: 18px 0 14px;
+}
+
+/* Save stays at the bottom of the sheet; it covers the sheet's bottom padding so rows never show below it. */
+.storage-save {
+  position: sticky;
+  bottom: calc(-16px - env(safe-area-inset-bottom));
+  z-index: 2;
+  margin: auto -16px calc(-16px - env(safe-area-inset-bottom));
+  padding: 10px 16px calc(16px + env(safe-area-inset-bottom));
+  background: var(--sheet-bg);
+}
+
+.storage-save .form-error {
+  margin-bottom: 8px;
+}
+
+@media (min-width: 640px) {
+  .storage-save {
+    bottom: -20px;
+    margin-bottom: -20px;
+    padding-bottom: 20px;
+  }
+}
+
+/* Custom storage form */
+.storage-back {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 2px;
+  margin: -6px 0 -6px -8px;
+}
+
+.storage-field-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 16px 14px 0;
+}
+
+.storage-kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.storage-kind-btn {
+  position: relative;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 18px;
+  background: var(--fill);
+  font-size: 15px;
+}
+
+.storage-kind-btn::after {
+  content: '';
+  position: absolute;
+  inset: -4px -2px;
+}
+
+.storage-kind-btn[aria-checked='true'] {
+  background: var(--accent-fill);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+.storage-colours {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.storage-swatch {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.storage-swatch::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+
+.storage-swatch[aria-checked='true'] {
+  box-shadow:
+    0 0 0 2px var(--card-elevated),
+    0 0 0 4px var(--text);
+}
+
+.storage-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: 17px;
+}
+
+.storage-preview-name {
+  min-width: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.storage-usage {
+  margin: 6px 0 -8px;
+  color: var(--muted);
+  font-size: 15px;
+  text-align: center;
+}
+
+/* Bag screen: "Stored at" under the coin line (plan §5.2). */
+.storage-tags {
+  margin-top: 4px;
+}
+
+.storage-tags-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+}
+
+.storage-tags-label {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.storage-tags-head .text-btn {
+  margin-right: -8px;
+}
+
+.storage-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.storage-tags .storage-chip {
+  background: var(--card);
+}
+
+.storage-not-set {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+/* Add trade: the Stored at row (plan §5.5). Chips wrap; Choose… stays at the end. */
+.storage-field-control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  padding: 6px 0;
+}
+
+.storage-field-control .storage-tag-list {
+  flex: 1 1 auto;
+}
+
+.storage-field-control .chip-btn {
+  margin-left: auto;
+}

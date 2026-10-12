@@ -1,6 +1,6 @@
 # Storage tags — plan
 
-> **Status:** Planned · **Owner:** @stanislavSav · **Decided:** 2026-10-12
+> **Status:** In progress · **Owner:** @stanislavSav · **Decided:** 2026-10-12
 > **Vocabulary:** [docs/CONTEXT.md](../CONTEXT.md) (Bag, Storage, Storage tag, Tombstone, Device preference) ·
 > **Decisions:** §3 below and the global decisions G1–G7 in [docs/README.md](../README.md) · **Mockup:** none, the
 > wireframes in §5 are the contract · **Catalogue:** [catalogue.md](catalogue.md) · **Tasks:** [tasks/](tasks/README.md)
@@ -316,6 +316,9 @@ setBagStorages(journal, bagId, storageIds: string[], now): Journal
 addCustomStorage(journal, { name, kind, colour }, now): { journal: Journal; id: string }
 updateCustomStorage(journal, id, { name?, kind?, colour? }, now): Journal
 deleteCustomStorage(journal, id, now): Journal // tombstone
+// Errors a user can see are AppErrors (src/domain/errors.ts) with the codes storageIdsInvalid, storageTooMany,
+// storageNameRequired, storageNameTooLong, storageNameTaken, storageKindInvalid, storageColourInvalid,
+// storageNotFound (and bagNotFound); the UI shows the text from the `errors` group of the dictionaries.
 // src/domain/actions.ts: NewTradeInput.bag gains { newBagName?: string; storageIds?: string[] }
 
 // src/storage-tags/catalogue.ts
@@ -330,6 +333,20 @@ export function bagStorages(bag: Bag, lookup): StorageInfo[] // known ids only, 
 export function storageSearch(query: string, infos: readonly StorageInfo[]): StorageInfo[] // name, id, aliases
 export function textColour(background: string): '#ffffff' | '#000000' // letter badge and generic icon colour
 export function badgeLetter(name: string): string
+
+// src/storage-tags/picker.ts (task 03): what the picker shows
+export type PickerGroupKey = 'used' | 'cex' | 'dex' | 'hot' | 'cold' | 'custom'
+export function usedStorageIds(journal, lookup): Set<string> // known ids on live bags, all accounts
+export function pickerGroups(infos, used, query, locale): { key: PickerGroupKey; items: StorageInfo[] }[]
+export function storageNameTaken(name, infos, selfId?): boolean // predefined + live custom names, any case
+export function bagsUsingStorage(journal, id): number
+
+// src/ui/StoragePickerSheet.tsx + CustomStorageForm.tsx (task 03); styles in src/ui/storage-tags.css.
+// src/ui/storageHandlers.ts: customStorageHandlers(apply) gives the picker's three custom-storage callbacks,
+// so JournalApp only opens the picker. src/ui/storageText.ts: kindLabel(t, kind), groupLabel(t, key).
+// Task 04: src/ui/StorageTags.tsx (StorageTags block + StorageChips, also used by the Add trade row);
+// applyBagStorages(apply, bagId, ids) in storageHandlers.ts returns false when nothing changed; useJournal's apply
+// does not save a journal that an edit returned unchanged, so a no-op Save leaves the backup state alone.
 
 // src/storage-tags/StorageIcon.tsx (+ storage-icon.css; the only .tsx in this folder)
 export function StorageIcon(props: { info: StorageInfo; size: number }): JSX.Element // aria-hidden
