@@ -1,5 +1,6 @@
 import { useEffect, useEffectEvent, useId, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
+import { useT } from '../i18n'
 import { isTopLayer, lockPage, pushLayer } from './modal'
 import { useVisualViewport } from './useVisualViewport'
 
@@ -11,6 +12,7 @@ interface Props {
 
 /** Bottom sheet on phones, centered dialog on wide screens. Closes on backdrop tap and Escape. */
 export function Sheet({ title, onClose, children }: Props) {
+  const t = useT()
   const titleId = useId()
   const dialog = useRef<HTMLDivElement>(null)
   const box = useVisualViewport()
@@ -49,7 +51,7 @@ export function Sheet({ title, onClose, children }: Props) {
         <div className="sheet-head">
           <h2 id={titleId}>{title}</h2>
           <button type="button" className="text-btn" onClick={onClose}>
-            Close
+            {t.common.close}
           </button>
         </div>
         <div className="sheet-body">{children}</div>

@@ -1,0 +1,74 @@
+import { useId } from 'react'
+import { LANG_NAMES, LANGS, useLang, useT } from '../i18n'
+import { Sheet } from './Sheet'
+
+const REPO_URL = 'https://github.com/stanislavSav/trade-journal'
+const LICENCE_URL = `${REPO_URL}/blob/main/LICENSE`
+
+/** Device settings and information about the app (docs/i18n/plan.md §5.2). */
+export function SettingsSheet({ onClose }: { onClose: () => void }) {
+  const t = useT()
+  const { lang, setLang, chosen } = useLang()
+  const languageId = useId()
+  const aboutId = useId()
+
+  const links = [
+    { href: REPO_URL, label: t.settings.sourceCode },
+    { href: LICENCE_URL, label: t.settings.licence },
+  ]
+
+  return (
+    <Sheet title={t.settings.title} onClose={onClose}>
+      <div className="settings">
+        <section aria-labelledby={languageId}>
+          <h3 id={languageId} className="section-title">
+            {t.settings.language}
+          </h3>
+          <div className="segmented settings-segmented" role="radiogroup" aria-label={t.settings.language}>
+            {LANGS.map((l) => (
+              <button
+                key={l}
+                type="button"
+                role="radio"
+                lang={l}
+                aria-checked={lang === l}
+                onClick={() => setLang(l)}
+              >
+                {LANG_NAMES[l]}
+              </button>
+            ))}
+          </div>
+          {!chosen && <p className="help settings-hint">{t.settings.languageHint}</p>}
+        </section>
+
+        {/* Feature 3 adds the Accounts section here; order: Language, Accounts, About (docs/account-removal/plan.md). */}
+
+        <section aria-labelledby={aboutId}>
+          <h3 id={aboutId} className="section-title">
+            {t.settings.about}
+          </h3>
+          <div className="card list">
+            <div className="about-head">
+              <div className="about-title">
+                <span>Trade Journal</span>
+                <span className="num muted">{__APP_VERSION__}</span>
+              </div>
+              <p className="help">{t.settings.dataStays}</p>
+            </div>
+            {links.map((link) => (
+              <a key={link.href} className="row link-row" href={link.href} target="_blank" rel="noopener noreferrer">
+                <span>
+                  {link.label}
+                  <span className="sr-only"> {t.settings.opensInNewTab}</span>
+                </span>
+                <span className="link-arrow" aria-hidden="true">
+                  ↗
+                </span>
+              </a>
+            ))}
+          </div>
+        </section>
+      </div>
+    </Sheet>
+  )
+}

@@ -21,7 +21,25 @@ export const uk: Messages = {
   common: {
     close: 'Закрити',
   },
+  header: {
+    accounts: 'Портфелі',
+    addAccount: 'Додати портфель',
+    settings: 'Налаштування',
+    backup: 'Бекап',
+    backupUnsaved: 'Бекап, є зміни без резервної копії',
+  },
   backup: {
     merged: (p) => `Об'єднано: ${newTrades(p.added)}, ${updatedTrades(p.updated)}`,
+  },
+  settings: {
+    title: 'Налаштування',
+    language: 'Мова',
+    languageHint: 'Поки ви не оберете, застосунок використовує мову цього пристрою.',
+    about: 'Про застосунок',
+    dataStays:
+      'Ваші дані зберігаються лише на цьому пристрої. Без облікового запису, без сервера, без стеження. Ціни — з CoinGecko.',
+    sourceCode: 'Вихідний код на GitHub',
+    licence: 'Ліцензія MIT',
+    opensInNewTab: '(відкриється в новій вкладці)',
   },
 }

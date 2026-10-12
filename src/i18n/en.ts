@@ -10,8 +10,25 @@ export const en = {
   common: {
     close: 'Close',
   },
+  header: {
+    accounts: 'Accounts',
+    addAccount: 'Add account',
+    settings: 'Settings',
+    backup: 'Backup',
+    backupUnsaved: 'Backup, has changes not backed up',
+  },
   backup: {
     merged: (p: { added: number; updated: number }) => `Merged: ${newTrades(p.added)}, ${updatedTrades(p.updated)}`,
+  },
+  settings: {
+    title: 'Settings',
+    language: 'Language',
+    languageHint: 'Until you choose, the app follows the language of this device.',
+    about: 'About',
+    dataStays: 'Your data stays on this device. No account, no server, no tracking. Prices come from CoinGecko.',
+    sourceCode: 'Source code on GitHub',
+    licence: 'MIT licence',
+    opensInNewTab: '(opens in a new tab)',
   },
 }
 

@@ -54,16 +54,17 @@ device.
 
 ## Acceptance criteria
 
-- [ ] The gear button shows in the header on every account and in the empty state; it opens the Settings sheet.
-- [ ] Tapping `Українська` switches the sheet title, the header labels and `<html lang>` to Ukrainian at once, without
+- [x] The gear button shows in the header on every account and in the empty state; it opens the Settings sheet.
+- [x] Tapping `Українська` switches the sheet title, the header labels and `<html lang>` to Ukrainian at once, without
       a reload; the sheet stays open.
-- [ ] After a reload the chosen language stays; `trade-journal:ui:lang` holds `"uk"` or `"en"`.
-- [ ] The device-language hint shows on first use and disappears after a choice.
-- [ ] About shows `0.1.0` (the `package.json` version), and both links open the right GitHub pages in a new tab.
-- [ ] Keyboard: Tab reaches both language options and both links; Escape closes the sheet; focus returns to the gear.
-- [ ] Screen reader (VoiceOver): the gear is read as "Settings" / "Налаштування"; the language options are read as
-      radio buttons with their checked state.
-- [ ] At 320 px width the header still shows the gear and the Backup button without overlap.
+- [x] After a reload the chosen language stays; `trade-journal:ui:lang` holds `"uk"` or `"en"`.
+- [x] The device-language hint shows on first use and disappears after a choice.
+- [x] About shows `0.1.0` (the `package.json` version), and both links open the right GitHub pages in a new tab.
+- [x] Keyboard: Tab reaches both language options and both links; Escape closes the sheet; focus returns to the gear.
+- [x] Screen reader (VoiceOver): the gear is read as "Settings" / "Налаштування"; the language options are read as
+      radio buttons with their checked state. _(Checked in the Chrome accessibility tree; the VoiceOver pass on an
+      iPhone is part of task 05.)_
+- [x] At 320 px width the header still shows the gear and the Backup button without overlap.
 
 ## Verification
 
@@ -80,8 +81,24 @@ Manual: `npm run dev`; open Settings; switch the language both ways; reload; che
 
 _(Append a dated entry before you stop, even mid-task: what is done, what is next, surprises.)_
 
+- **2026-10-12** — Done. `GearIcon`, the gear `icon-btn` in `Header` (between the account bar and Backup), sheet
+  state `{ kind: 'settings' }`, and `src/ui/SettingsSheet.tsx` with Language and About. `__APP_VERSION__` comes from
+  `package.json` through `define` in `vite.config.ts` (read with `fs`), declared in `src/vite-env.d.ts`.
+  - The criterion "the header labels switch" needs the header in the catalog, so `Header.tsx` and the `Close` button
+    of `Sheet.tsx` are translated here already (`header.*`, `common.close`). Task 04 does not need to touch them.
+  - The language buttons have `lang="en"` / `lang="uk"`, so a screen reader says each name in its own voice. The
+    radiogroup uses `aria-label` (not the upper-case section title) for its name. The links carry a hidden
+    "(opens in a new tab)".
+  - `.segmented` CSS now also matches `[role='radio']` / `[aria-checked='true']`.
+  - A comment in `SettingsSheet.tsx` marks where feature 3 adds the Accounts section.
+  - Checked in headless Chrome at 320 px and 390 px: the switch changes the sheet, the header labels and
+    `<html lang>` at once, the sheet stays open, the key holds `"uk"` after a reload, the hint disappears after a
+    choice, Escape closes and focus returns to the gear, Tab reaches both options and both links. At 320 px the header
+    has no overlap (the account tabs scroll, as before). Not yet checked on a real iPhone (task 05).
+  - Next: task 03.
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
 | ----------- | ---------- | ---------- | ------------ |
-| Not started | 0%         | 0h         | 0            |
+| Done        | 100%       | 1h         | —            |

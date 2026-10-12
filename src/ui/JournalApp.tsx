@@ -25,6 +25,7 @@ import { Header } from './Header'
 import { PlusIcon } from './icons'
 import { coinMap, findBagSummary, geckoIdsFor, liveAccounts, openPositions, openTotals, priceFor } from './portfolioView'
 import { useBagRoute } from './route'
+import { SettingsSheet } from './SettingsSheet'
 import { SummaryCard } from './SummaryCard'
 import { accountTabId } from './tabKeys'
 import { Toast, type ToastMessage } from './Toast'
@@ -34,6 +35,7 @@ type SheetState =
   | { kind: 'edit'; tradeId: string }
   | { kind: 'backup' }
   | { kind: 'account' }
+  | { kind: 'settings' }
   | null
 
 export function JournalApp() {
@@ -115,6 +117,7 @@ export function JournalApp() {
           onAddAccount={() => setSheet({ kind: 'account' })}
           unsaved={api.unsaved}
           onBackup={() => setSheet({ kind: 'backup' })}
+          onSettings={() => setSheet({ kind: 'settings' })}
         />
         {api.saveError && (
           <p className="banner" role="alert">
@@ -201,6 +204,7 @@ export function JournalApp() {
       {sheet?.kind === 'account' && (
         <AddAccountSheet accounts={accounts} onAdd={createAccount} onClose={() => setSheet(null)} />
       )}
+      {sheet?.kind === 'settings' && <SettingsSheet onClose={() => setSheet(null)} />}
 
       <Toast message={toast} onDone={() => setToast(null)} />
     </>

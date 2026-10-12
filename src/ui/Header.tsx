@@ -1,5 +1,6 @@
 import type { Account } from '../domain'
-import { PlusIcon } from './icons'
+import { useT } from '../i18n'
+import { GearIcon, PlusIcon } from './icons'
 import { accountTabId, onTabKeys } from './tabKeys'
 
 interface Props {
@@ -9,13 +10,15 @@ interface Props {
   onAddAccount: () => void
   unsaved: boolean
   onBackup: () => void
+  onSettings: () => void
 }
 
-export function Header({ accounts, activeId, onSelect, onAddAccount, unsaved, onBackup }: Props) {
+export function Header({ accounts, activeId, onSelect, onAddAccount, unsaved, onBackup, onSettings }: Props) {
+  const t = useT()
   return (
     <header className="app-header">
       <div className="account-bar">
-        <div className="account-tabs" role="tablist" aria-label="Accounts" onKeyDown={onTabKeys}>
+        <div className="account-tabs" role="tablist" aria-label={t.header.accounts} onKeyDown={onTabKeys}>
           {accounts.map((a) => {
             const selected = a.id === activeId
             return (
@@ -35,17 +38,20 @@ export function Header({ accounts, activeId, onSelect, onAddAccount, unsaved, on
             )
           })}
         </div>
-        <button type="button" className="icon-btn" aria-label="Add account" onClick={onAddAccount}>
+        <button type="button" className="icon-btn" aria-label={t.header.addAccount} onClick={onAddAccount}>
           <PlusIcon size={18} />
         </button>
       </div>
+      <button type="button" className="icon-btn" aria-label={t.header.settings} onClick={onSettings}>
+        <GearIcon />
+      </button>
       <button
         type="button"
         className="backup-btn"
         onClick={onBackup}
-        aria-label={unsaved ? 'Backup, has changes not backed up' : 'Backup'}
+        aria-label={unsaved ? t.header.backupUnsaved : t.header.backup}
       >
-        Backup
+        {t.header.backup}
         {unsaved && <span className="dot" aria-hidden="true" />}
       </button>
     </header>

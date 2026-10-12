@@ -320,7 +320,8 @@ button:disabled {
   background: var(--fill);
 }
 
-.segmented [role='tab'] {
+.segmented [role='tab'],
+.segmented [role='radio'] {
   flex: 1;
   display: inline-flex;
   align-items: center;
@@ -332,7 +333,8 @@ button:disabled {
   font-weight: 500;
 }
 
-.segmented [aria-selected='true'] {
+.segmented [aria-selected='true'],
+.segmented [aria-checked='true'] {
   background: var(--segment-on);
   font-weight: 600;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
@@ -1025,6 +1027,58 @@ textarea.input {
 
 .help.ok {
   color: var(--pos);
+}
+
+/* Settings */
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.settings-segmented {
+  margin-bottom: 0;
+}
+
+.settings-hint {
+  margin: 8px 16px 0;
+}
+
+.about-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+}
+
+.about-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 17px;
+}
+
+.link-row {
+  align-items: center;
+  min-height: 44px;
+  color: var(--accent);
+  font-size: 17px;
+  text-decoration: none;
+}
+
+.list > .link-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 16px;
+  border-top: var(--hairline) solid var(--sep);
+}
+
+.link-arrow {
+  flex: none;
+  color: var(--muted);
 }
 
 /* Sheets */
