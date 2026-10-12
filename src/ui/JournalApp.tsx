@@ -19,6 +19,7 @@ import { AddTradeSheet, type AddPreset } from './AddTradeSheet'
 import { BackupSheet } from './BackupSheet'
 import { BagDetail } from './BagDetail'
 import { BagList, type ListTab } from './BagList'
+import { DEFAULT_SORT, sortBags } from './bagSort'
 import { DetailLayer } from './DetailLayer'
 import { EditTradeSheet } from './EditTradeSheet'
 import { Header } from './Header'
@@ -55,6 +56,12 @@ export function JournalApp() {
     [summary, coins, prices.snapshot.prices],
   )
   const totals = useMemo(() => openTotals(positions), [positions])
+  // List order comes only from sortBags (docs/list-sorting/plan.md); the sort control arrives in task 02.
+  const openRows = useMemo(() => sortBags(positions, DEFAULT_SORT.open), [positions])
+  const closedRows = useMemo(() => {
+    const rows = summary ? summary.closed.map((s) => ({ summary: s })) : []
+    return sortBags(rows, DEFAULT_SORT.closed).map((r) => r.summary)
+  }, [summary])
 
   const [listTab, setListTab] = useState<ListTab>('open')
   const [sheet, setSheet] = useState<SheetState>(null)
@@ -124,7 +131,7 @@ export function JournalApp() {
         {summary && accountId ? (
           <main id="account-panel" role="tabpanel" aria-labelledby={accountTabId(accountId)}>
             <SummaryCard totals={totals} realized={summary.realized} prices={prices} />
-            <BagList tab={listTab} onTab={setListTab} open={positions} closed={summary.closed} onOpen={openBag} />
+            <BagList tab={listTab} onTab={setListTab} open={openRows} closed={closedRows} onOpen={openBag} />
           </main>
         ) : (
           <main className="empty-state">
