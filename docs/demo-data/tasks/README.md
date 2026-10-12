@@ -17,7 +17,7 @@ truth.** Update both in the same change.
 | 01  | [Rich, deterministic demo journal](01-deterministic-demo-journal.md)          | —          | Done        | 100%     |
 | 02  | [Demo mode on the live site](02-demo-mode-in-production.md)                   | 01         | Done        | 100%     |
 | 03  | [Sample backup file and service-worker rule](03-sample-backup-file.md)        | 01         | Done        | 100%     |
-| 04  | [README "How to test" and device checks](04-readme-and-device-checks.md)      | 02, 03     | Not started | 0%       |
+| 04  | [README "How to test" and device checks](04-readme-and-device-checks.md)      | 02, 03     | Done        | 100%     |
 
 ## How to pick up a task (also for a new agent session)
 

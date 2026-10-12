@@ -1,6 +1,6 @@
 # Demo data — plan
 
-> **Status:** In progress · **Owner:** @stanislavSav · **Decided:** 2026-10-12
+> **Status:** Shipped (2026-10-12; iPhone checks in task 04 left for the owner) · **Owner:** @stanislavSav · **Decided:** 2026-10-12
 > **Vocabulary:** [docs/CONTEXT.md](../CONTEXT.md) (Demo mode, Backup, Device preference, Storage tag) ·
 > **Decisions:** [docs/README.md](../README.md) G4, G5, G6, G7 · **Depends on:** features 1–5, especially
 > [i18n](../i18n/plan.md) (Settings sheet, `useT()`) and [storage tags](../storage-tags/plan.md) ·

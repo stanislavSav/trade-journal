@@ -58,7 +58,7 @@ because later features add UI text in two languages (needs i18n) and the demo da
 | 3   | [Remove an account](account-removal/plan.md)       | Accounts section in Settings; remove an account with its bags and trades | Shipped |
 | 4   | [List sorting](list-sorting/plan.md)               | Sort open bags by value, gain %, invested, latest action or name; closed bags by the last four | Shipped |
 | 5   | [Storage tags](storage-tags/plan.md)               | Tag where each bag is kept (Binance, Ledger, …), icons, filter chips   | Planned |
-| 6   | [Demo data](demo-data/plan.md)                     | `?demo` link on the live app and a sample backup file for testers      | Planned |
+| 6   | [Demo data](demo-data/plan.md)                     | `?demo` link on the live app and a sample backup file for testers      | Shipped |
 
 Whitelabel (branded copies of the app) is planned privately and is not part of this repo yet.
 

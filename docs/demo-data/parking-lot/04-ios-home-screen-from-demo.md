@@ -12,4 +12,6 @@
   - C — in demo mode, replace the URL with `history.replaceState` to drop `?demo` after start, so "Add to Home Screen"
     sees the plain URL. Then a reload leaves the demo (it reads the URL again), which breaks "reload resets the demo".
 - **What the code does meanwhile:** A. The real behaviour must be checked on an iPhone in task 04.
+  Checked so far (2026-10-12, desktop Chrome): the built manifest has `start_url: /trade-journal/`, so a Chrome
+  install from the demo page opens the real app. The iPhone run is still to do.
 - **Status:** Waiting for device run

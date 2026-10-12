@@ -30,7 +30,17 @@ browser tab, or use the browser's install button if it shows one.
 
 ## Try it
 
-Open the live app. Your data stays on your device. A demo link with sample data is coming.
+Open the live app. Your data stays on your device. Two safe ways to test it:
+
+- **Try the demo:** https://stanislavsav.github.io/trade-journal/?demo opens the app with sample data: three accounts
+  with open and closed bags. Nothing is saved and your own data is not touched. **Exit demo** in the banner returns to
+  your app. Reloading the page starts the demo again.
+- **Test backups with the sample file:** download https://stanislavsav.github.io/trade-journal/sample-backup.json (or
+  open [public/sample-backup.json](public/sample-backup.json) on GitHub → **Download raw file**), then open
+  **Backup → Load backup** and pick the file.
+
+**Loading the sample file merges it into the data in that browser.** Use a private window, a test device, or the demo
+link. To remove the sample data again: **Settings → Accounts**, remove `Demo`, `Demo Family` and `Demo Swing`.
 
 ## How data works
 
@@ -52,6 +62,9 @@ npm test           # unit tests (Vitest)
 npm run typecheck  # TypeScript check
 npm run build      # type check + production build in dist/
 ```
+
+The sample backup file is generated from `src/state/demoData.ts`. After you change the demo data, run
+`npm test -- -u` to write the new `public/sample-backup.json`.
 
 After cloning, run `git config core.hooksPath .githooks` once. Commit rules: [CLAUDE.md](CLAUDE.md). Plans and task
 briefs: [docs/](docs/README.md).

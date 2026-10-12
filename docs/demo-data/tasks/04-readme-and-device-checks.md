@@ -52,11 +52,14 @@ checked both on real devices.
 
 ## Acceptance criteria
 
-- [ ] README has the two routes, the merge warning and the removal hint; links work on the live site.
-- [ ] The iOS home-screen result is recorded in the parking lot.
-- [ ] Offline `?demo` works on the iPhone.
-- [ ] The sample file downloads and loads on the iPhone.
-- [ ] Plan status `Shipped`; board all `Done`.
+- [x] README has the two routes, the merge warning and the removal hint. The live links work only after the owner
+      pushes and the deploy runs; on `npm run preview` both URLs work (`?demo` and `sample-backup.json`).
+- [ ] The iOS home-screen result is recorded in the parking lot. **Owner, on an iPhone** (needs the deployed site).
+- [ ] Offline `?demo` works on the iPhone. **Owner, on an iPhone.** Checked in desktop headless Chrome: with the
+      service worker installed and the network off, `?demo` loads with cached prices.
+- [ ] The sample file downloads and loads on the iPhone. **Owner, on an iPhone.** Checked in desktop headless Chrome
+      (download URL, Load backup twice, remove the Demo accounts in Settings).
+- [x] Plan status `Shipped`; board all `Done`.
 
 ## Verification
 
@@ -72,8 +75,36 @@ Manual: the device checks in step 2.
 
 _(Append a dated entry before you stop, even mid-task: what is done, what is next, surprises.)_
 
+- **2026-10-12** — Done, except the iPhone checks, which need the owner and the deployed site. README "Try it" now
+  has the demo link, the sample file (site and GitHub), the merge warning and how to remove the `Demo…` accounts; the
+  "Develop" section says to run `npm test -- -u` after changing `src/state/demoData.ts`.
+  Checked in headless Chrome on `npm run preview`: the manifest `start_url` is `/trade-journal/` (no `?demo`, so a
+  Chrome install opens the real app); offline `?demo` loads from the service worker with cached prices; after loading
+  the sample, Settings → Accounts removes `Demo Swing`.
+  **Owner, after the deploy:** the iPhone steps in step 2 (Safari demo + Exit demo, Add to Home Screen from `?demo` →
+  record in [04-ios-home-screen-from-demo.md](../parking-lot/04-ios-home-screen-from-demo.md), offline `?demo`, the
+  sample file from the Files app in a private tab). Also check the storage chips in the demo when the storage-tags UI
+  is on `main`.
+
+  Text for Telegram (English):
+
+  > Want to try my trade journal? Two safe ways:
+  > 1. Demo with sample data, nothing is saved and your own data is not touched:
+  >    https://stanislavsav.github.io/trade-journal/?demo
+  > 2. To test backups: download https://stanislavsav.github.io/trade-journal/sample-backup.json and load it with
+  >    Backup → Load backup. It merges into the data in that browser, so use a private window.
+
+  Text for Telegram (Ukrainian):
+
+  > Хочете спробувати мій журнал угод? Є два безпечні способи:
+  > 1. Демо з прикладом даних: нічого не зберігається, Ваші власні дані не змінюються:
+  >    https://stanislavsav.github.io/trade-journal/?demo
+  > 2. Щоб перевірити резервні копії: завантажте https://stanislavsav.github.io/trade-journal/sample-backup.json і
+  >    відкрийте його через «Бекап → Завантажити копію». Файл об’єднається з даними в цьому браузері, тому
+  >    відкрийте застосунок у приватному вікні.
+
 ## Status
 
 | Status      | Progress % | Time spent | Tokens spent |
 | ----------- | ---------- | ---------- | ------------ |
-| Not started | 0%         | 0h         | 0            |
+| Done        | 100%       | 0.5h       | —            |
